@@ -7,10 +7,15 @@ import { Card, PageHead, ScoreBadge, btn, btnPrimary } from "@/components/ui";
 
 export default function Reports() {
   const { tracked, reports, saveReport, filters } = useApp();
+  // `filters` changes identity when feedback is added, which must refresh this.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const s = useMemo(() => summarize(DEFAULT_FILTERS), [filters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const ranked = useMemo(() => rankIssues(DEFAULT_FILTERS), [filters]);
   const top = ranked.slice(0, 5);
   const [date, setDate] = useState("");
+  // Date is read after mount: reading the clock during render is not allowed in a prerendered page.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setDate(new Date().toLocaleDateString("en-US", { dateStyle: "long" })), []);
   const net = pct(s.sentiment.positive, s.total) - pct(s.sentiment.negative, s.total);
 

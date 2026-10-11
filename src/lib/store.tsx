@@ -21,6 +21,8 @@ function usePersisted<T>(key: string, init: T) {
   const [v, setV] = useState<T>(init);
   const [ready, setReady] = useState(false);
   useEffect(() => {
+    // Load after mount so server and first client render match (localStorage is client-only).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     try { const s = localStorage.getItem(key); if (s) setV(JSON.parse(s)); } catch {}
     setReady(true);
   }, [key]);
@@ -37,6 +39,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Aggregates read user feedback from a module-level list, so set it during render and
   // give `filters` a new identity whenever it changes: every memo keyed on `filters` recomputes.
   setUserReviews(user);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const filters = useMemo(() => ({ ...filtersRaw }), [filtersRaw, user]);
   const addUser = (r: Review[]) => setUser((u) => [...u, ...r].slice(-3000));
   const clearUser = () => setUser([]);

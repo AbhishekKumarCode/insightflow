@@ -30,6 +30,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const { filters, setFilters, tracked, setImportOpen, user } = useApp();
+  // `filters` changes identity when feedback is added, which must refresh this.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const all = useMemo(() => summarize(DEFAULT_FILTERS), [filters]);
   const { positive, neutral, negative } = all.sentiment;
 

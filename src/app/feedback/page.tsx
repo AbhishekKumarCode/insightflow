@@ -1,9 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Plus, ListPlus, Check } from "lucide-react";
 import { filterReviews, issueById, fmt } from "@/lib/data";
 import { useApp } from "@/lib/store";
-import { Card, PageHead, SentimentPill, Chip, btn, btnPrimary } from "@/components/ui";
+import { Card, PageHead, SentimentPill, Chip, btn } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
 
 const PAGE = 15;

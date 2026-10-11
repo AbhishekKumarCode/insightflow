@@ -10,6 +10,8 @@ const STATUSES: TrackedStatus[] = ["New", "Investigating", "In progress", "Resol
 
 export default function Tracker() {
   const { tracked, updateTracked, untrack, ready, filters } = useApp();
+  // `filters` changes identity when feedback is added, which must refresh this.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const score = useMemo(() => Object.fromEntries(rankIssues(DEFAULT_FILTERS).map((i) => [i.id, i.score])), [filters]);
   return (
     <>
