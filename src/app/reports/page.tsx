@@ -37,21 +37,21 @@ export default function Reports() {
           <button className={btnPrimary} onClick={() => saveReport({ id: crypto.randomUUID(), title: `Insight report, ${date}`, createdAt: new Date().toISOString(), topIssueIds: top.map((i) => i.id) })}><Save size={16} />Save report</button>
         </div>} />
 
-      <article className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_1px_2px_rgba(15,18,38,0.04)]">
-        <div className="report-mast bg-ink2 px-8 py-9 text-white md:px-12">
-          <p className="text-sm text-slate-400">InsightFlow briefing, {date}</p>
-          <h2 className="mt-3 max-w-lg text-[32px] font-semibold leading-[1.1]">{top[0] ? `Start with ${top[0].name.toLowerCase()}.` : "No negative feedback to report."}</h2>
-          <dl className="mt-7 grid grid-cols-3 gap-4 border-t border-white/10 pt-5">
-            <div><dt className="text-xs text-slate-400">Reviews analyzed</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{fmt(s.total)}</dd></div>
-            <div><dt className="text-xs text-slate-400">Negative</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{pct(s.sentiment.negative, s.total)}%</dd></div>
-            <div><dt className="text-xs text-slate-400">Net sentiment</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{net > 0 ? "+" : ""}{net}</dd></div>
+      <article className="mx-auto max-w-3xl overflow-hidden rounded-lg border border-line bg-white">
+        <div className="report-mast border-b border-stone-900 px-8 pb-7 pt-9 md:px-12">
+          <p className="text-sm text-muted">InsightFlow report, {date}</p>
+          <h2 className="mt-3 max-w-lg text-[30px] font-semibold leading-[1.15]">{top[0] ? `Start with ${top[0].name.toLowerCase()}.` : "No negative feedback to report."}</h2>
+          <dl className="mt-6 grid grid-cols-3 gap-4">
+            <div><dt className="text-xs text-muted">Reviews analyzed</dt><dd className="mt-1 text-2xl font-semibold tabular-nums">{fmt(s.total)}</dd></div>
+            <div><dt className="text-xs text-muted">Negative</dt><dd className="mt-1 text-2xl font-semibold tabular-nums">{pct(s.sentiment.negative, s.total)}%</dd></div>
+            <div><dt className="text-xs text-muted">Net sentiment</dt><dd className="mt-1 text-2xl font-semibold tabular-nums">{net > 0 ? "+" : ""}{net}</dd></div>
           </dl>
         </div>
 
         <div className="space-y-9 px-8 py-9 md:px-12">
           <section>
-            <h3 className="font-display text-xl font-semibold">Summary</h3>
-            <p className="mt-2 max-w-prose text-[15px] leading-relaxed text-slate-700">
+            <h3 className="text-lg font-semibold">Summary</h3>
+            <p className="mt-2 max-w-prose text-[15px] leading-relaxed text-stone-700">
               Of {fmt(s.total)} reviews ({s.unique} distinct after cleaning), {pct(s.sentiment.positive, s.total)}% are positive and {pct(s.sentiment.negative, s.total)}% negative.
               {top[0] && <> The most-reported problem is {top[0].name.toLowerCase()}, with {fmt(top[0].negative)} negative reviews.</>}
               {fraudInTop > 0 && <> {fraudInTop} of the top {top.length} issues involve fraud, which carries the highest severity.</>}
@@ -59,33 +59,33 @@ export default function Reports() {
           </section>
 
           <section>
-            <h3 className="font-display text-xl font-semibold">Decisions, in order</h3>
+            <h3 className="text-lg font-semibold">Priorities</h3>
             <ol className="mt-4 space-y-6">
               {top.map((i, n) => (
                 <li key={i.id} className="flex gap-4">
                   <ScoreRing score={i.score} />
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold"><span className="text-muted">{n + 1}.</span> {i.name}</p>
-                    <p className="mt-1 max-w-prose text-sm leading-relaxed text-slate-700">{i.recommendation?.why}</p>
-                    <ul className="mt-2 space-y-1 text-sm text-slate-700">{i.recommendation?.actions.map((a) => <li key={a} className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-indigo-400" />{a}</li>)}</ul>
-                    {i.quotes[0] && <blockquote className="mt-3 border-l-2 border-rose-300 pl-3 text-sm italic text-slate-600">“{i.quotes[0].text}” <span className="not-italic text-muted">reported {fmt(i.quotes[0].count)}×</span></blockquote>}
+                    <p className="mt-1 max-w-prose text-sm leading-relaxed text-stone-700">{i.recommendation?.why}</p>
+                    <ul className="mt-2 space-y-1 text-sm text-stone-700">{i.recommendation?.actions.map((a) => <li key={a} className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-stone-500" />{a}</li>)}</ul>
+                    {i.quotes[0] && <blockquote className="mt-3 border-l-2 border-rose-300 pl-3 text-sm italic text-stone-600">“{i.quotes[0].text}” <span className="not-italic text-muted">reported {fmt(i.quotes[0].count)}×</span></blockquote>}
                   </div>
                 </li>))}
             </ol>
           </section>
 
-          {tracked.length > 0 && <section><h3 className="font-display text-xl font-semibold">Already in progress</h3>
-            <ul className="mt-3 divide-y divide-slate-100 text-sm">{tracked.map((t) => <li key={t.issueId} className="flex gap-3 py-2"><span className="flex-1">{issueById(t.issueId).name}</span><span className="text-muted">{t.status}{t.owner && `, ${t.owner}`}</span></li>)}</ul></section>}
+          {tracked.length > 0 && <section><h3 className="text-lg font-semibold">Already in progress</h3>
+            <ul className="mt-3 divide-y divide-stone-100 text-sm">{tracked.map((t) => <li key={t.issueId} className="flex gap-3 py-2"><span className="flex-1">{issueById(t.issueId).name}</span><span className="text-muted">{t.status}{t.owner && `, ${t.owner}`}</span></li>)}</ul></section>}
 
-          <footer className="border-t border-slate-200 pt-5 text-xs leading-relaxed text-muted">
-            <p><b className="font-medium text-slate-600">Method.</b> Priority score = 100 × (0.40 reach + 0.35 consistency + 0.25 severity). It ranks issues and is not a measurement. Repeated reviews count at their original numbers.</p>
+          <footer className="border-t border-stone-200 pt-5 text-xs leading-relaxed text-muted">
+            <p><b className="font-medium text-stone-600">Method.</b> Priority score = 100 × (0.40 volume + 0.35 negative share + 0.25 severity). It ranks issues and is not a measurement. Repeated reviews count at their original numbers.</p>
             <p className="mt-1">The sample data has no dates, so trend charts use a simulated 13-week timeline.</p>
           </footer>
         </div>
       </article>
 
-      {reports.length > 0 && <Card className="no-print mx-auto mt-6 max-w-3xl"><h3 className="font-display text-lg font-semibold">Saved reports</h3>
-        <ul className="mt-2 divide-y divide-slate-100 text-sm">{reports.map((r) => <li key={r.id} className="py-2.5">{r.title}<span className="ml-2 text-muted">{new Date(r.createdAt).toLocaleString()}</span></li>)}</ul></Card>}
+      {reports.length > 0 && <Card className="no-print mx-auto mt-6 max-w-3xl"><h3 className="text-lg font-semibold">Saved reports</h3>
+        <ul className="mt-2 divide-y divide-stone-100 text-sm">{reports.map((r) => <li key={r.id} className="py-2.5">{r.title}<span className="ml-2 text-muted">{new Date(r.createdAt).toLocaleString()}</span></li>)}</ul></Card>}
     </>
   );
 }

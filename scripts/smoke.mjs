@@ -9,7 +9,7 @@ await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
 ok("overview shows 7,000", await p.getByText("7,000").first().isVisible());
 await p.getByLabel("Category").selectOption("Fraud and Scam");
 ok("category filter changes total to 1,755", await p.getByText("1,755").first().isVisible());
-ok("top issue is fraud", (await p.locator("ol").first().innerText()).includes("Charged but order never arrived"));
+ok("top issue is fraud", (await p.locator("tbody tr").first().innerText()).includes("Charged but order never arrived"));
 await p.getByLabel("Sentiment").selectOption("positive");
 ok("positive+fraud shows 326", await p.getByText("326").first().isVisible());
 await p.getByText("Clear filters").click();

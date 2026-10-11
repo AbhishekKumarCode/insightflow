@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f3f5fa;
-  --foreground: #0f172a;
+  --background: #f7f7f5;
+  --foreground: #111111;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-brand: #4f46e5;
-  --color-brand-soft: #eef0ff;
-  --color-ink: #151a33;
-  --color-muted: #64748b;
-  --color-line: #e2e8f0;
-  --color-pos: #16a34a;
-  --color-neu: #d97706;
-  --color-neg: #dc2626;
-  --color-ink2: #0f1226;
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #111111;
+  --color-brand-soft: #ecece8;
+  --color-ink: #111111;
+  --color-muted: #6b6b66;
+  --color-line: #e3e3df;
+  --color-pos: #2f8f5b;
+  --color-neu: #c98a1b;
+  --color-neg: #c8372d;
+  --color-ink2: #111111;
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
   --radius-card: 12px;
   --radius-ctl: 8px;
 }
@@ -50,25 +50,25 @@ body {
 .stagger > *:nth-child(5) { animation-delay: 240ms; } .stagger > *:nth-child(6) { animation-delay: 300ms; }
 .stagger > *:nth-child(n + 7) { animation-delay: 360ms; }
 
-.grow { transform-origin: left; animation: grow 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both; }
+.grow { transform-origin: left; }
 .step-in { animation: fade-up 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 110ms); }
 .pop-in { animation: pop 0.4s ease-out both; animation-delay: calc(var(--i, 0) * 110ms + 120ms); }
 .tab-pane { animation: fade-up 0.25s ease-out both; }
-.pulse { animation: pulse-ring 1.6s ease-out infinite; }
+.pulse { }
 
 dialog[open] { animation: dialog-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1); }
 dialog[open]::backdrop { animation: fade 0.24s ease-out; }
 
 tbody tr { transition: background-color 0.15s; }
-tbody tr:hover { background-color: #f8fafc; }
+tbody tr:hover { background-color: #f1f1ee; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
 }
 
-.font-display { letter-spacing: -0.025em; }
-h1, h2 { letter-spacing: -0.02em; }
-:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+.font-display { letter-spacing: -0.01em; }
+h1, h2 { letter-spacing: -0.01em; }
+:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
 
 @media print {
   .bg-ink2, .bg-white, [class*="bg-"] { -webkit-print-color-adjust: exact; print-color-adjust: exact; }

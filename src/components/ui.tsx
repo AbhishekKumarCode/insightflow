@@ -1,7 +1,7 @@
 import type { Sentiment } from "@/lib/data";
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <section className={`rounded-2xl border border-slate-200/70 bg-white p-5 shadow-[0_1px_2px_rgba(15,18,38,0.04)] ${className}`}>{children}</section>;
+  return <section className={`rounded-lg border border-stone-200/70 bg-white p-5 ${className}`}>{children}</section>;
 }
 export function PageHead({ title, sub, right }: { title: string; sub: string; right?: React.ReactNode }) {
   return (
@@ -16,15 +16,15 @@ export function SentimentPill({ s }: { s: Sentiment }) {
   return <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${SENT[s]}`}>{s}</span>;
 }
 export function Chip({ children }: { children: React.ReactNode }) {
-  return <span className="inline-block rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{children}</span>;
+  return <span className="inline-block rounded-md bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-600">{children}</span>;
 }
 export function ScoreBadge({ score }: { score: number }) {
   return <span className="inline-block whitespace-nowrap rounded-md bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand">Priority {score}</span>;
 }
-export const btn = "inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50 disabled:opacity-50";
-export const btnPrimary = "inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50";
+export const btn = "inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-sm font-medium hover:bg-stone-50 disabled:opacity-50";
+export const btnPrimary = "inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white hover:bg-stone-900 disabled:opacity-50";
 
-export const tier = (score: number) => (score >= 85 ? "#f43f5e" : score >= 70 ? "#f59e0b" : "#6366f1");
+export const tier = (score: number) => (score >= 85 ? "#c8372d" : score >= 70 ? "#c98a1b" : "#6b6b66");
 /** Score as a ring: the arc fills in proportion to the 0-100 score. */
 export function ScoreRing({ score, size = 44 }: { score: number; size?: number }) {
   const r = (size - 6) / 2, c = 2 * Math.PI * r;
@@ -34,7 +34,7 @@ export function ScoreRing({ score, size = 44 }: { score: number; size?: number }
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e2e8f0" strokeWidth="4" />
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={tier(score)} strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - score / 100)} />
       </svg>
-      <span className="font-display absolute text-[13px] font-semibold tabular-nums">{score}</span>
+      <span className="absolute text-[13px] font-semibold tabular-nums">{score}</span>
     </span>
   );
 }
