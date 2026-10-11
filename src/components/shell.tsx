@@ -16,14 +16,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const { filters, setFilters } = useApp();
-  if (path === "/") return <>{children}</>;
+  
   return (
     <div className="flex min-h-screen">
       <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-line bg-white p-4 gap-1 sticky top-0 h-screen">
-        <Link href="/" className="flex items-center gap-2 px-2 py-3 text-lg font-semibold">
+        <Link href="/import" className="flex items-center gap-2 px-2 py-3 text-lg font-semibold">
           <span className="grid size-8 place-items-center rounded-lg bg-brand text-white"><Sparkles size={16} /></span>InsightFlow
         </Link>
-        <Link href="/" className="mb-3 flex items-center justify-center gap-2 rounded-lg bg-brand px-3 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
+        <Link href="/import" className="mb-3 flex items-center justify-center gap-2 rounded-lg bg-brand px-3 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
           <Upload size={16} /> Import data
         </Link>
         {NAV.map(({ href, label, icon: Icon }) => {
