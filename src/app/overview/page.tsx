@@ -72,7 +72,7 @@ export default function Overview() {
         <div className="space-y-6">
           {top && (
             <section className="grid text-white lg:grid-cols-[1.05fr_1fr]">
-              <div className="flex flex-col rounded-t-3xl bg-hero p-7 md:p-9 lg:rounded-3xl">
+              <div className="flex flex-col rounded-t-3xl bg-hero p-7 md:p-9 lg:rounded-3xl lg:rounded-tr-none">
                 <div className="flex items-start justify-between gap-4">
                   <p className="text-sm text-white/70">What to fix first</p>
                   <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium">{top.category}</span>
@@ -99,7 +99,7 @@ export default function Overview() {
               </div>
 
               <div className="flex flex-col">
-                <div className="flex items-start justify-between gap-4 bg-hero px-7 pb-6 pt-7 md:px-9 md:pt-9 lg:rounded-br-3xl">
+                <div className="flex items-start justify-between gap-4 bg-hero px-7 pb-6 pt-7 md:px-9 md:pt-9 lg:rounded-tr-3xl lg:rounded-br-3xl">
                   <div>
                     <h3 className="text-lg font-semibold">Pressure board</h3>
                     <p className="mt-1 text-sm text-white/70">The five issues that need attention soonest.</p>
