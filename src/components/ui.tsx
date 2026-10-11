@@ -1,12 +1,12 @@
 import type { Sentiment } from "@/lib/data";
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <section className={`rounded-xl border border-line bg-white p-5 ${className}`}>{children}</section>;
+  return <section className={`rounded-2xl border border-slate-200/70 bg-white p-5 shadow-[0_1px_2px_rgba(15,18,38,0.04)] ${className}`}>{children}</section>;
 }
 export function PageHead({ title, sub, right }: { title: string; sub: string; right?: React.ReactNode }) {
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-      <div><h1 className="text-2xl font-semibold tracking-tight">{title}</h1><p className="mt-1 text-sm text-muted">{sub}</p></div>
+      <div><h1 className="text-[28px] font-semibold leading-tight">{title}</h1><p className="mt-1 text-sm text-muted">{sub}</p></div>
       {right}
     </div>
   );

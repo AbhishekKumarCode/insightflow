@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f9fc;
+  --background: #f3f5fa;
   --foreground: #0f172a;
 }
 
@@ -10,13 +10,15 @@
   --color-foreground: var(--foreground);
   --color-brand: #4f46e5;
   --color-brand-soft: #eef0ff;
-  --color-ink: #0f172a;
+  --color-ink: #151a33;
   --color-muted: #64748b;
   --color-line: #e2e8f0;
   --color-pos: #16a34a;
   --color-neu: #d97706;
   --color-neg: #dc2626;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-ink2: #0f1226;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   --radius-card: 12px;
   --radius-ctl: 8px;
 }
@@ -63,3 +65,7 @@ tbody tr:hover { background-color: #f8fafc; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
 }
+
+.font-display { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.02em; }
+h1, h2 { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.015em; }
+:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }

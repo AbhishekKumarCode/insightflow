@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { ArrowRight } from "lucide-react";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
+import { Area, AreaChart, CartesianGrid, Cell, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
 import { rankIssues, summarize, pct, fmt, issueById, DATA } from "@/lib/data";
 import { ShieldAlert, ThumbsUp, TrendingDown } from "lucide-react";
 import { useApp } from "@/lib/store";
@@ -53,40 +53,66 @@ export default function Overview() {
       {empty ? (
         <Card className="py-16 text-center text-muted">No feedback matches these filters. <span className="text-brand">Clear filters</span> to see everything.</Card>
       ) : (
-        <div className="stagger space-y-6">
-          <Card>
-            <div className="mb-4 flex items-start justify-between">
-              <div><h2 className="text-lg font-semibold">What to fix first</h2><p className="text-sm text-muted">Ranked by priority score: negative volume, negative share and severity.</p></div>
-              <Link href="/priorities" className="flex items-center gap-1 text-sm font-medium text-brand">View all priorities <ArrowRight size={14} /></Link>
-            </div>
-            {ranked.length === 0 ? <p className="text-sm text-muted">No negative feedback in this selection.</p> : (
-              <ol className="divide-y divide-line rounded-lg border border-line">
-                {ranked.slice(0, 3).map((i, n) => (
-                  <li key={i.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
-                    <span className="grid size-6 place-items-center rounded-full bg-slate-100 text-xs font-semibold">{n + 1}</span>
-                    <span className="font-medium">{i.name}</span><ScoreBadge score={i.score} />
-                    <span className="ml-auto text-sm text-muted">{fmt(i.negative)} negative reviews · {i.category}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </Card>
+        <div className="space-y-6">
+          {top && (
+            <section className="grid overflow-hidden rounded-3xl bg-ink2 text-white lg:grid-cols-[1.05fr_1fr]">
+              <div className="flex flex-col p-7 md:p-9">
+                <p className="text-sm text-slate-400">What to fix first</p>
+                <h2 className="mt-3 text-[34px] font-semibold leading-[1.08] md:text-[40px]">{top.name}</h2>
+                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-300">
+                  {fmt(top.negative)} customers reported this, {pct(top.negative, top.rows)}% of them negative. It sits in {top.category}
+                  {top.severity >= 0.85 ? ", where each case means lost money or trust" : ""}. Priority {top.score} of 100.
+                </p>
+                <div className="mt-auto flex flex-wrap items-center gap-3 pt-7">
+                  <Link href="/priorities" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ink2 transition hover:bg-slate-100">See why it ranks first <ArrowRight size={16} /></Link>
+                  <button onClick={() => track(top.id)} disabled={tracked.some((t) => t.issueId === top.id)} className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-60">
+                    {tracked.some((t) => t.issueId === top.id) ? "Tracking" : "Track this issue"}
+                  </button>
+                </div>
+              </div>
+              <div className="border-t border-white/10 bg-white/[0.04] p-7 md:p-9 lg:border-l lg:border-t-0">
+                <div className="flex items-baseline justify-between"><h3 className="text-sm font-medium text-slate-300">Pressure board</h3>
+                  <Link href="/priorities" className="text-xs text-indigo-300 hover:underline">All {ranked.length} issues</Link></div>
+                <ol className="mt-4 space-y-4">
+                  {ranked.slice(0, 5).map((i, n) => (
+                    <li key={i.id}>
+                      <div className="flex items-baseline gap-3 text-sm">
+                        <span className="w-4 text-slate-500 tabular-nums">{n + 1}</span>
+                        <span className="flex-1 font-medium text-slate-100">{i.name}</span>
+                        <span className="font-display text-lg font-semibold tabular-nums">{i.score}</span>
+                      </div>
+                      <div className="ml-7 mt-1.5 h-2 rounded-full bg-white/10">
+                        <div className="grow h-2 rounded-full" style={{ width: `${Math.max(6, i.inputs.volume * 100)}%`, background: i.severity >= 0.85 ? "#fb7185" : i.severity >= 0.7 ? "#fbbf24" : "#a5b4fc", animationDelay: `${0.25 + n * 0.09}s` }} />
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+                  <span>Bar length: how many reported it</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-rose-400" />Money or trust</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-amber-400" />Broken or unresolved</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-indigo-300" />Inconvenience</span>
+                </p>
+              </div>
+            </section>
+          )}
+          {!top && <Card><h2 className="text-lg font-semibold">What to fix first</h2><p className="mt-1 text-sm text-muted">No negative feedback in this selection.</p></Card>}
 
-          <div className="stagger grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <Kpi label="Total feedback" num={s.total} sub={`${s.unique} unique reviews`} />
+          <section className="grid grid-cols-2 divide-slate-200/80 rounded-2xl border border-slate-200/70 bg-white lg:grid-cols-4 lg:divide-x [&>*:nth-child(-n+2)]:border-b [&>*:nth-child(-n+2)]:border-slate-200/80 lg:[&>*:nth-child(-n+2)]:border-b-0">
+            <Kpi label="Total feedback" num={s.total} sub={`${s.unique} distinct reviews`} />
             <Kpi label="Net sentiment" num={net} format={(n) => `${Math.round(n) > 0 ? "+" : ""}${Math.round(n)}`} sub="Positive % minus negative %" />
             <Kpi label="Negative share" num={pct(s.sentiment.negative, s.total)} format={(n) => `${Math.round(n)}%`} sub={`${fmt(s.sentiment.negative)} reviews`} />
-            <Kpi label="Top issue" text={top?.name ?? "None"} sub={top ? `Priority ${top.score}` : "No negative feedback"} />
-          </div>
+            <Kpi label="Issues ranked" num={ranked.length} sub={top ? `Highest priority ${top.score}` : "None"} />
+          </section>
 
-          <div className="stagger grid gap-4 md:grid-cols-3">
+          <section className="grid divide-slate-200/80 rounded-2xl border border-slate-200/70 bg-white md:grid-cols-3 md:divide-x">
             {insights.map(({ icon: Icon, tone, title, body }) => (
-              <Card key={title} className="flex gap-3 !p-4">
-                <span className={`grid size-9 shrink-0 place-items-center rounded-lg ${tone}`}><Icon size={18} /></span>
-                <div><p className="text-sm font-semibold">{title}</p><p className="mt-0.5 text-sm text-muted">{body}</p></div>
-              </Card>
+              <div key={title} className="flex gap-3 p-5">
+                <Icon size={18} className={`mt-0.5 shrink-0 ${tone.split(" ")[0]}`} />
+                <div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-sm leading-relaxed text-muted">{body}</p></div>
+              </div>
             ))}
-          </div>
+          </section>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
@@ -133,21 +159,6 @@ export default function Overview() {
                   <Area yAxisId="l" dataKey="volume" name="Feedback volume" stroke="#4f46e5" fill="#eef0ff" strokeWidth={2} />
                   <Line yAxisId="r" dataKey="negPct" name="Negative %" stroke="#dc2626" strokeWidth={2} dot={false} />
                 </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <Card>
-            <h2 className="text-lg font-semibold">Most reported problems</h2>
-            <div className="mt-3 h-72">
-              <ResponsiveContainer>
-                <BarChart data={[...ranked].sort((a, b) => b.negative - a.negative).slice(0, 8).map((i) => ({ name: i.name, n: i.negative }))} layout="vertical" margin={{ left: 40 }}>
-                  <CartesianGrid horizontal={false} stroke="#e2e8f0" />
-                  <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis type="category" dataKey="name" width={220} tickLine={false} axisLine={false} fontSize={12} />
-                  <Tooltip formatter={(v) => [fmt(Number(v)), "Negative reviews"]} />
-                  <Bar dataKey="n" fill="#4f46e5" radius={[0, 6, 6, 0]} />
-                </BarChart>
               </ResponsiveContainer>
             </div>
           </Card>
@@ -231,10 +242,10 @@ export default function Overview() {
 
 function Kpi({ label, num, format = fmt, text, sub }: { label: string; num?: number; format?: (n: number) => string; text?: string; sub: string }) {
   return (
-    <Card>
+    <div className="p-5 md:p-6">
       <p className="text-sm text-muted">{label}</p>
-      <p className={`mt-2 font-semibold tracking-tight ${text ? "text-lg leading-snug" : "text-3xl tabular-nums"}`}>{text ?? <CountUp value={num ?? 0} format={format} />}</p>
-      <p className="mt-1 text-xs text-muted">{sub}</p>
-    </Card>
+      <p className="font-display mt-1.5 text-[34px] font-semibold leading-none tabular-nums">{text ?? <CountUp value={num ?? 0} format={format} />}</p>
+      <p className="mt-2 text-xs text-muted">{sub}</p>
+    </div>
   );
 }
