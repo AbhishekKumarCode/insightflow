@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, MessageSquare, Flag, ListChecks, FileText, Upload, Search, Sparkles } from "lucide-react";
+import { BarChart3, MessageSquare, Flag, ListChecks, FileText, Upload, Search, Sparkles, Database, FilePlus2 } from "lucide-react";
 import { useApp } from "@/lib/store";
 
 const NAV = [
@@ -15,7 +15,7 @@ const NAV = [
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
-  const { filters, setFilters } = useApp();
+  const { filters, setFilters, tracked } = useApp();
   
   return (
     <div className="flex min-h-screen">
@@ -45,6 +45,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
               placeholder="Search feedback or issues…" aria-label="Search feedback"
               className="w-full rounded-lg border border-line bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
           </label>
+          <div className="ml-auto flex items-center gap-2 md:gap-3">
+            <span className="hidden items-center gap-2 rounded-full border border-line bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 lg:flex">
+              <Database size={14} className="text-brand" />Sample dataset · 7,000 reviews
+            </span>
+            <Link href="/tracker" aria-label={`${tracked.length} tracked issues`} className="relative grid size-9 place-items-center rounded-lg border border-line text-slate-600 hover:bg-slate-50">
+              <ListChecks size={18} />
+              {tracked.length > 0 && <span className="absolute -right-1.5 -top-1.5 grid min-w-5 place-items-center rounded-full bg-brand px-1 text-[11px] font-semibold text-white">{tracked.length}</span>}
+            </Link>
+            <Link href="/reports" className="hidden items-center gap-2 rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 sm:flex"><FilePlus2 size={16} />Create report</Link>
+            <span aria-hidden className="grid size-9 place-items-center rounded-full bg-brand-soft text-sm font-semibold text-brand">AK</span>
+          </div>
         </header>
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>

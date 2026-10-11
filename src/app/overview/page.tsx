@@ -3,15 +3,16 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { ArrowRight } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
-import { rankIssues, summarize, pct, fmt, WEEKS, DATA } from "@/lib/data";
+import { rankIssues, summarize, pct, fmt, issueById, DATA } from "@/lib/data";
+import { ShieldAlert, ThumbsUp, TrendingDown } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { Card, PageHead, ScoreBadge, btn } from "@/components/ui";
+import { Card, PageHead, ScoreBadge } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
 
 const COLORS = { positive: "#16a34a", neutral: "#d97706", negative: "#dc2626" };
 
 export default function Overview() {
-  const { filters: f } = useApp();
+  const { filters: f, tracked } = useApp();
   const s = useMemo(() => summarize(f), [f]);
   const ranked = useMemo(() => rankIssues(f), [f]);
   const net = pct(s.sentiment.positive, s.total) - pct(s.sentiment.negative, s.total);
@@ -21,10 +22,31 @@ export default function Overview() {
   const top = ranked[0];
   const empty = s.total === 0;
 
+  // Derived panels, all computed from the filtered rows.
+  const negTotal = s.sentiment.negative;
+  const fraudNeg = s.rows.filter((x) => x.r.sentiment === "negative" && x.r.category === "Fraud and Scam").reduce((a, x) => a + x.w, 0);
+  const loved: Record<string, number> = {};
+  const catSent: Record<string, { positive: number; neutral: number; negative: number }> = {};
+  const issueWeekly: Record<string, number[]> = {};
+  for (const { r, w } of s.rows) {
+    (catSent[r.category] ??= { positive: 0, neutral: 0, negative: 0 })[r.sentiment] += w;
+    if (r.sentiment === "positive") loved[r.issue] = (loved[r.issue] ?? 0) + w;
+    if (r.sentiment === "negative") {
+      const wk = (issueWeekly[r.issue] ??= Array(r.weekly.length).fill(0));
+      for (let i = f.from; i <= f.to; i++) wk[i] += r.weekly[i];
+    }
+  }
+  const lovedList = Object.entries(loved).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const worstCat = Object.entries(catSent).map(([c, v]) => ({ c, share: pct(v.negative, v.positive + v.neutral + v.negative) })).sort((a, b) => b.share - a.share)[0];
+  const insights = [
+    { icon: ShieldAlert, tone: "text-neg bg-red-50", title: "Fraud drives the risk", body: negTotal ? `${pct(fraudNeg, negTotal)}% of all negative reviews are in Fraud and Scam, the highest-severity category.` : "No negative feedback in this selection." },
+    { icon: TrendingDown, tone: "text-amber-600 bg-amber-50", title: "Most negative category", body: worstCat ? `${worstCat.c} is ${worstCat.share}% negative, the highest of any category.` : "No data." },
+    { icon: ThumbsUp, tone: "text-pos bg-green-50", title: "Strongest positive", body: lovedList[0] ? `${issueById(lovedList[0][0]).name}: ${fmt(lovedList[0][1])} positive reviews.` : "No positive feedback in this selection." },
+  ];
+
   return (
     <>
-      <PageHead title="Overview" sub="Sentiment, recurring issues and what to fix first, across all feedback."
-        right={<Link href="/reports" className={btn}>Create report</Link>} />
+      <PageHead title="Overview" sub="Sentiment, recurring issues and what to fix first, across all feedback." />
       <FilterBar />
       {empty ? (
         <Card className="py-16 text-center text-muted">No feedback matches these filters. <span className="text-brand">Clear filters</span> to see everything.</Card>
@@ -53,6 +75,15 @@ export default function Overview() {
             <Kpi label="Net sentiment" value={`${net > 0 ? "+" : ""}${net}`} sub="Positive % minus negative %" />
             <Kpi label="Negative share" value={`${pct(s.sentiment.negative, s.total)}%`} sub={`${fmt(s.sentiment.negative)} reviews`} />
             <Kpi label="Top issue" value={top?.name ?? "None"} sub={top ? `Priority ${top.score}` : "No negative feedback"} small />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {insights.map(({ icon: Icon, tone, title, body }) => (
+              <Card key={title} className="flex gap-3 !p-4">
+                <span className={`grid size-9 shrink-0 place-items-center rounded-lg ${tone}`}><Icon size={18} /></span>
+                <div><p className="text-sm font-semibold">{title}</p><p className="mt-0.5 text-sm text-muted">{body}</p></div>
+              </Card>
+            ))}
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
@@ -117,6 +148,61 @@ export default function Overview() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+          </Card>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <h2 className="text-lg font-semibold">Sentiment by category</h2>
+              <p className="text-sm text-muted">Each category mixes praise and complaints, so category alone does not tell you what is wrong.</p>
+              <div className="mt-4 space-y-4">
+                {Object.entries(catSent).map(([c, v]) => {
+                  const t = v.positive + v.neutral + v.negative;
+                  return (
+                    <div key={c}>
+                      <div className="mb-1 flex justify-between text-sm"><span>{c}</span><span className="text-muted">{pct(v.negative, t)}% negative</span></div>
+                      <div className="flex h-3 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${c}: ${pct(v.positive, t)}% positive, ${pct(v.negative, t)}% negative`}>
+                        <div style={{ width: `${pct(v.positive, t)}%`, background: COLORS.positive }} />
+                        <div style={{ width: `${pct(v.neutral, t)}%`, background: COLORS.neutral }} />
+                        <div style={{ width: `${pct(v.negative, t)}%`, background: COLORS.negative }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+            <Card>
+              <h2 className="text-lg font-semibold">What customers love</h2>
+              <p className="text-sm text-muted">The positive side, so you know what to protect.</p>
+              <ul className="mt-3 divide-y divide-line">
+                {lovedList.length === 0 && <li className="py-3 text-sm text-muted">No positive feedback in this selection.</li>}
+                {lovedList.map(([id, n]) => (
+                  <li key={id} className="flex items-center gap-3 py-2.5 text-sm">
+                    <ThumbsUp size={14} className="text-pos" /><span className="flex-1">{issueById(id).name}</span>
+                    <span className="text-muted">{issueById(id).category}</span><span className="w-14 text-right font-medium">{fmt(n)}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+
+          <Card className="!p-0 overflow-hidden">
+            <div className="px-5 pt-5"><h2 className="text-lg font-semibold">Issue watchlist</h2><p className="text-sm text-muted">Every ranked issue with its weekly negative volume (simulated timeline).</p></div>
+            <div className="overflow-x-auto"><table className="mt-3 w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-muted"><tr><th className="px-5 py-2">Issue</th><th className="px-3">Category</th><th className="px-3 text-right">Negative</th><th className="px-3">Weekly</th><th className="px-3">Score</th><th className="px-5 text-right">Status</th></tr></thead>
+              <tbody className="divide-y divide-line">
+                {ranked.map((i) => {
+                  const t = tracked.find((x) => x.issueId === i.id);
+                  const wk = (issueWeekly[i.id] ?? []).slice(f.from, f.to + 1).map((v, k) => ({ k, v }));
+                  return (
+                    <tr key={i.id}>
+                      <td className="px-5 py-2.5 font-medium">{i.name}</td><td className="px-3 text-muted">{i.category}</td>
+                      <td className="px-3 text-right tabular-nums">{fmt(i.negative)}</td>
+                      <td className="w-32 px-3"><div className="h-8 w-28"><ResponsiveContainer><AreaChart data={wk}><Area isAnimationActive={false} dataKey="v" stroke="#4f46e5" fill="#eef0ff" strokeWidth={1.5} /></AreaChart></ResponsiveContainer></div></td>
+                      <td className="px-3"><ScoreBadge score={i.score} /></td>
+                      <td className="px-5 text-right">{t ? <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-medium text-brand">{t.status}</span> : <Link href="/priorities" className="text-xs font-medium text-muted hover:text-brand">Not tracked</Link>}</td>
+                    </tr>);
+                })}
+              </tbody></table></div>
           </Card>
         </div>
       )}

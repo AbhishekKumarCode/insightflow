@@ -8,7 +8,7 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22
-      - key: ANTHROPIC_API_KEY
+      - key: DEEPSEEK_API_KEY
         sync: false
       - key: ADAPTION_API_KEY
         sync: false
