@@ -72,7 +72,7 @@ export default function Overview() {
         <div className="space-y-6">
           {top && (
             <section className="grid text-white lg:grid-cols-[1.05fr_1fr]">
-              <div className="flex flex-col rounded-t-3xl bg-hero p-7 md:p-9 lg:rounded-l-3xl lg:rounded-tr-none">
+              <div className="flex flex-col rounded-t-3xl bg-hero p-7 md:p-9 lg:rounded-l-3xl lg:rounded-tr-none lg:rounded-br-3xl">
                 <div className="flex items-start justify-between gap-4">
                   <p className="text-sm text-white/70">What to fix first</p>
                   <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium">{top.category}</span>
