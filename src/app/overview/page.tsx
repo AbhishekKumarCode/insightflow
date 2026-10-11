@@ -71,8 +71,8 @@ export default function Overview() {
       ) : (
         <div className="space-y-6">
           {top && (
-            <section className="grid overflow-hidden rounded-3xl bg-hero text-white lg:grid-cols-[1.05fr_1fr]">
-              <div className="flex flex-col p-7 md:p-9">
+            <section className="grid text-white lg:grid-cols-[1.05fr_1fr]">
+              <div className="flex flex-col rounded-t-3xl bg-hero p-7 md:p-9 lg:rounded-l-3xl lg:rounded-tr-none">
                 <div className="flex items-start justify-between gap-4">
                   <p className="text-sm text-white/70">What to fix first</p>
                   <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium">{top.category}</span>
@@ -99,14 +99,16 @@ export default function Overview() {
               </div>
 
               <div className="flex flex-col">
-                <div className="flex items-start justify-between gap-4 px-7 pb-6 pt-7 md:px-9 md:pt-9">
+                <div className="flex items-start justify-between gap-4 bg-hero px-7 pb-6 pt-7 md:px-9 md:pt-9 lg:rounded-tr-3xl">
                   <div>
                     <h3 className="text-lg font-semibold">Pressure board</h3>
                     <p className="mt-1 text-sm text-white/70">The five issues that need attention soonest.</p>
                   </div>
                   <Link href="/priorities" className="shrink-0 whitespace-nowrap text-sm font-medium text-indigo-200 hover:underline">All {ranked.length} issues</Link>
                 </div>
-                <div className="flex flex-1 flex-col rounded-l-3xl bg-white p-7 text-ink md:p-9">
+                <div className="relative flex flex-1">
+                  <span aria-hidden className="absolute left-0 top-0 size-6 bg-hero" />
+                <div className="relative flex flex-1 flex-col rounded-b-3xl bg-white p-7 text-ink md:p-9 lg:rounded-bl-none lg:rounded-tl-3xl">
                   <ol className="flex flex-1 flex-col justify-between gap-4">
                     {ranked.slice(0, 5).map((i, n) => (
                       <li key={i.id}>
@@ -127,6 +129,7 @@ export default function Overview() {
                     <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-amber-500" />Broken or unresolved</span>
                     <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-indigo-500" />Inconvenience</span>
                   </p>
+                </div>
                 </div>
               </div>
             </section>
