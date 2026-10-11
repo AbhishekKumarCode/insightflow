@@ -26,15 +26,15 @@ export const btnPrimary = "inline-flex items-center justify-center gap-2 rounded
 
 export const tier = (score: number) => (score >= 85 ? "#f43f5e" : score >= 70 ? "#f59e0b" : "#6366f1");
 /** Score as a ring: the arc fills in proportion to the 0-100 score. */
-export function ScoreRing({ score, size = 44 }: { score: number; size?: number }) {
+export function ScoreRing({ score, size = 44, dark = false }: { score: number; size?: number; dark?: boolean }) {
   const r = (size - 6) / 2, c = 2 * Math.PI * r;
   return (
     <span className="relative inline-grid shrink-0 place-items-center" style={{ width: size, height: size }} role="img" aria-label={`Priority ${score} of 100`}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e2e8f0" strokeWidth="4" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={dark ? "rgba(255,255,255,0.14)" : "#e2e8f0"} strokeWidth="4" />
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={tier(score)} strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - score / 100)} />
       </svg>
-      <span className="font-display absolute text-[13px] font-semibold tabular-nums">{score}</span>
+      <span className={`font-display absolute font-semibold tabular-nums ${dark ? "text-white" : ""}`} style={{ fontSize: size >= 52 ? 18 : 13 }}>{score}</span>
     </span>
   );
 }

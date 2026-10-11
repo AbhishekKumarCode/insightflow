@@ -6,7 +6,7 @@ import { Area, AreaChart, CartesianGrid, Cell, Line, Pie, PieChart, ResponsiveCo
 import { rankIssues, summarize, pct, fmt, issueById, DATA } from "@/lib/data";
 import { ShieldAlert, ThumbsUp, TrendingDown } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { Card, PageHead, ScoreBadge } from "@/components/ui";
+import { Card, PageHead, ScoreBadge, ScoreRing } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
 import { CountUp } from "@/components/count-up";
 import { CheckCircle2, ListPlus } from "lucide-react";
@@ -49,6 +49,22 @@ export default function Overview() {
   return (
     <>
       <PageHead title="Overview" sub="Sentiment, recurring issues and what to fix first, across all feedback." />
+      {ranked.length > 0 && (() => {
+        const top3 = ranked.slice(0, 3);
+        const left = top3.filter((i) => !tracked.some((t) => t.issueId === i.id));
+        return (
+          <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-indigo-200 bg-indigo-50/70 px-5 py-3.5">
+            <span className={`grid size-9 shrink-0 place-items-center rounded-full bg-brand text-white ${left.length ? "pulse" : ""}`}>{left.length ? <ListPlus size={20} /> : <CheckCircle2 size={20} />}</span>
+            <div className="min-w-56 flex-1">
+              <p className="font-semibold">{left.length ? "Recommended next step" : "Top issues are being tracked"}</p>
+              <p className="text-sm text-slate-600">{left.length ? `Start tracking the top ${top3.length}: ${top3.map((i) => i.name.toLowerCase()).join(", ")}.` : "Move them forward in the Tracker, then export a report for your team."}</p>
+            </div>
+            {left.length > 0 ? <button onClick={() => top3.forEach((i) => track(i.id))} className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Track top {top3.length} issues</button>
+              : <Link href="/tracker" className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Open Tracker <ArrowRight size={16} /></Link>}
+            <Link href="/reports" className="text-sm font-medium text-brand hover:underline">Create report</Link>
+          </div>
+        );
+      })()}
       <FilterBar />
       {empty ? (
         <Card className="py-16 text-center text-muted">No feedback matches these filters. <span className="text-brand">Clear filters</span> to see everything.</Card>
@@ -57,17 +73,24 @@ export default function Overview() {
           {top && (
             <section className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
               <div className="flex flex-col rounded-3xl bg-ink2 p-7 text-white md:p-9">
-                <p className="text-sm text-slate-400">What to fix first</p>
-                <h2 className="mt-3 text-[34px] font-semibold leading-[1.08] md:text-[40px]">{top.name}</h2>
-                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-300">
-                  It sits in {top.category}{top.severity >= 0.85 ? ", where each case means lost money or trust" : ""}.
-                </p>
+                <div className="flex items-start justify-between gap-4">
+                  <p className="text-sm text-slate-400">What to fix first</p>
+                  <ScoreRing score={top.score} size={56} dark />
+                </div>
+                <h2 className="mt-3 max-w-md text-[34px] font-semibold leading-[1.08] md:text-[40px]">{top.name}</h2>
+                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-300">{top.recommendation?.why ?? `It sits in ${top.category}.`}</p>
                 <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-white/10 pt-5">
                   <div><dt className="text-xs text-slate-400">Reported</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{fmt(top.negative)}</dd></div>
                   <div><dt className="text-xs text-slate-400">Negative</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{pct(top.negative, top.rows)}%</dd></div>
-                  <div><dt className="text-xs text-slate-400">Priority</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{top.score}<span className="text-base text-slate-500">/100</span></dd></div>
+                  <div><dt className="text-xs text-slate-400">Category</dt><dd className="mt-1 text-[15px] font-medium leading-snug">{top.category}</dd></div>
                 </dl>
-                <div className="mt-auto flex flex-wrap items-center gap-3 pt-7">
+                {top.recommendation?.actions[0] && (
+                  <div className="mt-5 rounded-2xl bg-white/[0.07] p-4">
+                    <p className="text-xs font-medium text-indigo-300">Do this first</p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-100">{top.recommendation.actions[0]}</p>
+                  </div>
+                )}
+                <div className="mt-auto flex flex-wrap items-center gap-3 pt-6">
                   <Link href="/priorities" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ink2 transition hover:bg-slate-100">See why it ranks first <ArrowRight size={16} /></Link>
                   <button onClick={() => track(top.id)} disabled={tracked.some((t) => t.issueId === top.id)} className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-60">
                     {tracked.some((t) => t.issueId === top.id) ? "Tracking" : "Track this issue"}
@@ -75,11 +98,11 @@ export default function Overview() {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200/70 bg-white p-7 md:p-9">
+              <div className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 md:p-9">
                 <div className="flex items-baseline justify-between"><h3 className="text-lg font-semibold">Pressure board</h3>
                   <Link href="/priorities" className="text-sm font-medium text-indigo-600 hover:underline">All {ranked.length} issues</Link></div>
                 <p className="mt-1 text-sm text-muted">The five issues that need attention soonest.</p>
-                <ol className="mt-5 space-y-4">
+                <ol className="mt-5 flex flex-1 flex-col justify-between gap-4">
                   {ranked.slice(0, 5).map((i, n) => (
                     <li key={i.id}>
                       <div className="flex items-baseline gap-3 text-sm">
@@ -104,22 +127,6 @@ export default function Overview() {
           )}
           {!top && <Card><h2 className="text-lg font-semibold">What to fix first</h2><p className="mt-1 text-sm text-muted">No negative feedback in this selection.</p></Card>}
 
-          {ranked.length > 0 && (() => {
-            const top3 = ranked.slice(0, 3);
-            const left = top3.filter((i) => !tracked.some((t) => t.issueId === i.id));
-            return (
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-indigo-200 bg-indigo-50/70 px-5 py-3.5">
-                <span className={`grid size-9 shrink-0 place-items-center rounded-full bg-brand text-white ${left.length ? "pulse" : ""}`}>{left.length ? <ListPlus size={20} /> : <CheckCircle2 size={20} />}</span>
-                <div className="min-w-56 flex-1">
-                  <p className="font-semibold">{left.length ? "Recommended next step" : "Top issues are being tracked"}</p>
-                  <p className="text-sm text-slate-600">{left.length ? `Start tracking the top ${top3.length}: ${top3.map((i) => i.name.toLowerCase()).join(", ")}.` : "Move them forward in the Tracker, then export a report for your team."}</p>
-                </div>
-                {left.length > 0 ? <button onClick={() => top3.forEach((i) => track(i.id))} className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Track top {top3.length} issues</button>
-                  : <Link href="/tracker" className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Open Tracker <ArrowRight size={16} /></Link>}
-                <Link href="/reports" className="text-sm font-medium text-brand hover:underline">Create report</Link>
-              </div>
-            );
-          })()}
 
           <section className="grid grid-cols-2 divide-slate-200/80 rounded-2xl border border-slate-200/70 bg-white lg:grid-cols-4 lg:divide-x [&>*:nth-child(-n+2)]:border-b [&>*:nth-child(-n+2)]:border-slate-200/80 lg:[&>*:nth-child(-n+2)]:border-b-0">
             <Kpi label="Total feedback" num={s.total} sub={`${s.unique} distinct reviews`} />
