@@ -99,7 +99,7 @@ export default function Overview() {
               </div>
 
               <div className="flex flex-col">
-                <div className="flex items-start justify-between gap-4 bg-hero px-7 pb-6 pt-7 md:px-9 md:pt-9 lg:rounded-tr-3xl lg:rounded-b-3xl">
+                <div className="flex items-start justify-between gap-4 bg-hero px-7 pb-6 pt-7 md:px-9 md:pt-9 lg:rounded-tr-3xl lg:rounded-br-3xl">
                   <div>
                     <h3 className="text-lg font-semibold">Pressure board</h3>
                     <p className="mt-1 text-sm text-white/70">The five issues that need attention soonest.</p>
@@ -107,7 +107,8 @@ export default function Overview() {
                   <Link href="/priorities" className="shrink-0 whitespace-nowrap text-sm font-medium text-indigo-200 hover:underline">All {ranked.length} issues</Link>
                 </div>
                 <div className="relative flex flex-1">
-                <div className="relative flex flex-1 flex-col rounded-b-3xl bg-white p-7 text-ink md:p-9 lg:rounded-bl-none">
+                  <span aria-hidden className="absolute left-0 top-0 size-8 bg-hero" />
+                <div className="relative flex flex-1 flex-col rounded-b-3xl bg-white p-7 text-ink md:p-9 lg:rounded-bl-none lg:rounded-tl-[2rem]">
                   <ol className="flex flex-1 flex-col justify-between gap-4">
                     {ranked.slice(0, 5).map((i, n) => (
                       <li key={i.id}>
