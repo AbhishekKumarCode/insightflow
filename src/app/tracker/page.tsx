@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useMemo } from "react";
-import { Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { GripVertical, Trash2 } from "lucide-react";
 import { issueById, rankIssues, DEFAULT_FILTERS, pct } from "@/lib/data";
 import { useApp, type TrackedStatus } from "@/lib/store";
 import { Card, PageHead, Chip, ScoreRing, btnPrimary } from "@/components/ui";
@@ -19,11 +19,14 @@ export default function Tracker() {
   // `filters` changes identity when feedback is added, which must refresh this.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const score = useMemo(() => Object.fromEntries(rankIssues(DEFAULT_FILTERS).map((i) => [i.id, i.score])), [filters]);
+  const [dragging, setDragging] = useState<string | null>(null);
+  const [over, setOver] = useState<TrackedStatus | null>(null);
+  const drop = (s: TrackedStatus, id: string) => { if (id) updateTracked(id, { status: s }); setDragging(null); setOver(null); };
   const count = (s: TrackedStatus) => tracked.filter((t) => t.status === s).length;
 
   return (
     <>
-      <PageHead title="Tracker" sub="Issues you decided to act on. Status, owner and notes are saved in this browser." />
+      <PageHead title="Tracker" sub="Drag a card to the column that matches where the work is. Everything is saved in this browser." />
       {ready && tracked.length === 0 ? (
         <Card className="mx-auto max-w-xl py-14 text-center">
           <ScoreRing score={0} size={56} />
@@ -45,14 +48,22 @@ export default function Tracker() {
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {STATUSES.map(({ s, color, hint }) => (
-              <section key={s} aria-label={s} className="rounded-2xl bg-slate-200/40 p-3">
+              <section key={s} aria-label={s}
+                onDragOver={(e) => { if (e.dataTransfer.types.includes("text/plain")) { e.preventDefault(); setOver(s); } }}
+                onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOver(null); }}
+                onDrop={(e) => { e.preventDefault(); drop(s, e.dataTransfer.getData("text/plain")); }}
+                className={`rounded-2xl p-3 transition-colors ${over === s ? "bg-indigo-100/70 ring-2 ring-indigo-400 ring-offset-2 ring-offset-[#f3f5fa]" : "bg-slate-200/40"}`}>
                 <header className="mb-3 px-1"><h2 className="flex items-center gap-2 text-sm font-semibold"><i className="size-2.5 rounded-full" style={{ background: color }} />{s}<span className="ml-auto rounded-full bg-white px-2 text-xs text-muted">{count(s)}</span></h2><p className="mt-0.5 text-xs text-muted">{hint}</p></header>
                 <div className="space-y-3">
                   {tracked.filter((t) => t.status === s).map((t) => {
                     const i = issueById(t.issueId);
                     return (
-                      <article key={t.issueId} className="space-y-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(15,18,38,0.04)]">
+                      <article key={t.issueId} draggable data-issue={t.issueId}
+                        onDragStart={(e) => { setDragging(t.issueId); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", t.issueId); }}
+                        onDragEnd={() => { setDragging(null); setOver(null); }}
+                        className={`cursor-grab space-y-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(15,18,38,0.04)] transition active:cursor-grabbing ${dragging === t.issueId ? "scale-[0.98] opacity-40" : "hover:shadow-md"}`}>
                         <div className="flex items-start gap-3">
+                          <GripVertical size={14} aria-hidden className="mt-1 shrink-0 text-slate-300" />
                           {score[t.issueId] != null && <ScoreRing score={score[t.issueId]} size={40} />}
                           <div className="min-w-0 flex-1"><p className="text-sm font-semibold leading-snug">{i.name}</p>
                             <p className="mt-1.5"><span className="inline-block whitespace-nowrap"><Chip>{i.category}</Chip></span></p>
@@ -64,7 +75,7 @@ export default function Tracker() {
                         <textarea aria-label="Notes" placeholder="Notes" value={t.note} onChange={(e) => updateTracked(t.issueId, { note: e.target.value })} rows={2} className="w-full rounded-xl border border-slate-200 px-2.5 py-2 text-sm" />
                       </article>);
                   })}
-                  {count(s) === 0 && <p className="rounded-xl border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-muted">Nothing here</p>}
+                  {count(s) === 0 && <p className="rounded-xl border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-muted">{dragging ? "Drop here" : "Nothing here"}</p>}
                 </div>
               </section>
             ))}
