@@ -95,14 +95,15 @@ export default function ImportPage() {
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border border-line p-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-muted">Before cleaning</p>
-                  <p className="mt-1 text-3xl font-semibold">{a.before.score}<span className="text-lg text-muted">/10</span> <span className="text-lg text-neg">Grade {a.before.grade}</span></p>
+                  <p className="mt-1 text-3xl font-semibold">{a.before.score.toFixed(1)}<span className="text-lg text-muted">/10</span> <span className="text-lg text-neg">Grade {a.before.grade}</span></p>
                   <p className="mt-1 text-sm text-muted">Percentile {a.before.percentile}%: 99.4% of corporate-business datasets score higher.</p>
                   <dl className="mt-3 space-y-1 text-sm"><Dl k="Domain" v={a.before.domain} /><Dl k="Tone" v={a.before.tone} /><Dl k="Language" v={a.before.language} /></dl>
                 </div>
                 <div className="rounded-lg border border-line p-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-muted">After cleaning</p>
-                  <p className="mt-1 text-3xl font-semibold tabular-nums">{fmt(a.result.rowsSubmitted)} <span className="text-muted">→</span> {fmt(a.result.rowsAfter)} <span className="text-lg font-medium text-muted">rows</span></p>
-                  {a.overall && <p className="mt-1 text-sm text-muted">Adaption score {a.overall.score}/10, grade {a.overall.grade}.</p>}
+                  <p className="mt-1 text-3xl font-semibold">{a.overall.score.toFixed(1)}<span className="text-lg text-muted">/10</span> <span className="text-lg text-pos">Grade {a.overall.grade}</span></p>
+                  <p className="mt-1 text-sm text-muted">Percentile {a.overall.percentile}%, up {a.overall.relativeImprovementPct}% from the original score.</p>
+                  <p className="mt-3 text-sm font-medium tabular-nums">{fmt(a.result.rowsSubmitted)} <span className="text-muted">→</span> {fmt(a.result.rowsAfter)} rows</p>
                   <dl className="mt-3 space-y-1.5 text-sm">
                     <Dl k="Distinct reviews kept" v={`${a.result.distinctReviewsKept} of ${DATA.totals.uniqueReviews}`} />
                     <Dl k="Checklist points earned" v={`${a.result.checklistMeanPct}%`} />
