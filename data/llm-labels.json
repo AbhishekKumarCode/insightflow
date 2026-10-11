@@ -1,0 +1,2882 @@
+[
+ {
+  "id": "r001",
+  "text": "The customer service was outstanding. They resolved my issue within minutes.",
+  "category": "Customer Service",
+  "count": 259,
+  "issue": "Fast, helpful support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r002",
+  "text": "Unfortunately, the customer service was not helpful. My issue remains unresolved.",
+  "category": "Customer Service",
+  "count": 252,
+  "issue": "Unresolved issue, unhelpful support",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r003",
+  "text": "The support staff was knowledgeable and provided excellent assistance.",
+  "category": "Customer Service",
+  "count": 236,
+  "issue": "Knowledgeable, excellent assistance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r004",
+  "text": "I had a great experience with the support team. They were very helpful and friendly.",
+  "category": "Customer Service",
+  "count": 231,
+  "issue": "Helpful, friendly support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r005",
+  "text": "I had to wait for a long time to get a response from customer service, which was frustrating.",
+  "category": "Customer Service",
+  "count": 228,
+  "issue": "Long wait for response",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r006",
+  "text": "Customer service was unhelpful and my issue remains unresolved.",
+  "category": "Customer Service",
+  "count": 52,
+  "issue": "Unresolved issue, unhelpful support",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r007",
+  "text": "Customer service was friendly and provided a quick resolution for my concern.",
+  "category": "Customer Service",
+  "count": 50,
+  "issue": "Friendly, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r008",
+  "text": "Customer service was helpful and provided quick resolution.",
+  "category": "Customer Service",
+  "count": 39,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r009",
+  "text": "Customer service was helpful and provided a quick resolution for my concern.",
+  "category": "Customer Service",
+  "count": 36,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r010",
+  "text": "Customer service was responsive and provided excellent assistance.",
+  "category": "Customer Service",
+  "count": 34,
+  "issue": "Responsive, excellent assistance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r011",
+  "text": "The support team was knowledgeable and provided a satisfactory solution to my issue.",
+  "category": "Customer Service",
+  "count": 24,
+  "issue": "Knowledgeable, satisfactory solution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r012",
+  "text": "Customer service was responsive and provided a quick resolution.",
+  "category": "Customer Service",
+  "count": 22,
+  "issue": "Responsive, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r013",
+  "text": "Customer service was helpful and provided a detailed explanation for my concern.",
+  "category": "Customer Service",
+  "count": 21,
+  "issue": "Helpful, detailed explanation",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r014",
+  "text": "Customer service was responsive and provided a satisfactory solution.",
+  "category": "Customer Service",
+  "count": 21,
+  "issue": "Responsive, satisfactory solution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r015",
+  "text": "Customer service was not helpful and did not provide a satisfactory solution to my issue.",
+  "category": "Customer Service",
+  "count": 14,
+  "issue": "Unhelpful, unsatisfactory solution",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r016",
+  "text": "Customer service was helpful and provided excellent assistance.",
+  "category": "Customer Service",
+  "count": 12,
+  "issue": "Helpful, excellent assistance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r017",
+  "text": "Customer service was friendly and provided clear instructions for my concern.",
+  "category": "Customer Service",
+  "count": 11,
+  "issue": "Friendly, clear instructions",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r018",
+  "text": "Customer service was patient and provided a clear explanation for my concern.",
+  "category": "Customer Service",
+  "count": 10,
+  "issue": "Patient, clear explanation",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r019",
+  "text": "Customer service was responsive and provided quick resolution.",
+  "category": "Customer Service",
+  "count": 10,
+  "issue": "Responsive, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r020",
+  "text": "The support team was unhelpful and my issue remains unresolved.",
+  "category": "Customer Service",
+  "count": 9,
+  "issue": "Unresolved issue, unhelpful support",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r021",
+  "text": "The customer service was responsive and provided great assistance.",
+  "category": "Customer Service",
+  "count": 9,
+  "issue": "Responsive, great assistance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r022",
+  "text": "The customer service team was unresponsive and unhelpful. My issue remains unresolved.",
+  "category": "Customer Service",
+  "count": 9,
+  "issue": "Unresolved issue, unhelpful support",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r023",
+  "text": "The customer service was unhelpful and my issue remains unresolved.",
+  "category": "Customer Service",
+  "count": 8,
+  "issue": "Unresolved issue, unhelpful support",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r024",
+  "text": "The customer service team was knowledgeable and provided great assistance.",
+  "category": "Customer Service",
+  "count": 8,
+  "issue": "Knowledgeable, great assistance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r025",
+  "text": "Customer service was helpful and resolved my concern efficiently.",
+  "category": "Customer Service",
+  "count": 7,
+  "issue": "Helpful, efficient resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r026",
+  "text": "Customer service was unresponsive and took a long time to resolve my issue.",
+  "category": "Customer Service",
+  "count": 7,
+  "issue": "Unresponsive, slow resolution",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r027",
+  "text": "Customer service was knowledgeable and patient, they guided me through the purchasing process.",
+  "category": "Customer Service",
+  "count": 6,
+  "issue": "Knowledgeable, patient guidance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r028",
+  "text": "Customer service was knowledgeable and provided excellent assistance throughout the purchasing process.",
+  "category": "Customer Service",
+  "count": 5,
+  "issue": "Knowledgeable, excellent assistance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r029",
+  "text": "Customer service was incredibly helpful and resolved my issue promptly.",
+  "category": "Customer Service",
+  "count": 5,
+  "issue": "Helpful, prompt resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r030",
+  "text": "Customer service was very professional and provided clear instructions throughout the purchasing process.",
+  "category": "Customer Service",
+  "count": 5,
+  "issue": "Professional, clear instructions",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r031",
+  "text": "I had a great experience with the support team, they were very helpful and friendly.",
+  "category": "Customer Service",
+  "count": 5,
+  "issue": "Helpful, friendly support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r032",
+  "text": "Unfortunately, the customer service was not helpful and my issue remains unresolved.",
+  "category": "Customer Service",
+  "count": 5,
+  "issue": "Unresolved issue, unhelpful support",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r033",
+  "text": "Customer service was helpful and provided a comprehensive solution for my issue.",
+  "category": "Customer Service",
+  "count": 5,
+  "issue": "Helpful, comprehensive solution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r034",
+  "text": "Customer service was attentive and provided a detailed explanation for my concern.",
+  "category": "Customer Service",
+  "count": 5,
+  "issue": "Attentive, detailed explanation",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r035",
+  "text": "Customer service was knowledgeable and provided a detailed explanation for my concern.",
+  "category": "Customer Service",
+  "count": 5,
+  "issue": "Knowledgeable, detailed explanation",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r036",
+  "text": "Customer service was professional and provided a quick resolution for my issue.",
+  "category": "Customer Service",
+  "count": 3,
+  "issue": "Professional, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r037",
+  "text": "Customer service was knowledgeable and provided a quick resolution for my issue.",
+  "category": "Customer Service",
+  "count": 3,
+  "issue": "Knowledgeable, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r038",
+  "text": "Customer service was helpful and resolved my issue promptly.",
+  "category": "Customer Service",
+  "count": 3,
+  "issue": "Helpful, prompt resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r039",
+  "text": "Customer service was knowledgeable and provided clear instructions for my concern.",
+  "category": "Customer Service",
+  "count": 3,
+  "issue": "Knowledgeable, clear instructions",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r040",
+  "text": "Customer service was friendly and provided a satisfactory explanation for my concern.",
+  "category": "Customer Service",
+  "count": 3,
+  "issue": "Friendly, satisfactory explanation",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r041",
+  "text": "Customer service was helpful and provided a quick resolution for my issue.",
+  "category": "Customer Service",
+  "count": 2,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r042",
+  "text": "Customer service was unresponsive to my inquiry. I'm disappointed with the experience.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Unresponsive, slow resolution",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r043",
+  "text": "Customer service was incredibly helpful and resolved my issue within minutes.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r044",
+  "text": "Customer service was friendly and efficient, my issue was resolved quickly.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Friendly, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r045",
+  "text": "The customer service was outstanding and resolved my issue within minutes.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r046",
+  "text": "Customer service was excellent, they went above and beyond to help me.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, excellent assistance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r047",
+  "text": "I had a terrible experience with the support team, they were unhelpful.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Unhelpful, unsatisfactory solution",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r048",
+  "text": "Customer service was helpful and resolved my issue quickly.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r049",
+  "text": "Customer service was exceptional, they resolved my issue quickly and efficiently.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, efficient resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r050",
+  "text": "The support team was helpful and friendly, they provided great assistance.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, friendly support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r051",
+  "text": "The customer service was unresponsive, my issue remains unresolved.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Unresolved issue, unhelpful support",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r052",
+  "text": "The customer service was helpful and efficient, they resolved my issue promptly.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, prompt resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r053",
+  "text": "The customer service team was friendly and helpful. They resolved my issue promptly.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Friendly, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r054",
+  "text": "Customer service was responsive and resolved my issue promptly.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Responsive, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r055",
+  "text": "Customer service was friendly and provided valuable insights for my query.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, detailed explanation",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r056",
+  "text": "Customer service was attentive and provided clear instructions for my concern.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Professional, clear instructions",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r057",
+  "text": "Customer service was knowledgeable and provided a comprehensive solution for my issue.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, comprehensive solution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r058",
+  "text": "Customer service was patient and provided a detailed explanation for my concern.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Patient, clear explanation",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r059",
+  "text": "Customer service was attentive and provided a clear explanation for my concern.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Attentive, detailed explanation",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r060",
+  "text": "Customer service was patient and provided a comprehensive solution for my issue.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, comprehensive solution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r061",
+  "text": "Customer service was friendly and resolved my issue within minutes.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Friendly, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r062",
+  "text": "Customer service was helpful and provided a satisfactory solution.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Responsive, satisfactory solution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r063",
+  "text": "Customer service was outstanding. They resolved my issue within minutes.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r064",
+  "text": "Customer service was not helpful. My issue remains unresolved.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Unresolved issue, unhelpful support",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r065",
+  "text": "Customer service was outstanding and resolved my issue swiftly.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r066",
+  "text": "Customer service was outstanding and resolved my issue within minutes.",
+  "category": "Customer Service",
+  "count": 1,
+  "issue": "Helpful, quick resolution",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r067",
+  "text": "I encountered a scam where the seller asked for additional payment after placing the order.",
+  "category": "Fraud and Scam",
+  "count": 276,
+  "issue": "Charged but order never arrived",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r068",
+  "text": "I was scammed by this seller. The product I received was not as advertised.",
+  "category": "Fraud and Scam",
+  "count": 253,
+  "issue": "Product not as advertised",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r069",
+  "text": "Beware of fraudulent activities. I never received my order despite being charged.",
+  "category": "Fraud and Scam",
+  "count": 250,
+  "issue": "Charged but order never arrived",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r070",
+  "text": "This site is a scam. They took my money and never sent the product.",
+  "category": "Fraud and Scam",
+  "count": 247,
+  "issue": "Charged but order never arrived",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r071",
+  "text": "I suspect fraudulent activity as I was charged multiple times for a single purchase.",
+  "category": "Fraud and Scam",
+  "count": 243,
+  "issue": "Charged multiple times for one purchase",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r072",
+  "text": "No fraudulent activity or scam during my transaction.",
+  "category": "Fraud and Scam",
+  "count": 209,
+  "issue": "No fraudulent activity or scam",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r073",
+  "text": "Suspected fraudulent activity as I was charged multiple times.",
+  "category": "Fraud and Scam",
+  "count": 53,
+  "issue": "Charged multiple times for one purchase",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r074",
+  "text": "No signs of fraudulent activity or scam during my purchase.",
+  "category": "Fraud and Scam",
+  "count": 49,
+  "issue": "No fraudulent activity or scam",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r075",
+  "text": "No fraudulent activity or scam during my purchase.",
+  "category": "Fraud and Scam",
+  "count": 30,
+  "issue": "No fraudulent activity or scam",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r076",
+  "text": "No signs of fraudulent activity or scam during my transaction.",
+  "category": "Fraud and Scam",
+  "count": 25,
+  "issue": "No fraudulent activity or scam",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r077",
+  "text": "I was scammed, I received a product that did not function properly.",
+  "category": "Fraud and Scam",
+  "count": 13,
+  "issue": "Product did not function properly",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r078",
+  "text": "I was scammed, I received a product that did not meet my expectations.",
+  "category": "Fraud and Scam",
+  "count": 13,
+  "issue": "Product did not meet expectations",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r079",
+  "text": "I was scammed, I received a product that was not authentic.",
+  "category": "Fraud and Scam",
+  "count": 13,
+  "issue": "Product was not authentic",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r080",
+  "text": "I was scammed, I received a product that was not related to my order.",
+  "category": "Fraud and Scam",
+  "count": 12,
+  "issue": "Product not related to order",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r081",
+  "text": "I was a victim of a scam. I was charged multiple times for a single purchase.",
+  "category": "Fraud and Scam",
+  "count": 9,
+  "issue": "Charged multiple times for one purchase",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r082",
+  "text": "I was scammed and received a product that did not function properly.",
+  "category": "Fraud and Scam",
+  "count": 8,
+  "issue": "Product did not function properly",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r083",
+  "text": "I was scammed by a fraudulent seller, they took my money and never sent the product.",
+  "category": "Fraud and Scam",
+  "count": 6,
+  "issue": "Charged but order never arrived",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r084",
+  "text": "I was not a victim of fraud, the seller was transparent and provided a clear refund policy.",
+  "category": "Fraud and Scam",
+  "count": 6,
+  "issue": "No fraudulent activity or scam",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r085",
+  "text": "I was scammed by a fraudulent seller, they provided a low-quality product that did not meet my expectations.",
+  "category": "Fraud and Scam",
+  "count": 5,
+  "issue": "Product did not meet expectations",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r086",
+  "text": "I was a victim of fraud, the seller provided a counterfeit product.",
+  "category": "Fraud and Scam",
+  "count": 5,
+  "issue": "Product was not authentic",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r087",
+  "text": "I was a victim of fraud, the seller provided a low-quality product that did not meet my expectations.",
+  "category": "Fraud and Scam",
+  "count": 5,
+  "issue": "Product did not meet expectations",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r088",
+  "text": "I was not a victim of fraud, the seller provided a genuine product as advertised.",
+  "category": "Fraud and Scam",
+  "count": 5,
+  "issue": "No fraudulent activity or scam",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r089",
+  "text": "Beware of fraudulent activities, I never received my order despite being charged.",
+  "category": "Fraud and Scam",
+  "count": 5,
+  "issue": "Charged but order never arrived",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r090",
+  "text": "I encountered a scam where the seller provided a low-quality product that did not meet my expectations.",
+  "category": "Fraud and Scam",
+  "count": 4,
+  "issue": "Product did not meet expectations",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r091",
+  "text": "I was a victim of fraud, the seller requested additional payment after purchase.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Charged multiple times for one purchase",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r092",
+  "text": "I was not a victim of fraud, the seller provided the genuine product as advertised.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "No fraudulent activity or scam",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r093",
+  "text": "I was unfortunately scammed, the product I received was not as advertised.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Product not as advertised",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r094",
+  "text": "I was scammed, I received a counterfeit product despite authentic packaging.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Product was not authentic",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r095",
+  "text": "I was scammed, I never received my order despite being charged.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Charged but order never arrived",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r096",
+  "text": "I encountered a fraudulent activity, the product I received was not as advertised.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Product not as advertised",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r097",
+  "text": "I was scammed, I never received the product despite being charged.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Charged but order never arrived",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r098",
+  "text": "I encountered a fraudulent activity, the seller asked for additional payment.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Charged multiple times for one purchase",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r099",
+  "text": "I encountered a fraudulent seller. They provided a counterfeit product and refused to refund my money.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Product was not authentic",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r100",
+  "text": "No fraudulent activity detected during my purchase.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "No fraudulent activity or scam",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r101",
+  "text": "Fraudulent activity was detected during my transaction.",
+  "category": "Fraud and Scam",
+  "count": 1,
+  "issue": "Charged multiple times for one purchase",
+  "sentiment": "negative",
+  "severity": 0.9
+ },
+ {
+  "id": "r102",
+  "text": "The packaging was damaged upon arrival, and some items were missing from my order.",
+  "category": "Operational Issues",
+  "count": 295,
+  "issue": "Product not related to order",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r103",
+  "text": "My order was processed incorrectly, and I received the wrong items.",
+  "category": "Operational Issues",
+  "count": 274,
+  "issue": "Product not related to order",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r104",
+  "text": "I faced several issues while placing my order on the website. It kept crashing.",
+  "category": "Operational Issues",
+  "count": 262,
+  "issue": "Product did not function properly",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r105",
+  "text": "The delivery was delayed by two weeks, which was very inconvenient.",
+  "category": "Operational Issues",
+  "count": 250,
+  "issue": "Long wait for response",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r106",
+  "text": "There were glitches on the website, making it difficult to complete my purchase.",
+  "category": "Operational Issues",
+  "count": 239,
+  "issue": "Product did not function properly",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r107",
+  "text": "Delivery was on time and the product was in excellent condition.",
+  "category": "Operational Issues",
+  "count": 149,
+  "issue": "Fast, helpful support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r108",
+  "text": "Delivery was delayed, but the company provided a satisfactory explanation and compensation.",
+  "category": "Operational Issues",
+  "count": 79,
+  "issue": "Long wait for response",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r109",
+  "text": "Delivery was on time and the product was in perfect condition.",
+  "category": "Operational Issues",
+  "count": 70,
+  "issue": "Fast, helpful support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r110",
+  "text": "Delivery was delayed by a week, causing inconvenience.",
+  "category": "Operational Issues",
+  "count": 54,
+  "issue": "Long wait for response",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r111",
+  "text": "The delivery process had some operational issues, but I received a replacement product.",
+  "category": "Operational Issues",
+  "count": 25,
+  "issue": "Product not related to order",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r112",
+  "text": "The ordering process was smooth, but the delivery was delayed significantly.",
+  "category": "Operational Issues",
+  "count": 25,
+  "issue": "Long wait for response",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r113",
+  "text": "The delivery process was delayed due to operational issues. However, the company provided a replacement product.",
+  "category": "Operational Issues",
+  "count": 9,
+  "issue": "Long wait for response",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r114",
+  "text": "The ordering process was smooth and hassle-free. I received my product on time.",
+  "category": "Operational Issues",
+  "count": 8,
+  "issue": "Fast, helpful support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r115",
+  "text": "I faced several issues while placing my order on the website, but the support team was helpful and resolved them.",
+  "category": "Operational Issues",
+  "count": 6,
+  "issue": "Product did not function properly",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r116",
+  "text": "The delivery was on time and the packaging was in excellent condition.",
+  "category": "Operational Issues",
+  "count": 6,
+  "issue": "Fast, helpful support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r117",
+  "text": "The delivery was delayed due to unforeseen circumstances, but the seller provided regular updates and a compensation.",
+  "category": "Operational Issues",
+  "count": 6,
+  "issue": "Long wait for response",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r118",
+  "text": "I had a great experience with the website, it was user-friendly and easy to navigate.",
+  "category": "Operational Issues",
+  "count": 5,
+  "issue": "Fast, helpful support",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r119",
+  "text": "The delivery was delayed due to unforeseen circumstances, but the seller was transparent about the situation.",
+  "category": "Operational Issues",
+  "count": 5,
+  "issue": "Long wait for response",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r120",
+  "text": "The website had some technical issues, but the support team was quick to resolve them.",
+  "category": "Operational Issues",
+  "count": 5,
+  "issue": "Product did not function properly",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r121",
+  "text": "I faced several issues while placing my order on the website, it kept crashing.",
+  "category": "Operational Issues",
+  "count": 5,
+  "issue": "Website crashed during order",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r122",
+  "text": "Delivery was on time and the product was in good condition.",
+  "category": "Operational Issues",
+  "count": 5,
+  "issue": "On-time delivery, good condition",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r123",
+  "text": "Delivery was delayed by a week, which was inconvenient.",
+  "category": "Operational Issues",
+  "count": 3,
+  "issue": "Delivery delayed by a week",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r124",
+  "text": "Delivery was delayed by two weeks, which was very inconvenient.",
+  "category": "Operational Issues",
+  "count": 2,
+  "issue": "Delivery delayed by two weeks",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r125",
+  "text": "The delivery was delayed due to unforeseen circumstances, but I was informed promptly.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Delay due to unforeseen circumstances",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r126",
+  "text": "I encountered a minor operational issue with the product, but the seller was responsive and provided a solution.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Minor issue, responsive seller",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r127",
+  "text": "The delivery process had some operational issues, but the product was worth it.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Operational issues, product worth it",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r128",
+  "text": "The ordering process was smooth, but the delivery was delayed.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Smooth order, delayed delivery",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r129",
+  "text": "I faced several issues while placing my order, the website was unresponsive.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Website unresponsive during order",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r130",
+  "text": "There were some operational issues, the delivery was delayed and the packaging was damaged.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Delayed delivery, damaged packaging",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r131",
+  "text": "I faced some difficulties while placing my order, the website kept crashing.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Website crashed during order",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r132",
+  "text": "There were some operational issues, the website had glitches and the checkout process was difficult.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Website glitches, difficult checkout",
+  "sentiment": "negative",
+  "severity": 0.5
+ },
+ {
+  "id": "r133",
+  "text": "Delivery was on time and the packaging was in good condition.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "On-time delivery, good packaging",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r134",
+  "text": "Delivery was slightly delayed but the company kept me informed.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Slight delay, kept informed",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r135",
+  "text": "Delivery was on time and the product was in pristine condition.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "On-time delivery, pristine condition",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r136",
+  "text": "Delivery was on time and the packaging was intact.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "On-time delivery, intact packaging",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r137",
+  "text": "Delivery was delayed by a week and the product was damaged upon arrival.",
+  "category": "Operational Issues",
+  "count": 1,
+  "issue": "Delayed delivery, damaged product",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r138",
+  "text": "The features of this product are innovative and very useful for my daily needs.",
+  "category": "Product Feedback",
+  "count": 267,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r139",
+  "text": "Unfortunately, the product did not meet my expectations. It stopped working after a week.",
+  "category": "Product Feedback",
+  "count": 247,
+  "issue": "Product did not meet expectations",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r140",
+  "text": "I found the product to be very durable and well-made. Highly recommended!",
+  "category": "Product Feedback",
+  "count": 240,
+  "issue": "Durable, well-made product",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r141",
+  "text": "Great value for money. The product performs very well and is worth the price.",
+  "category": "Product Feedback",
+  "count": 238,
+  "issue": "Great value for money",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r142",
+  "text": "The product quality is excellent. It works exactly as described and exceeds my expectations.",
+  "category": "Product Feedback",
+  "count": 238,
+  "issue": "Excellent quality, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r143",
+  "text": "The product's performance is reliable and consistent.",
+  "category": "Product Feedback",
+  "count": 16,
+  "issue": "Reliable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r144",
+  "text": "The product is a must-have, the features are incredibly useful and innovative.",
+  "category": "Product Feedback",
+  "count": 13,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r145",
+  "text": "The product is a great value, it performs well for the price.",
+  "category": "Product Feedback",
+  "count": 12,
+  "issue": "Great value for money",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r146",
+  "text": "The product is a game-changer, the features are incredibly useful and innovative.",
+  "category": "Product Feedback",
+  "count": 11,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r147",
+  "text": "The product's performance is efficient and effective.",
+  "category": "Product Feedback",
+  "count": 11,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r148",
+  "text": "I had a minor issue with the product, but the seller's support team was very responsive and provided a satisfactory solution.",
+  "category": "Product Feedback",
+  "count": 10,
+  "issue": "Minor issue, responsive support",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r149",
+  "text": "The product met my expectations and provided excellent value for money.",
+  "category": "Product Feedback",
+  "count": 9,
+  "issue": "Met expectations, excellent value",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r150",
+  "text": "The product's features are innovative and very useful. I highly recommend it.",
+  "category": "Product Feedback",
+  "count": 9,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r151",
+  "text": "The product's features are user-friendly and intuitive.",
+  "category": "Product Feedback",
+  "count": 9,
+  "issue": "User-friendly, intuitive features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r152",
+  "text": "The product's design is modern and sleek.",
+  "category": "Product Feedback",
+  "count": 9,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r153",
+  "text": "The product is a great investment, it performs well and exceeds my expectations.",
+  "category": "Product Feedback",
+  "count": 8,
+  "issue": "Great investment, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r154",
+  "text": "The product's quality is excellent and it performs as advertised.",
+  "category": "Product Feedback",
+  "count": 8,
+  "issue": "Excellent quality, as advertised",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r155",
+  "text": "The product's features are intuitive and easy to use.",
+  "category": "Product Feedback",
+  "count": 8,
+  "issue": "Intuitive, easy-to-use features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r156",
+  "text": "The product's performance is stable and consistent.",
+  "category": "Product Feedback",
+  "count": 7,
+  "issue": "Stable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r157",
+  "text": "The product's features are innovative and cutting-edge.",
+  "category": "Product Feedback",
+  "count": 7,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r158",
+  "text": "The product's design is minimalist and elegant.",
+  "category": "Product Feedback",
+  "count": 7,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r159",
+  "text": "The product's design is minimalist and elegant, I love it!",
+  "category": "Product Feedback",
+  "count": 7,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r160",
+  "text": "The product's performance is impressive and exceeds expectations.",
+  "category": "Product Feedback",
+  "count": 6,
+  "issue": "Impressive performance, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r161",
+  "text": "The product's design is minimalistic and elegant.",
+  "category": "Product Feedback",
+  "count": 6,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r162",
+  "text": "The product's design is sleek and modern.",
+  "category": "Product Feedback",
+  "count": 6,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r163",
+  "text": "The product's design is ergonomic and comfortable.",
+  "category": "Product Feedback",
+  "count": 6,
+  "issue": "Ergonomic, comfortable design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r164",
+  "text": "The product's design is functional and practical.",
+  "category": "Product Feedback",
+  "count": 6,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r165",
+  "text": "The product's features are customizable and versatile.",
+  "category": "Product Feedback",
+  "count": 6,
+  "issue": "Customizable, versatile features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r166",
+  "text": "The product's features are innovative and groundbreaking.",
+  "category": "Product Feedback",
+  "count": 6,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r167",
+  "text": "The product exceeded my expectations in terms of quality and performance.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Excellent quality, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r168",
+  "text": "The product arrived in perfect condition and met all my expectations.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "On-time delivery, pristine condition",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r169",
+  "text": "I encountered a minor issue with the product, but the seller was responsive and provided a solution.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Minor issue, responsive seller",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r170",
+  "text": "I had a great experience with the product, it exceeded my expectations in terms of performance.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Impressive performance, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r171",
+  "text": "The product quality is excellent and exceeds my expectations.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Excellent quality, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r172",
+  "text": "The product performed very well and was worth the price, great value for money.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Great value for money",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r173",
+  "text": "The product is a great investment, it performs exceptionally well and exceeds my expectations.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Great investment, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r174",
+  "text": "The product's features are essential and improve my productivity.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r175",
+  "text": "The product's performance is powerful and efficient.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r176",
+  "text": "The product's design is minimalistic and functional.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r177",
+  "text": "The product's performance is stable and reliable.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Stable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r178",
+  "text": "The product's features are innovative and very useful for my daily needs.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r179",
+  "text": "The product's design is classic and timeless.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r180",
+  "text": "The product's performance is consistent and stable.",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Stable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r181",
+  "text": "The product's design is modern and sleek, I love it!",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r182",
+  "text": "The product's design is functional and practical, I love it!",
+  "category": "Product Feedback",
+  "count": 5,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r183",
+  "text": "The product's features are user-friendly and easy to navigate.",
+  "category": "Product Feedback",
+  "count": 4,
+  "issue": "User-friendly, intuitive features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r184",
+  "text": "The product's design is minimalist and sleek.",
+  "category": "Product Feedback",
+  "count": 4,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r185",
+  "text": "The product's design is stylish and unique.",
+  "category": "Product Feedback",
+  "count": 4,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r186",
+  "text": "The product's performance is powerful and robust.",
+  "category": "Product Feedback",
+  "count": 4,
+  "issue": "Reliable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r187",
+  "text": "The product's features are innovative and useful.",
+  "category": "Product Feedback",
+  "count": 4,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r188",
+  "text": "The product's features are user-friendly and convenient.",
+  "category": "Product Feedback",
+  "count": 4,
+  "issue": "User-friendly, intuitive features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r189",
+  "text": "The product's design is classic and timeless, I love it!",
+  "category": "Product Feedback",
+  "count": 4,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r190",
+  "text": "The product's design is modern and functional.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r191",
+  "text": "The product's durability is impressive and it has been reliable for years.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Durable, well-made product",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r192",
+  "text": "The product's performance is excellent and exceeds my expectations.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Excellent quality, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r193",
+  "text": "The product's design is modern and sophisticated.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r194",
+  "text": "The product's design is simple and functional.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r195",
+  "text": "The product's design is modern and stylish.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r196",
+  "text": "The product's design is ergonomic and practical.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Ergonomic, comfortable design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r197",
+  "text": "The product's design is futuristic and high-tech.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r198",
+  "text": "The product's performance is fast and powerful.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r199",
+  "text": "The product's performance is efficient and reliable.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r200",
+  "text": "The product's performance is reliable and efficient.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r201",
+  "text": "The product's performance is impressive and consistent.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Reliable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r202",
+  "text": "The product's features are innovative and convenient.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r203",
+  "text": "The product's design is minimalist and sophisticated, I love it!",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r204",
+  "text": "The product's design is unique and eye-catching, I love it!",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r205",
+  "text": "The product's performance is robust and durable.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Durable, well-made product",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r206",
+  "text": "The product's performance is smooth and seamless.",
+  "category": "Product Feedback",
+  "count": 3,
+  "issue": "Stable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r207",
+  "text": "The product's quality is top-notch and it performs efficiently.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r208",
+  "text": "The product's design is sleek and aesthetically pleasing.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r209",
+  "text": "The product's design is visually appealing and functional.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r210",
+  "text": "The product's features are innovative and useful for my daily needs.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r211",
+  "text": "The product's design is modern and elegant.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r212",
+  "text": "The product's design is minimalist and understated.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r213",
+  "text": "The product's design is elegant and timeless.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r214",
+  "text": "The product's design is unique and visually appealing.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r215",
+  "text": "The product's features are innovative and enhance my daily tasks.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r216",
+  "text": "The product's design is functional and meets my needs.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r217",
+  "text": "The product's performance is consistent and reliable.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Reliable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r218",
+  "text": "The product's features are efficient and productive.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r219",
+  "text": "The product's design is minimalistic and chic.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r220",
+  "text": "The product's design is modern and innovative.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r221",
+  "text": "The product's performance is impressive and efficient.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r222",
+  "text": "The product's design is eco-friendly and sustainable.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r223",
+  "text": "The product's design is stylish and trendy.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r224",
+  "text": "The product's design is unique and eye-catching.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r225",
+  "text": "The product's performance is efficient and powerful.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r226",
+  "text": "The product's design is sleek and minimalist.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r227",
+  "text": "The product's design is contemporary and trendy.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r228",
+  "text": "The product's features are intuitive and user-friendly.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Intuitive, easy-to-use features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r229",
+  "text": "The product's design is timeless and elegant.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r230",
+  "text": "The product's design is minimalist and chic.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r231",
+  "text": "The product's design is stylish and contemporary.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r232",
+  "text": "The product's design is minimalist and sophisticated.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r233",
+  "text": "The product's performance is outstanding and exceeds expectations.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Impressive performance, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r234",
+  "text": "The product's design is artistic and visually appealing, I love it!",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r235",
+  "text": "The product's design is traditional and nostalgic, I love it!",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r236",
+  "text": "The product's design is vintage and classic, I love it!",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r237",
+  "text": "The product's performance is fast and efficient.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r238",
+  "text": "The product's performance is accurate and precise.",
+  "category": "Product Feedback",
+  "count": 2,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r239",
+  "text": "The product's innovative features have greatly improved my daily tasks.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r240",
+  "text": "The product arrived with some defects, but the seller was responsive and provided a replacement.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Minor issue, responsive seller",
+  "sentiment": "neutral",
+  "severity": 0
+ },
+ {
+  "id": "r241",
+  "text": "The product features are impressive and have greatly improved my daily tasks.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r242",
+  "text": "The product did not meet my expectations and stopped working after a week.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Product did not meet expectations",
+  "sentiment": "negative",
+  "severity": 0.7
+ },
+ {
+  "id": "r243",
+  "text": "The product features are impressive and I'm satisfied with my purchase.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r244",
+  "text": "The product quality was exceptional, it exceeded my expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Excellent quality, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r245",
+  "text": "The product is a game-changer, the features are incredibly useful.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r246",
+  "text": "The product quality is good, it meets my daily needs.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Met expectations, excellent value",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r247",
+  "text": "The product exceeded my expectations, it's very durable and well-made.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Durable, well-made product",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r248",
+  "text": "The product is innovative and useful, it's worth the investment.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r249",
+  "text": "The product is of high quality, it performs well and meets my needs.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Reliable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r250",
+  "text": "The product is of excellent quality, it exceeds my expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Excellent quality, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r251",
+  "text": "The product is well-made and exceeds my expectations. I'm very satisfied with my purchase.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Durable, well-made product",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r252",
+  "text": "The product's features are impressive and exceeded my expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Impressive performance, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r253",
+  "text": "The product's durability is commendable and it has been reliable for weeks.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Durable, well-made product",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r254",
+  "text": "The product's design is sleek and user-friendly.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r255",
+  "text": "The product's performance is outstanding and meets my requirements.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Reliable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r256",
+  "text": "The product's features are unique and useful for my needs.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r257",
+  "text": "The product's quality is high and it performs efficiently.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r258",
+  "text": "The product's design is visually appealing and easy to use.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r259",
+  "text": "The product's features are innovative and convenient for my daily needs.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r260",
+  "text": "The product's durability is impressive and it has been reliable for months.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Durable, well-made product",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r261",
+  "text": "The product's performance is exceptional and meets my expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Impressive performance, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r262",
+  "text": "The product's performance is exceptional and exceeds my expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Impressive performance, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r263",
+  "text": "The product's performance is exceptional and exceeds expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Impressive performance, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r264",
+  "text": "The product's design is vibrant and eye-catching.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r265",
+  "text": "The product's performance is efficient and saves me time.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r266",
+  "text": "The product's features are user-friendly and easy to use.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "User-friendly, intuitive features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r267",
+  "text": "The product's design is futuristic and innovative.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r268",
+  "text": "The product's design is traditional and nostalgic.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r269",
+  "text": "The product's features are versatile and adaptable.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Customizable, versatile features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r270",
+  "text": "The product's design is simple and intuitive.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Intuitive, easy-to-use features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r271",
+  "text": "The product's features are customizable and personalizable.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Customizable, versatile features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r272",
+  "text": "The product's design is sleek and elegant.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r273",
+  "text": "The product's design is minimalistic and sleek.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r274",
+  "text": "The product's design is ergonomic and stylish.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Ergonomic, comfortable design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r275",
+  "text": "The product's design is simple yet effective.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r276",
+  "text": "The product's features are accessible and inclusive.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Customizable, versatile features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r277",
+  "text": "The product's design is ergonomic and user-friendly.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Ergonomic, comfortable design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r278",
+  "text": "The product's features are versatile and multifunctional.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Customizable, versatile features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r279",
+  "text": "The product's performance is responsive and fast.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r280",
+  "text": "The product's features are advanced and sophisticated.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r281",
+  "text": "The product's design is sleek and futuristic.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r282",
+  "text": "The product's performance is robust and dependable.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Reliable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r283",
+  "text": "The product's design is minimalist and uncluttered.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r284",
+  "text": "The product's features are customizable and adaptable.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Customizable, versatile features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r285",
+  "text": "The product's design is sleek and contemporary.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r286",
+  "text": "The product's performance is impressive and exceeded my expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Impressive performance, exceeds expectations",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r287",
+  "text": "The product's features are practical and useful.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r288",
+  "text": "The product's design is simple yet elegant.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r289",
+  "text": "The product's design is functional and user-friendly.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r290",
+  "text": "The product's design is stylish and modern.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r291",
+  "text": "The product's design is timeless and classic.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r292",
+  "text": "The product's features are advanced and innovative.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r293",
+  "text": "The product's features are advanced and high-tech.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r294",
+  "text": "The product's design is vintage and unique.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r295",
+  "text": "The product's features are functional and practical.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r296",
+  "text": "The product's design is artistic and creative.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r297",
+  "text": "The product's features are advanced and cutting-edge.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r298",
+  "text": "The product's design is minimalist and functional.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r299",
+  "text": "The product's design is futuristic and advanced.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r300",
+  "text": "The product's features are game-changing and exceeded expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r301",
+  "text": "The product's durability is impressive and exceeds my expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Durable, well-made product",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r302",
+  "text": "The product's design is vibrant and eye-catching, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r303",
+  "text": "The product's design is contemporary and stylish, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r304",
+  "text": "The product's features are practical and efficient.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Functional, practical design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r305",
+  "text": "The product's design is colorful and playful, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r306",
+  "text": "The product's performance is powerful and effective.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r307",
+  "text": "The product's design is sleek and modern, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r308",
+  "text": "The product's features are innovative and very useful.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, useful features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r309",
+  "text": "The product's design is cultural and unique, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r310",
+  "text": "The product's design is futuristic and innovative, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Innovative, cutting-edge features",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r311",
+  "text": "The product's performance is fast and responsive.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r312",
+  "text": "The product's design is colorful and vibrant, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r313",
+  "text": "The product's performance is responsive and agile.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Efficient, effective performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r314",
+  "text": "The product's design is simple and straightforward, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Minimalist, elegant design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r315",
+  "text": "The product's performance is reliable and dependable.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Reliable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r316",
+  "text": "The product's design is sophisticated and refined, I love it!",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r317",
+  "text": "The product's quality is average and does not meet my expectations.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Product did not meet expectations",
+  "sentiment": "negative",
+  "severity": 0.3
+ },
+ {
+  "id": "r318",
+  "text": "The product's performance is stable and robust.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Stable, consistent performance",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r319",
+  "text": "The product's design is vintage and retro.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ },
+ {
+  "id": "r320",
+  "text": "The product's design is artistic and visually appealing.",
+  "category": "Product Feedback",
+  "count": 1,
+  "issue": "Modern, sleek design",
+  "sentiment": "positive",
+  "severity": 0
+ }
+]

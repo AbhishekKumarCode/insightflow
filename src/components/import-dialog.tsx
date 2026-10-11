@@ -29,6 +29,7 @@ export function ImportDialog() {
   const [text, setText] = useState("");
   const [cat, setCat] = useState("");
   const [drag, setDrag] = useState(false);
+  const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
     const d = ref.current; if (!d) return;
@@ -36,7 +37,8 @@ export function ImportDialog() {
     if (!importOpen && d.open) d.close();
   }, [importOpen]);
 
-  const reset = () => { setRows(null); setErr(""); setText(""); setName(""); setCat(""); };
+  const reveal = (r: RawRow[]) => { setRows(r); setScanning(true); setTimeout(() => setScanning(false), 750); };
+  const reset = () => { setScanning(false); setRows(null); setErr(""); setText(""); setName(""); setCat(""); };
   const close = () => { setImportOpen(false); reset(); };
 
   const index = useMemo(() => buildIndex(DATA.reviews.map((r) => ({ text: r.text, issue: r.issue, sentiment: r.sentiment }))), []);
@@ -57,7 +59,7 @@ export function ImportDialog() {
         if (!meta.fields?.includes("review")) return setErr(`Couldn't find a "review" column. Columns found: ${meta.fields?.join(", ") || "none"}.`);
         const good = data.filter((r) => r.review?.trim()).slice(0, MAX_ROWS).map((r) => ({ review: r.review, category: r.category }));
         if (!good.length) return setErr("The file has a review column but no review text.");
-        setName(file.name); setRows(good);
+        setName(file.name); reveal(good);
       },
       error: (e) => setErr(`Couldn't read the file: ${e.message}`),
     });
@@ -67,7 +69,7 @@ export function ImportDialog() {
     const lines = (mode === "paste" ? text.split(/\r?\n/) : [text]).map((l) => l.trim()).filter(Boolean).slice(0, MAX_ROWS);
     if (!lines.length) return setErr(mode === "paste" ? "Paste at least one review, one per line." : "Write the feedback first.");
     setName(mode === "paste" ? "Pasted feedback" : "Single entry");
-    setRows(lines.map((review) => ({ review, category: mode === "one" ? cat || undefined : undefined })));
+    reveal(lines.map((review) => ({ review, category: mode === "one" ? cat || undefined : undefined })));
   };
 
   const commit = () => {
@@ -116,9 +118,9 @@ export function ImportDialog() {
 
         <div className="space-y-5 overflow-y-auto px-6 py-5">
           {!rows && tab === "upload" && (
-            <div onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
+            <div key="u" onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
               onDrop={(e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files[0]; if (f) onFile(f); }}
-              className={`rounded-xl border-2 border-dashed px-6 py-10 text-center ${drag ? "border-brand bg-brand-soft" : "border-line"}`}>
+              className={`tab-pane rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors ${drag ? "scale-[1.01] border-brand bg-brand-soft" : "border-line"}`}>
               <UploadCloud className="mx-auto text-brand" size={30} />
               <p className="mt-3 font-medium">Drop a CSV here</p>
               <p className="mt-1 text-sm text-muted">Needs a <code>review</code> column. <code>category</code> is optional. Max 5 MB.</p>
@@ -126,12 +128,12 @@ export function ImportDialog() {
             </div>
           )}
           {!rows && tab === "paste" && (
-            <div><textarea value={text} onChange={(e) => setText(e.target.value)} rows={7} placeholder={"One review per line, for example:\nMy order never arrived and nobody answers my emails\nGreat product, fast delivery"} aria-label="Pasted feedback"
+            <div className="tab-pane"><textarea value={text} onChange={(e) => setText(e.target.value)} rows={7} placeholder={"One review per line, for example:\nMy order never arrived and nobody answers my emails\nGreat product, fast delivery"} aria-label="Pasted feedback"
               className="w-full rounded-lg border border-line p-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
               <button className={`${btnPrimary} mt-3`} onClick={() => fromText("paste")}>Check feedback</button></div>
           )}
           {!rows && tab === "one" && (
-            <div className="space-y-3">
+            <div className="tab-pane space-y-3">
               <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder="What did the customer say?" aria-label="Feedback text"
                 className="w-full rounded-lg border border-line p-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
               <select value={cat} onChange={(e) => setCat(e.target.value)} aria-label="Category" className="rounded-lg border border-line px-3 py-2 text-sm">
@@ -142,14 +144,20 @@ export function ImportDialog() {
           )}
           {err && <div role="alert" className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><AlertTriangle size={16} className="mt-0.5 shrink-0" />{err}</div>}
 
-          {result && s && (
+          {result && s && scanning && (
+            <div role="status" className="tab-pane py-10 text-center">
+              <div className="relative mx-auto h-1.5 w-56 overflow-hidden rounded-full bg-slate-100"><div className="absolute inset-y-0 w-1/3 rounded-full bg-brand" style={{ animation: "scan 0.9s ease-in-out infinite" }} /></div>
+              <p className="mt-3 text-sm text-muted">Checking {fmt(rows?.length ?? 0)} reviews: duplicates, personal data, language…</p>
+            </div>
+          )}
+          {result && s && !scanning && (
             <>
               <div>
                 <div className="mb-2 flex items-center gap-2"><ShieldCheck size={16} className="text-brand" /><h3 className="text-sm font-semibold">Pre-flight check</h3><span className="text-xs text-muted">{name}</span></div>
                 <ul className="divide-y divide-line rounded-lg border border-line">
-                  {checks.map((c) => (
-                    <li key={c.label} className="flex gap-3 px-4 py-2.5 text-sm">
-                      {c.ok ? <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-pos" /> : <AlertTriangle size={16} className="mt-0.5 shrink-0 text-neu" />}
+                  {checks.map((c, i) => (
+                    <li key={c.label} style={{ ["--i" as string]: i }} className="step-in flex gap-3 px-4 py-2.5 text-sm">
+                      <span className="pop-in mt-0.5 shrink-0" style={{ ["--i" as string]: i }}>{c.ok ? <CheckCircle2 size={16} className="text-pos" /> : <AlertTriangle size={16} className="text-neu" />}</span>
                       <div><p className="font-medium">{c.label}</p><p className="text-xs text-muted">{c.note}</p></div>
                     </li>))}
                 </ul>
@@ -158,8 +166,8 @@ export function ImportDialog() {
                 <div className="mb-2 flex items-center gap-2"><Sparkles size={16} className="text-brand" /><h3 className="text-sm font-semibold">Matched to known issues</h3>
                   <span className="text-xs text-muted">{nMatched} of {result.matched.length} distinct reviews matched</span></div>
                 <ul className="divide-y divide-line rounded-lg border border-line text-sm">
-                  {result.matched.slice(0, 5).map(({ d, m }) => (
-                    <li key={d.text} className="space-y-1 px-4 py-2.5">
+                  {result.matched.slice(0, 5).map(({ d, m }, i) => (
+                    <li key={d.text} style={{ ["--i" as string]: i + checks.length }} className="step-in space-y-1 px-4 py-2.5">
                       <p>{d.text}{d.count > 1 && <span className="ml-1 text-xs text-muted">({fmt(d.count)}×)</span>}</p>
                       <p className="flex flex-wrap items-center gap-2 text-xs"><SentimentPill s={m.sentiment} />
                         {m.matched && m.issue ? <span className="text-slate-600">{issueById(m.issue).name} <span className="text-muted">· {Math.round(m.similarity * 100)}% similar to “{m.neighbor.slice(0, 48)}…”</span></span>
@@ -177,7 +185,7 @@ export function ImportDialog() {
           <Link href="/import" onClick={close} className="text-sm text-muted hover:text-brand">Adaption cleaning details</Link>
           <div className="ml-auto flex gap-2">
             {rows && <button className={btn} onClick={reset}>Back</button>}
-            {rows && <button className={btnPrimary} onClick={commit}>Add {fmt(rows.length)} reviews to dashboard</button>}
+            {rows && !scanning && <button className={`${btnPrimary} step-in`} style={{ ["--i" as string]: checks.length + 2 }} onClick={commit}>Add {fmt(rows.length)} reviews to dashboard</button>}
           </div>
         </div>
       </div>

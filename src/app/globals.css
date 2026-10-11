@@ -32,3 +32,34 @@ body {
   main { padding: 0 !important; }
   body { background: #fff; }
 }
+
+/* ---- motion ---- */
+@keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(350%); } }
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgb(79 70 229 / 0.35); } 100% { box-shadow: 0 0 0 10px rgb(79 70 229 / 0); } }
+
+.stagger > * { animation: fade-up 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 0ms; } .stagger > *:nth-child(2) { animation-delay: 60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; } .stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 240ms; } .stagger > *:nth-child(6) { animation-delay: 300ms; }
+.stagger > *:nth-child(n + 7) { animation-delay: 360ms; }
+
+.grow { transform-origin: left; animation: grow 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both; }
+.step-in { animation: fade-up 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 110ms); }
+.pop-in { animation: pop 0.4s ease-out both; animation-delay: calc(var(--i, 0) * 110ms + 120ms); }
+.tab-pane { animation: fade-up 0.25s ease-out both; }
+.pulse { animation: pulse-ring 1.6s ease-out infinite; }
+
+dialog[open] { animation: dialog-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1); }
+dialog[open]::backdrop { animation: fade 0.24s ease-out; }
+
+tbody tr { transition: background-color 0.15s; }
+tbody tr:hover { background-color: #f8fafc; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
+}
