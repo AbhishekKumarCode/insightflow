@@ -1,0 +1,13 @@
+{
+  "source": "Adaption web app: Instruction dataset, review = prompt, category = context, recipes Prompt Deduplication + Checklist verification",
+  "rowsSubmitted": 7223,
+  "rowsAfter": 441,
+  "distinctReviewsKept": 320,
+  "reviewsStillRepeated": 54,
+  "extraRowsFromRepeats": 121,
+  "maxRepeat": 6,
+  "checklistMeanPct": 98.4,
+  "fullMarksRows": 379,
+  "labelChangedRows": 40,
+  "promptsRewritten": 0
+}

@@ -91,7 +91,7 @@ export default function ImportPage() {
           {res.isSample && (
             <Card>
               <div className="flex items-center gap-2"><ShieldCheck size={18} className="text-brand" /><h2 className="text-lg font-semibold">Adaption data-quality check</h2></div>
-              <p className="mt-1 text-sm text-muted">The sample file was run through Adaption ({a.recipes.join(" + ")}), {a.rowsSubmitted.toLocaleString()} rows, {a.creditsUsed} credits.</p>
+              <p className="mt-1 text-sm text-muted">The sample file was run through Adaption ({a.recipes.join(" + ")}), {a.result.rowsSubmitted.toLocaleString()} rows, {a.creditsUsed} credits.</p>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border border-line p-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-muted">Before cleaning</p>
@@ -101,9 +101,17 @@ export default function ImportPage() {
                 </div>
                 <div className="rounded-lg border border-line p-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-muted">After cleaning</p>
-                  {a.after ? <p className="mt-1 text-3xl font-semibold">{a.after.score}<span className="text-lg text-muted">/10</span></p>
-                    : <p className="mt-1 text-lg font-medium text-muted">Result pending</p>}
-                  <p className="mt-1 text-sm text-muted">{a.after ? `${fmt(a.after.rows)} rows after deduplication.` : "Adaption emails the finished results. This card updates when they arrive."}</p>
+                  <p className="mt-1 text-3xl font-semibold tabular-nums">{fmt(a.result.rowsSubmitted)} <span className="text-muted">→</span> {fmt(a.result.rowsAfter)} <span className="text-lg font-medium text-muted">rows</span></p>
+                  {a.overall && <p className="mt-1 text-sm text-muted">Adaption score {a.overall.score}/10, grade {a.overall.grade}.</p>}
+                  <dl className="mt-3 space-y-1.5 text-sm">
+                    <Dl k="Distinct reviews kept" v={`${a.result.distinctReviewsKept} of ${DATA.totals.uniqueReviews}`} />
+                    <Dl k="Checklist points earned" v={`${a.result.checklistMeanPct}%`} />
+                    <Dl k="Rows with full marks" v={`${a.result.fullMarksRows} of ${a.result.rowsAfter}`} />
+                  </dl>
+                  <p className="mt-3 text-xs leading-relaxed text-muted">
+                    {a.result.reviewsStillRepeated} reviews still repeat (up to {a.result.maxRepeat} times), and repeat counts are lost in the cleaned file, so volume is counted from the original data.
+                    Adaption changed the category label in {a.result.labelChangedRows} rows, so its labels are not used as ground truth.
+                  </p>
                 </div>
               </div>
             </Card>
