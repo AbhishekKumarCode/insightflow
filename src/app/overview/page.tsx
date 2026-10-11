@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
 import { rankIssues, summarize, pct, fmt, issueById, DATA } from "@/lib/data";
 import { useApp } from "@/lib/store";
-import { Card, PageHead, btn } from "@/components/ui";
+import { Card, PageHead, btn, btnPrimary } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
 
 const COLORS = { positive: "#2f8f5b", neutral: "#c98a1b", negative: "#c8372d" };
@@ -57,13 +57,13 @@ export default function Overview() {
             {top ? (
               <>
                 <h2 className="max-w-2xl text-[30px] font-semibold leading-tight">Fix {top.name.toLowerCase()} first.</h2>
-                <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-stone-600">
+                <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-slate-600">
                   {plural(top.negative, "customer")} reported it and {pct(top.negative, top.rows) === 100 ? "every report was" : `${pct(top.negative, top.rows)}% of reports were`} negative.
                   It is in {top.category}{top.severity >= 0.85 ? ", where each case means lost money or trust" : ""}. Priority {top.score} out of 100.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Link href="/priorities" className={btn}>See how it was scored</Link>
-                  <button onClick={() => track(top.id)} disabled={topTracked} className={btn}>{topTracked ? "Tracking" : "Track this issue"}</button>
+                  <button onClick={() => track(top.id)} disabled={topTracked} className={btnPrimary}>{topTracked ? "Tracking" : "Track this issue"}</button>
                 </div>
               </>
             ) : <h2 className="text-2xl font-semibold">No negative feedback in this selection.</h2>}
@@ -79,11 +79,11 @@ export default function Overview() {
           <section>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 className="text-lg font-semibold">Issues by priority</h2>
-              {top3Left.length > 0 && <button onClick={() => top3.forEach((i) => track(i.id))} className="text-sm font-medium underline underline-offset-4 hover:text-stone-600">Track the top {top3.length}</button>}
+              {top3Left.length > 0 && <button onClick={() => top3.forEach((i) => track(i.id))} className="text-sm font-medium text-brand underline underline-offset-4 hover:text-blue-800">Track the top {top3.length}</button>}
             </div>
             <div className="mt-3 overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="border-b border-stone-900 text-left text-xs text-muted"><tr><th className="w-8 py-2 font-medium">#</th><th className="font-medium">Issue</th><th className="font-medium">Category</th><th className="w-56 font-medium">Negative reviews</th><th className="w-28 font-medium">Weekly</th><th className="w-14 text-right font-medium">Score</th><th className="w-28 pl-4 font-medium">Status</th></tr></thead>
+                <thead className="border-b border-slate-900 text-left text-xs text-muted"><tr><th className="w-8 py-2 font-medium">#</th><th className="font-medium">Issue</th><th className="font-medium">Category</th><th className="w-56 font-medium">Negative reviews</th><th className="w-28 font-medium">Weekly</th><th className="w-14 text-right font-medium">Score</th><th className="w-28 pl-4 font-medium">Status</th></tr></thead>
                 <tbody className="divide-y divide-line">
                   {ranked.map((i, n) => {
                     const t = tracked.find((x) => x.issueId === i.id);
@@ -91,9 +91,9 @@ export default function Overview() {
                     return (
                       <tr key={i.id}>
                         <td className="py-3 tabular-nums text-muted">{n + 1}</td>
-                        <td className="font-medium">{i.name}</td><td className="text-stone-600">{i.category}</td>
-                        <td><div className="flex items-center gap-3"><div className="h-1.5 flex-1 bg-stone-200"><div className="grow h-full" style={{ width: `${(i.negative / maxNeg) * 100}%`, background: i.severity >= 0.85 ? "#c8372d" : "#111" }} /></div><span className="w-10 text-right tabular-nums">{fmt(i.negative)}</span></div></td>
-                        <td><div className="h-7 w-24"><ResponsiveContainer><AreaChart data={wk}><Area dataKey="v" stroke="#6b6b66" fill="#ecece8" strokeWidth={1.25} isAnimationActive={false} /></AreaChart></ResponsiveContainer></div></td>
+                        <td className="font-medium">{i.name}</td><td className="text-slate-600">{i.category}</td>
+                        <td><div className="flex items-center gap-3"><div className="h-1.5 flex-1 bg-slate-200"><div className="grow h-full" style={{ width: `${(i.negative / maxNeg) * 100}%`, background: i.severity >= 0.85 ? "#c8372d" : "#1d4ed8" }} /></div><span className="w-10 text-right tabular-nums">{fmt(i.negative)}</span></div></td>
+                        <td><div className="h-7 w-24"><ResponsiveContainer><AreaChart data={wk}><Area dataKey="v" stroke="#1d4ed8" fill="#e8effd" strokeWidth={1.25} isAnimationActive={false} /></AreaChart></ResponsiveContainer></div></td>
                         <td className={`text-right text-base font-semibold tabular-nums ${i.score >= 85 ? "text-neg" : ""}`}>{i.score}</td>
                         <td className="pl-4 text-xs">{t ? <span className="font-medium">{t.status}</span> : <Link href="/priorities" className="text-muted hover:text-ink">Not tracked</Link>}</td>
                       </tr>);
@@ -114,7 +114,7 @@ export default function Overview() {
                   return (
                     <li key={c}>
                       <div className="mb-1 flex justify-between text-sm"><span className="font-medium">{c}</span><span className="tabular-nums text-muted">{fmt(t)} reviews, {pct(v.negative, t)}% negative</span></div>
-                      <div className="flex h-2 overflow-hidden bg-stone-200" role="img" aria-label={`${c}: ${pct(v.positive, t)}% positive, ${pct(v.negative, t)}% negative`}>
+                      <div className="flex h-2 overflow-hidden bg-slate-200" role="img" aria-label={`${c}: ${pct(v.positive, t)}% positive, ${pct(v.negative, t)}% negative`}>
                         <div style={{ width: `${pct(v.positive, t)}%`, background: COLORS.positive }} /><div style={{ width: `${pct(v.neutral, t)}%`, background: COLORS.neutral }} /><div style={{ width: `${pct(v.negative, t)}%`, background: COLORS.negative }} />
                       </div>
                     </li>);
@@ -140,12 +140,12 @@ export default function Overview() {
             <div className="mt-4 h-64">
               <ResponsiveContainer>
                 <ComposedChart data={trend}>
-                  <CartesianGrid vertical={false} stroke="#e3e3df" />
+                  <CartesianGrid vertical={false} stroke="#dde4ee" />
                   <XAxis dataKey="week" tickLine={false} axisLine={false} fontSize={12} />
                   <YAxis yAxisId="l" tickLine={false} axisLine={false} fontSize={12} width={40} />
                   <YAxis yAxisId="r" orientation="right" unit="%" domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} width={40} />
                   <Tooltip />
-                  <Area yAxisId="l" dataKey="volume" name="Feedback volume" stroke="#111111" fill="#ecece8" strokeWidth={1.5} isAnimationActive={false} />
+                  <Area yAxisId="l" dataKey="volume" name="Feedback volume" stroke="#1d4ed8" fill="#e8effd" strokeWidth={1.5} isAnimationActive={false} />
                   <Line yAxisId="r" dataKey="negPct" name="Negative %" stroke="#c8372d" strokeWidth={2} dot={false} isAnimationActive={false} />
                 </ComposedChart>
               </ResponsiveContainer>
@@ -154,7 +154,7 @@ export default function Overview() {
 
           <section className="border-t border-line pt-6">
             <h2 className="text-lg font-semibold">Worth knowing</h2>
-            <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[15px] text-stone-700 marker:text-stone-400">{highlights.map((h) => <li key={h}>{h}</li>)}</ul>
+            <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[15px] text-slate-700 marker:text-slate-400">{highlights.map((h) => <li key={h}>{h}</li>)}</ul>
           </section>
         </div>
       )}

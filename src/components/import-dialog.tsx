@@ -101,11 +101,11 @@ export function ImportDialog() {
 
   return (
     <dialog ref={ref} onClose={() => { setImportOpen(false); }} onClick={(e) => e.target === ref.current && close()}
-      aria-labelledby="import-title" className="m-auto w-[min(720px,calc(100vw-2rem))] rounded-lg border border-line bg-white p-0 shadow-2xl backdrop:bg-stone-900/50 backdrop:backdrop-blur-sm">
+      aria-labelledby="import-title" className="m-auto w-[min(720px,calc(100vw-2rem))] rounded-lg border border-line bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm">
       <div className="flex max-h-[85vh] flex-col">
         <div className="flex items-start justify-between border-b border-line px-6 py-4">
           <div><h2 id="import-title" className="text-lg font-semibold">Import data</h2><p className="text-sm text-muted">Add feedback. We check it first, then match it to known issues.</p></div>
-          <button onClick={close} aria-label="Close" className="rounded-lg p-1.5 text-muted hover:bg-stone-100"><X size={18} /></button>
+          <button onClick={close} aria-label="Close" className="rounded-lg p-1.5 text-muted hover:bg-slate-100"><X size={18} /></button>
         </div>
 
         <div className="flex gap-1 border-b border-line px-6 pt-3" role="tablist">
@@ -146,7 +146,7 @@ export function ImportDialog() {
 
           {result && s && scanning && (
             <div role="status" className="tab-pane py-10 text-center">
-              <div className="relative mx-auto h-1.5 w-56 overflow-hidden rounded-full bg-stone-100"><div className="absolute inset-y-0 w-1/3 rounded-full bg-brand" style={{ animation: "scan 0.9s ease-in-out infinite" }} /></div>
+              <div className="relative mx-auto h-1.5 w-56 overflow-hidden rounded-full bg-slate-100"><div className="absolute inset-y-0 w-1/3 rounded-full bg-brand" style={{ animation: "scan 0.9s ease-in-out infinite" }} /></div>
               <p className="mt-3 text-sm text-muted">Checking {fmt(rows?.length ?? 0)} reviews: duplicates, personal data, language…</p>
             </div>
           )}
@@ -170,7 +170,7 @@ export function ImportDialog() {
                     <li key={d.text} style={{ ["--i" as string]: i + checks.length }} className="step-in space-y-1 px-4 py-2.5">
                       <p>{d.text}{d.count > 1 && <span className="ml-1 text-xs text-muted">({fmt(d.count)}×)</span>}</p>
                       <p className="flex flex-wrap items-center gap-2 text-xs"><SentimentPill s={m.sentiment} />
-                        {m.matched && m.issue ? <span className="text-stone-600">{issueById(m.issue).name} <span className="text-muted">· {Math.round(m.similarity * 100)}% similar to “{m.neighbor.slice(0, 48)}…”</span></span>
+                        {m.matched && m.issue ? <span className="text-slate-600">{issueById(m.issue).name} <span className="text-muted">· {Math.round(m.similarity * 100)}% similar to “{m.neighbor.slice(0, 48)}…”</span></span>
                           : <span className="text-muted">No close match. Sentiment from keywords; kept as “Not matched”.</span>}</p>
                     </li>))}
                 </ul>

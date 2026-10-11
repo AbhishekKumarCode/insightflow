@@ -118,5 +118,5 @@ export default function ImportPage() {
     </>
   );
 }
-const Stat = ({ label, value }: { label: string; value: string }) => <div className="rounded-lg bg-stone-50 p-4"><p className="text-sm text-muted">{label}</p><p className="mt-1 text-2xl font-semibold">{value}</p></div>;
+const Stat = ({ label, value }: { label: string; value: string }) => <div className="rounded-lg bg-slate-50 p-4"><p className="text-sm text-muted">{label}</p><p className="mt-1 text-2xl font-semibold">{value}</p></div>;
 const Dl = ({ k, v }: { k: string; v: string }) => <div className="flex justify-between"><dt className="text-muted">{k}</dt><dd>{v}</dd></div>;

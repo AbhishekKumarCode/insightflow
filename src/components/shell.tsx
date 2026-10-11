@@ -28,10 +28,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-line px-5 py-6 md:flex">
         <Link href="/overview" className="mb-8 flex items-center gap-2.5">
-          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden><rect width="22" height="22" rx="4" fill="#111" /><path d="M5 15.5h3v-4H5zM9.5 15.5h3v-8h-3zM14 15.5h3v-11h-3z" fill="#f7f7f5" /></svg>
+          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden><rect width="22" height="22" rx="4" fill="#1d4ed8" /><path d="M5 15.5h3v-4H5zM9.5 15.5h3v-8h-3zM14 15.5h3v-11h-3z" fill="#f5f8fc" /></svg>
           <span className="text-[17px] font-semibold">InsightFlow</span>
         </Link>
-        <button onClick={() => setImportOpen(true)} className="mb-6 flex items-center justify-center gap-2 rounded-md bg-ink2 px-3 py-2 text-sm font-medium text-white transition hover:bg-stone-700">
+        <button onClick={() => setImportOpen(true)} className="mb-6 flex items-center justify-center gap-2 rounded-md bg-brand px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-800">
           <Upload size={15} /> Import data
         </button>
         <nav className="space-y-0.5 text-[15px]">
@@ -39,16 +39,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
             const on = path.startsWith(href);
             return (
               <Link key={href} href={href} aria-current={on ? "page" : undefined}
-                className={`flex items-center justify-between rounded-md px-2.5 py-1.5 transition-colors ${on ? "bg-stone-200/70 font-semibold text-ink" : "text-stone-600 hover:bg-stone-200/40 hover:text-ink"}`}>
+                className={`flex items-center justify-between rounded-md px-2.5 py-1.5 transition-colors ${on ? "bg-brand-soft font-semibold text-brand" : "text-slate-600 hover:bg-slate-100 hover:text-ink"}`}>
                 {label}
-                {href === "/tracker" && tracked.length > 0 && <span className="text-sm font-medium tabular-nums text-stone-500">{tracked.length}</span>}
+                {href === "/tracker" && tracked.length > 0 && <span className="text-sm font-medium tabular-nums text-slate-500">{tracked.length}</span>}
               </Link>
             );
           })}
         </nav>
         <div className="mt-auto border-t border-line pt-4 text-sm">
           <p className="font-medium">Sample dataset</p>
-          <div className="mt-2 flex h-1 overflow-hidden rounded-full bg-stone-200" role="img" aria-label={`${pct(positive, all.total)}% positive, ${pct(negative, all.total)}% negative`}>
+          <div className="mt-2 flex h-1 overflow-hidden rounded-full bg-slate-200" role="img" aria-label={`${pct(positive, all.total)}% positive, ${pct(negative, all.total)}% negative`}>
             <div style={{ width: `${pct(positive, all.total)}%` }} className="bg-pos" /><div style={{ width: `${pct(neutral, all.total)}%` }} className="bg-neu" /><div style={{ width: `${pct(negative, all.total)}%` }} className="bg-neg" />
           </div>
           <p className="mt-2 text-xs leading-relaxed text-muted">{fmt(all.total)} reviews, {pct(negative, all.total)}% negative{user.length > 0 && `. ${fmt(user.length)} added by you.`}</p>
@@ -62,12 +62,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <input value={filters.q} onChange={(e) => setFilters({ q: e.target.value })}
               onKeyDown={(e) => e.key === "Enter" && path !== "/feedback" && router.push("/feedback")}
               placeholder="Search feedback or issues" aria-label="Search feedback"
-              className="w-full rounded-md border border-line bg-white py-2 pl-9 pr-3 text-sm outline-none transition focus:border-stone-900" />
+              className="w-full rounded-md border border-line bg-white py-2 pl-9 pr-3 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10" />
           </label>
           <div className="ml-auto flex items-center gap-3 text-sm">
             <button onClick={() => setImportOpen(true)} aria-label="Import data" className="grid size-9 place-items-center rounded-md border border-line bg-white md:hidden"><Upload size={16} /></button>
-            <Link href="/tracker" aria-label={`${tracked.length} tracked issues`} className="hidden rounded-md px-2 py-1.5 text-stone-600 hover:text-ink sm:block">Tracked <b className="tabular-nums text-ink">{tracked.length}</b></Link>
-            <Link href="/reports" className="rounded-md border border-stone-900 px-3 py-1.5 font-medium hover:bg-stone-900 hover:text-white">Create report</Link>
+            <Link href="/tracker" aria-label={`${tracked.length} tracked issues`} className="hidden rounded-md px-2 py-1.5 text-slate-600 hover:text-ink sm:block">Tracked <b className="tabular-nums text-ink">{tracked.length}</b></Link>
+            <Link href="/reports" className="rounded-md border border-brand px-3 py-1.5 font-medium text-brand hover:bg-brand hover:text-white">Create report</Link>
           </div>
         </header>
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-10 md:py-10">{children}</main>
