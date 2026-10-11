@@ -6,7 +6,7 @@ import { Area, AreaChart, CartesianGrid, Cell, Line, Pie, PieChart, ResponsiveCo
 import { rankIssues, summarize, pct, fmt, issueById, DATA } from "@/lib/data";
 import { ShieldAlert, ThumbsUp, TrendingDown } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { Card, PageHead, ScoreBadge, ScoreRing } from "@/components/ui";
+import { Card, PageHead, ScoreBadge } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
 import { CountUp } from "@/components/count-up";
 import { CheckCircle2, ListPlus } from "lucide-react";
@@ -71,57 +71,63 @@ export default function Overview() {
       ) : (
         <div className="space-y-6">
           {top && (
-            <section className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
-              <div className="flex flex-col rounded-3xl bg-blue-800 p-7 text-white md:p-9">
+            <section className="grid overflow-hidden rounded-3xl bg-hero text-white lg:grid-cols-[1.05fr_1fr]">
+              <div className="flex flex-col p-7 md:p-9">
                 <div className="flex items-start justify-between gap-4">
-                  <p className="text-sm text-blue-200">What to fix first</p>
-                  <ScoreRing score={top.score} size={56} dark />
+                  <p className="text-sm text-white/70">What to fix first</p>
+                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium">{top.category}</span>
                 </div>
                 <h2 className="mt-3 max-w-md text-[34px] font-semibold leading-[1.08] md:text-[40px]">{top.name}</h2>
-                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-blue-100">{top.recommendation?.why ?? `It sits in ${top.category}.`}</p>
-                <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-white/15 pt-5">
-                  <div><dt className="text-xs text-blue-200">Reported</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{fmt(top.negative)}</dd></div>
-                  <div><dt className="text-xs text-blue-200">Negative</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{pct(top.negative, top.rows)}%</dd></div>
-                  <div><dt className="text-xs text-blue-200">Category</dt><dd className="mt-1 text-[15px] font-medium leading-snug">{top.category}</dd></div>
+                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-white/80">{top.recommendation?.why ?? `It sits in ${top.category}.`}</p>
+                <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-white/20 pt-5">
+                  <div><dt className="text-xs text-white/60">Reported</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{fmt(top.negative)}</dd></div>
+                  <div><dt className="text-xs text-white/60">Negative</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{pct(top.negative, top.rows)}%</dd></div>
+                  <div><dt className="text-xs text-white/60">Priority</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{top.score}<span className="text-base font-medium text-white/50">/100</span></dd></div>
                 </dl>
                 {top.recommendation?.actions[0] && (
                   <div className="mt-5 rounded-2xl bg-white/10 p-4">
-                    <p className="text-xs font-medium text-sky-200">Do this first</p>
+                    <p className="text-xs font-medium text-indigo-200">Do this first</p>
                     <p className="mt-1 text-sm leading-relaxed text-white">{top.recommendation.actions[0]}</p>
                   </div>
                 )}
                 <div className="mt-auto flex flex-wrap items-center gap-3 pt-6">
-                  <Link href="/priorities" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-50">See why it ranks first <ArrowRight size={16} /></Link>
+                  <Link href="/priorities" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-hero transition hover:bg-indigo-50">See why it ranks first <ArrowRight size={16} /></Link>
                   <button onClick={() => track(top.id)} disabled={tracked.some((t) => t.issueId === top.id)} className="rounded-xl border border-white/30 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-60">
                     {tracked.some((t) => t.issueId === top.id) ? "Tracking" : "Track this issue"}
                   </button>
                 </div>
               </div>
 
-              <div className="flex flex-col rounded-3xl border border-slate-200/70 bg-white p-7 md:p-9">
-                <div className="flex items-baseline justify-between"><h3 className="text-lg font-semibold">Pressure board</h3>
-                  <Link href="/priorities" className="text-sm font-medium text-indigo-600 hover:underline">All {ranked.length} issues</Link></div>
-                <p className="mt-1 text-sm text-muted">The five issues that need attention soonest.</p>
-                <ol className="mt-5 flex flex-1 flex-col justify-between gap-4">
-                  {ranked.slice(0, 5).map((i, n) => (
-                    <li key={i.id}>
-                      <div className="flex items-baseline gap-3 text-sm">
-                        <span className="w-4 text-slate-400 tabular-nums">{n + 1}</span>
-                        <span className="flex-1 font-medium">{i.name}</span>
-                        <span className="font-display text-lg font-semibold tabular-nums">{i.score}</span>
-                      </div>
-                      <div className="ml-7 mt-1.5 h-2 rounded-full bg-slate-100">
-                        <div className="grow h-2 rounded-full" style={{ width: `${Math.max(6, i.inputs.volume * 100)}%`, background: i.severity >= 0.85 ? "#f43f5e" : i.severity >= 0.7 ? "#f59e0b" : "#6366f1", animationDelay: `${0.25 + n * 0.09}s` }} />
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-                <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-slate-100 pt-4 text-xs text-muted">
-                  <span>Bar length: how many reported it</span>
-                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-rose-500" />Money or trust</span>
-                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-amber-500" />Broken or unresolved</span>
-                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-indigo-500" />Inconvenience</span>
-                </p>
+              <div className="flex flex-col">
+                <div className="flex items-start justify-between gap-4 px-7 pb-6 pt-7 md:px-9 md:pt-9">
+                  <div>
+                    <h3 className="text-lg font-semibold">Pressure board</h3>
+                    <p className="mt-1 text-sm text-white/70">The five issues that need attention soonest.</p>
+                  </div>
+                  <Link href="/priorities" className="shrink-0 whitespace-nowrap text-sm font-medium text-indigo-200 hover:underline">All {ranked.length} issues</Link>
+                </div>
+                <div className="flex flex-1 flex-col rounded-l-3xl bg-white p-7 text-ink md:p-9">
+                  <ol className="flex flex-1 flex-col justify-between gap-4">
+                    {ranked.slice(0, 5).map((i, n) => (
+                      <li key={i.id}>
+                        <div className="flex items-baseline gap-3 text-sm">
+                          <span className="w-4 text-slate-400 tabular-nums">{n + 1}</span>
+                          <span className="flex-1 font-medium">{i.name}</span>
+                          <span className="font-display text-lg font-semibold tabular-nums">{i.score}</span>
+                        </div>
+                        <div className="ml-7 mt-1.5 h-2 rounded-full bg-slate-100">
+                          <div className="grow h-2 rounded-full" style={{ width: `${Math.max(6, i.inputs.volume * 100)}%`, background: i.severity >= 0.85 ? "#f43f5e" : i.severity >= 0.7 ? "#f59e0b" : "#6366f1", animationDelay: `${0.25 + n * 0.09}s` }} />
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                  <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-slate-100 pt-4 text-xs text-muted">
+                    <span>Bar length: how many reported it</span>
+                    <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-rose-500" />Money or trust</span>
+                    <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-amber-500" />Broken or unresolved</span>
+                    <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-indigo-500" />Inconvenience</span>
+                  </p>
+                </div>
               </div>
             </section>
           )}

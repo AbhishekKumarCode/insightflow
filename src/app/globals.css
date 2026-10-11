@@ -16,6 +16,7 @@
   --color-pos: #16a34a;
   --color-neu: #d97706;
   --color-neg: #dc2626;
+  --color-hero: lab(31 11.9 -43.81);
   --color-ink2: #0f1226;
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --radius-card: 12px;
