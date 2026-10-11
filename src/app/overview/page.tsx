@@ -55,14 +55,18 @@ export default function Overview() {
       ) : (
         <div className="space-y-6">
           {top && (
-            <section className="grid overflow-hidden rounded-3xl bg-ink2 text-white lg:grid-cols-[1.05fr_1fr]">
-              <div className="flex flex-col p-7 md:p-9">
+            <section className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
+              <div className="flex flex-col rounded-3xl bg-ink2 p-7 text-white md:p-9">
                 <p className="text-sm text-slate-400">What to fix first</p>
                 <h2 className="mt-3 text-[34px] font-semibold leading-[1.08] md:text-[40px]">{top.name}</h2>
                 <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-300">
-                  {fmt(top.negative)} customers reported this, {pct(top.negative, top.rows)}% of them negative. It sits in {top.category}
-                  {top.severity >= 0.85 ? ", where each case means lost money or trust" : ""}. Priority {top.score} of 100.
+                  It sits in {top.category}{top.severity >= 0.85 ? ", where each case means lost money or trust" : ""}.
                 </p>
+                <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-white/10 pt-5">
+                  <div><dt className="text-xs text-slate-400">Reported</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{fmt(top.negative)}</dd></div>
+                  <div><dt className="text-xs text-slate-400">Negative</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{pct(top.negative, top.rows)}%</dd></div>
+                  <div><dt className="text-xs text-slate-400">Priority</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{top.score}<span className="text-base text-slate-500">/100</span></dd></div>
+                </dl>
                 <div className="mt-auto flex flex-wrap items-center gap-3 pt-7">
                   <Link href="/priorities" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ink2 transition hover:bg-slate-100">See why it ranks first <ArrowRight size={16} /></Link>
                   <button onClick={() => track(top.id)} disabled={tracked.some((t) => t.issueId === top.id)} className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-60">
@@ -70,28 +74,30 @@ export default function Overview() {
                   </button>
                 </div>
               </div>
-              <div className="border-t border-white/10 bg-white/[0.04] p-7 md:p-9 lg:border-l lg:border-t-0">
-                <div className="flex items-baseline justify-between"><h3 className="text-sm font-medium text-slate-300">Pressure board</h3>
-                  <Link href="/priorities" className="text-xs text-indigo-300 hover:underline">All {ranked.length} issues</Link></div>
-                <ol className="mt-4 space-y-4">
+
+              <div className="rounded-3xl border border-slate-200/70 bg-white p-7 md:p-9">
+                <div className="flex items-baseline justify-between"><h3 className="text-lg font-semibold">Pressure board</h3>
+                  <Link href="/priorities" className="text-sm font-medium text-indigo-600 hover:underline">All {ranked.length} issues</Link></div>
+                <p className="mt-1 text-sm text-muted">The five issues that need attention soonest.</p>
+                <ol className="mt-5 space-y-4">
                   {ranked.slice(0, 5).map((i, n) => (
                     <li key={i.id}>
                       <div className="flex items-baseline gap-3 text-sm">
-                        <span className="w-4 text-slate-500 tabular-nums">{n + 1}</span>
-                        <span className="flex-1 font-medium text-slate-100">{i.name}</span>
+                        <span className="w-4 text-slate-400 tabular-nums">{n + 1}</span>
+                        <span className="flex-1 font-medium">{i.name}</span>
                         <span className="font-display text-lg font-semibold tabular-nums">{i.score}</span>
                       </div>
-                      <div className="ml-7 mt-1.5 h-2 rounded-full bg-white/10">
-                        <div className="grow h-2 rounded-full" style={{ width: `${Math.max(6, i.inputs.volume * 100)}%`, background: i.severity >= 0.85 ? "#fb7185" : i.severity >= 0.7 ? "#fbbf24" : "#a5b4fc", animationDelay: `${0.25 + n * 0.09}s` }} />
+                      <div className="ml-7 mt-1.5 h-2 rounded-full bg-slate-100">
+                        <div className="grow h-2 rounded-full" style={{ width: `${Math.max(6, i.inputs.volume * 100)}%`, background: i.severity >= 0.85 ? "#f43f5e" : i.severity >= 0.7 ? "#f59e0b" : "#6366f1", animationDelay: `${0.25 + n * 0.09}s` }} />
                       </div>
                     </li>
                   ))}
                 </ol>
-                <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+                <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-slate-100 pt-4 text-xs text-muted">
                   <span>Bar length: how many reported it</span>
-                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-rose-400" />Money or trust</span>
-                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-amber-400" />Broken or unresolved</span>
-                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-indigo-300" />Inconvenience</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-rose-500" />Money or trust</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-amber-500" />Broken or unresolved</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-indigo-500" />Inconvenience</span>
                 </p>
               </div>
             </section>
