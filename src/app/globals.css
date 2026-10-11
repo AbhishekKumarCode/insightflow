@@ -69,3 +69,14 @@ tbody tr:hover { background-color: #f8fafc; }
 .font-display { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.02em; }
 h1, h2 { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.015em; }
 :focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+
+@media print {
+  .bg-ink2, .bg-white, [class*="bg-"] { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  article { box-shadow: none !important; border: 0 !important; }
+}
+
+@media print {
+  /* Browsers drop background colors by default, so the dark masthead becomes plain dark-on-white. */
+  .report-mast { background: #fff !important; color: #111 !important; border-bottom: 2px solid #111; }
+  .report-mast * { color: #111 !important; border-color: #ccc !important; }
+}
