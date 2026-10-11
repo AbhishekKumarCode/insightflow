@@ -98,6 +98,23 @@ export default function Overview() {
           )}
           {!top && <Card><h2 className="text-lg font-semibold">What to fix first</h2><p className="mt-1 text-sm text-muted">No negative feedback in this selection.</p></Card>}
 
+          {ranked.length > 0 && (() => {
+            const top3 = ranked.slice(0, 3);
+            const left = top3.filter((i) => !tracked.some((t) => t.issueId === i.id));
+            return (
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-indigo-200 bg-indigo-50/70 px-5 py-3.5">
+                <span className={`grid size-9 shrink-0 place-items-center rounded-full bg-brand text-white ${left.length ? "pulse" : ""}`}>{left.length ? <ListPlus size={20} /> : <CheckCircle2 size={20} />}</span>
+                <div className="min-w-56 flex-1">
+                  <p className="font-semibold">{left.length ? "Recommended next step" : "Top issues are being tracked"}</p>
+                  <p className="text-sm text-slate-600">{left.length ? `Start tracking the top ${top3.length}: ${top3.map((i) => i.name.toLowerCase()).join(", ")}.` : "Move them forward in the Tracker, then export a report for your team."}</p>
+                </div>
+                {left.length > 0 ? <button onClick={() => top3.forEach((i) => track(i.id))} className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Track top {top3.length} issues</button>
+                  : <Link href="/tracker" className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Open Tracker <ArrowRight size={16} /></Link>}
+                <Link href="/reports" className="text-sm font-medium text-brand hover:underline">Create report</Link>
+              </div>
+            );
+          })()}
+
           <section className="grid grid-cols-2 divide-slate-200/80 rounded-2xl border border-slate-200/70 bg-white lg:grid-cols-4 lg:divide-x [&>*:nth-child(-n+2)]:border-b [&>*:nth-child(-n+2)]:border-slate-200/80 lg:[&>*:nth-child(-n+2)]:border-b-0">
             <Kpi label="Total feedback" num={s.total} sub={`${s.unique} distinct reviews`} />
             <Kpi label="Net sentiment" num={net} format={(n) => `${Math.round(n) > 0 ? "+" : ""}${Math.round(n)}`} sub="Positive % minus negative %" />
@@ -218,22 +235,6 @@ export default function Overview() {
               </tbody></table></div>
           </Card>
 
-          {ranked.length > 0 && (() => {
-            const top3 = ranked.slice(0, 3);
-            const left = top3.filter((i) => !tracked.some((t) => t.issueId === i.id));
-            return (
-              <Card className="flex flex-wrap items-center gap-4 border-brand/30 bg-brand-soft/60">
-                <span className={`grid size-10 shrink-0 place-items-center rounded-full bg-brand text-white ${left.length ? "pulse" : ""}`}>{left.length ? <ListPlus size={20} /> : <CheckCircle2 size={20} />}</span>
-                <div className="min-w-56 flex-1">
-                  <p className="font-semibold">{left.length ? "Recommended next step" : "Top issues are being tracked"}</p>
-                  <p className="text-sm text-slate-600">{left.length ? `Start tracking the top ${top3.length}: ${top3.map((i) => i.name.toLowerCase()).join(", ")}.` : "Move them forward in the Tracker, then export a report for your team."}</p>
-                </div>
-                {left.length > 0 ? <button onClick={() => top3.forEach((i) => track(i.id))} className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Track top {top3.length} issues</button>
-                  : <Link href="/tracker" className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Open Tracker <ArrowRight size={16} /></Link>}
-                <Link href="/reports" className="text-sm font-medium text-brand hover:underline">Create report</Link>
-              </Card>
-            );
-          })()}
         </div>
       )}
     </>
