@@ -45,7 +45,7 @@ if (errs.length) console.log(errs);
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
 await p.getByRole("button", { name: "Import data" }).first().click();
 await p.getByRole("tab", { name: /Paste feedback/ }).click();
-await p.getByLabel("Pasted feedback").fill("No fraudulent activity or scam during my transaction\nI was scammed, they took my money. Contact me at jane@example.com\nThe app crashes every time I pay");
+await p.getByLabel("Pasted feedback").fill("Refund took six weeks to arrive\nI was scammed, they took my money. Contact me at jane@example.com\nThe app crashes every time I pay");
 await p.getByRole("button", { name: "Check feedback" }).click();
 await p.getByText(/Personal data found/).waitFor({ timeout: 5000 });
 ok("pre-flight flags the email", await p.getByText(/Personal data found/).isVisible());
@@ -58,4 +58,15 @@ ok("total becomes 7,003", await p.getByText("7,003").first().isVisible());
 await p.reload({ waitUntil: "networkidle" });
 await p.getByText("7,003").first().waitFor({ timeout: 5000 });
 ok("added reviews persist", await p.getByText("7,003").first().isVisible());
+
+// Adding the same text again must not double the counts.
+await p.getByRole("button", { name: "Import data" }).first().click();
+await p.getByRole("tab", { name: /Paste feedback/ }).click();
+await p.getByLabel("Pasted feedback").fill("Refund took six weeks to arrive\nThe app crashes every time I pay");
+await p.getByRole("button", { name: "Check feedback" }).click();
+await p.getByText(/already in your dashboard/).waitFor({ timeout: 5000 });
+ok("re-adding is flagged", await p.getByText(/already in your dashboard/).first().isVisible());
+ok("nothing new to add", await p.getByRole("button", { name: "Nothing new to add" }).isDisabled());
+await p.getByLabel(/Add the 2 repeated reviews again anyway/).check();
+ok("can add anyway on purpose", await p.getByRole("button", { name: /Add 2 reviews/ }).isEnabled());
 await b.close();

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo } from "react";
-import { Area, AreaChart, CartesianGrid, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
+import { Area, AreaChart, CartesianGrid, Cell, Line, Pie, PieChart, ReferenceLine, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
 import { rankIssues, summarize, pct, fmt, issueById, DATA } from "@/lib/data";
 import { useApp } from "@/lib/store";
 import { Card, PageHead, btn, btnPrimary } from "@/components/ui";
@@ -40,6 +40,9 @@ export default function Overview() {
     worstCat ? `${worstCat.c} is the most negative category: ${worstCat.share}% of its reviews.` : "",
     lovedList[0] ? `Customers praise ${issueById(lovedList[0][0]).name.toLowerCase()} most: ${plural(lovedList[0][1], "review")}.` : "",
   ].filter(Boolean);
+  const donut = (["positive", "neutral", "negative"] as const).map((k) => ({ name: k === "neutral" ? "Mixed" : k[0].toUpperCase() + k.slice(1), value: s.sentiment[k], color: COLORS[k] }));
+  const matrix = ranked.map((i, n) => ({ n: n + 1, name: i.name, x: i.negative, y: Math.round(i.severity * 100), hot: i.severity >= 0.85 }));
+  const voice = s.rows.filter((x) => x.r.sentiment === "negative").sort((a, b) => b.w - a.w).slice(0, 5);
   const topTracked = top ? tracked.some((t) => t.issueId === top.id) : false;
   const top3 = ranked.slice(0, 3);
   const top3Left = top3.filter((i) => !tracked.some((t) => t.issueId === i.id));
@@ -53,6 +56,7 @@ export default function Overview() {
         <Card className="py-16 text-center text-muted">No feedback matches these filters. Clear a filter to see everything.</Card>
       ) : (
         <div className="space-y-10">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
           <section>
             {top ? (
               <>
@@ -68,6 +72,18 @@ export default function Overview() {
               </>
             ) : <h2 className="text-2xl font-semibold">No negative feedback in this selection.</h2>}
           </section>
+            <section className="rounded-lg border border-line bg-white p-5" aria-label="Share of positive, mixed and negative reviews">
+              <div className="flex items-center gap-5">
+                <div className="relative size-36 shrink-0">
+                  <ResponsiveContainer><PieChart><Pie data={donut} dataKey="value" innerRadius={44} outerRadius={66} paddingAngle={2} stroke="none" isAnimationActive={false}>{donut.map((d) => <Cell key={d.name} fill={d.color} />)}</Pie></PieChart></ResponsiveContainer>
+                  <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-xl font-semibold tabular-nums leading-none">{fmt(s.total)}</p><p className="mt-1 text-[11px] text-muted">reviews</p></div></div>
+                </div>
+                <ul className="flex-1 space-y-2 text-sm">
+                  {donut.map((d) => <li key={d.name} className="flex items-center gap-2"><i className="size-2.5 rounded-full" style={{ background: d.color }} />{d.name}<span className="ml-auto tabular-nums text-muted">{pct(d.value, s.total)}%</span></li>)}
+                </ul>
+              </div>
+            </section>
+          </div>
 
           <section className="grid grid-cols-2 gap-y-6 border-y border-line py-6 lg:grid-cols-4 lg:divide-x lg:divide-line [&>*]:lg:px-6 [&>*:first-child]:lg:pl-0">
             <Fig label="Reviews" value={fmt(s.total)} sub={`${s.unique} distinct`} />
@@ -75,6 +91,38 @@ export default function Overview() {
             <Fig label="Negative" value={`${pct(s.sentiment.negative, s.total)}%`} sub={`${fmt(s.sentiment.negative)} reviews`} />
             <Fig label="Issues ranked" value={String(ranked.length)} sub={top ? `Highest priority ${top.score}` : "None"} />
           </section>
+
+          <div className="grid gap-10 lg:grid-cols-2">
+            <section>
+              <h2 className="text-lg font-semibold">Priority matrix</h2>
+              <p className="mt-1 text-sm text-muted">Each number is an issue from the table below. Top right means many customers and a high cost.</p>
+              <div className="mt-3 h-72 rounded-lg border border-line bg-white p-2">
+                <ResponsiveContainer>
+                  <ScatterChart margin={{ top: 14, right: 18, bottom: 22, left: 4 }}>
+                    <CartesianGrid stroke="#dde4ee" />
+                    <XAxis type="number" dataKey="x" name="Negative reviews" tickLine={false} axisLine={false} fontSize={11} domain={[0, "dataMax + 40"]} label={{ value: "Negative reviews", position: "insideBottom", offset: -12, fontSize: 11, fill: "#5b6b85" }} />
+                    <YAxis type="number" dataKey="y" name="Severity" tickLine={false} axisLine={false} fontSize={11} width={34} domain={[40, 100]} label={{ value: "Severity", angle: -90, position: "insideLeft", fontSize: 11, fill: "#5b6b85" }} />
+                    <ReferenceLine y={85} stroke="#c8372d" strokeDasharray="4 4" />
+                    <Tooltip cursor={{ strokeDasharray: "3 3" }} content={({ payload }) => payload?.[0] ? <div className="rounded-md border border-line bg-white px-3 py-2 text-xs shadow-sm"><p className="font-semibold">{payload[0].payload.n}. {payload[0].payload.name}</p><p className="text-muted">{fmt(payload[0].payload.x)} negative reviews, severity {payload[0].payload.y}</p></div> : null} />
+                    <Scatter data={matrix} isAnimationActive={false} shape={(props: { cx?: number; cy?: number; payload?: { n: number; hot: boolean } }) => (
+                      <g><circle cx={props.cx} cy={props.cy} r={11} fill={props.payload?.hot ? "#c8372d" : "#1d4ed8"} /><text x={props.cx} y={(props.cy ?? 0) + 4} textAnchor="middle" fontSize={11} fontWeight={600} fill="#fff">{props.payload?.n}</text></g>)} />
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+            </section>
+            <section>
+              <h2 className="text-lg font-semibold">In customers&apos; words</h2>
+              <p className="mt-1 text-sm text-muted">The most repeated complaints, exactly as written.</p>
+              <ul className="mt-3 divide-y divide-line rounded-lg border border-line bg-white">
+                {voice.length === 0 && <li className="p-4 text-sm text-muted">No negative feedback in this selection.</li>}
+                {voice.map(({ r, w }) => (
+                  <li key={r.id} className="px-4 py-3">
+                    <p className="text-sm leading-relaxed">“{r.text}”</p>
+                    <p className="mt-1 flex justify-between text-xs text-muted"><span>{issueById(r.issue).name}</span><span className="font-medium tabular-nums text-neg">{fmt(w)} times</span></p>
+                  </li>))}
+              </ul>
+            </section>
+          </div>
 
           <section>
             <div className="flex flex-wrap items-baseline justify-between gap-2">

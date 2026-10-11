@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Papa from "papaparse";
 import { X, UploadCloud, ClipboardPaste, PenLine, CheckCircle2, AlertTriangle, ShieldCheck, Sparkles } from "lucide-react";
-import { DATA, WEEKS, UNMATCHED, categories, fmt, issueById, type Review } from "@/lib/data";
+import { DATA, WEEKS, UNMATCHED, allReviews, categories, fmt, issueById, type Review } from "@/lib/data";
 import { buildIndex, classify } from "@/lib/match";
 import { scan, type RawRow } from "@/lib/scan";
 import { useApp } from "@/lib/store";
 import { SentimentPill, btn, btnPrimary } from "./ui";
 
+const norm = (t: string) => t.toLowerCase().replace(/[^a-z0-9 ]+/g, "").replace(/\s+/g, " ").trim();
 type Tab = "upload" | "paste" | "one";
 const TABS: { id: Tab; label: string; icon: typeof UploadCloud }[] = [
   { id: "upload", label: "Upload CSV", icon: UploadCloud },
@@ -30,6 +31,7 @@ export function ImportDialog() {
   const [cat, setCat] = useState("");
   const [drag, setDrag] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [addAnyway, setAddAnyway] = useState(false);
 
   useEffect(() => {
     const d = ref.current; if (!d) return;
@@ -38,16 +40,18 @@ export function ImportDialog() {
   }, [importOpen]);
 
   const reveal = (r: RawRow[]) => { setRows(r); setScanning(true); setTimeout(() => setScanning(false), 750); };
-  const reset = () => { setScanning(false); setRows(null); setErr(""); setText(""); setName(""); setCat(""); };
+  const reset = () => { setAddAnyway(false); setScanning(false); setRows(null); setErr(""); setText(""); setName(""); setCat(""); };
   const close = () => { setImportOpen(false); reset(); };
 
   const index = useMemo(() => buildIndex(DATA.reviews.map((r) => ({ text: r.text, issue: r.issue, sentiment: r.sentiment }))), []);
+  // Reviews already in the dashboard (sample data plus anything added before), compared on normalized text.
+  const existing = useMemo(() => new Set(allReviews().map((r) => norm(r.text))), [user, importOpen]); // eslint-disable-line react-hooks/exhaustive-deps
   const result = useMemo(() => {
     if (!rows) return null;
     const s = scan(rows);
-    const matched = s.distinct.map((d) => ({ d, m: classify(index, d.text) }));
-    return { s, matched };
-  }, [rows, index]);
+    const matched = s.distinct.map((d) => ({ d, m: classify(index, d.text), dup: existing.has(norm(d.text)) }));
+    return { s, matched, dupCount: matched.filter((x) => x.dup).length };
+  }, [rows, index, existing]);
 
   const onFile = (file: File) => {
     setErr(""); setRows(null);
@@ -76,12 +80,13 @@ export function ImportDialog() {
     if (!result) return;
     const known = new Set(categories());
     const stamp = Date.now();
-    const list: Review[] = result.matched.map(({ d, m }, i) => {
+    const list: Review[] = result.matched.filter((x) => addAnyway || !x.dup).map(({ d, m }, i) => {
       const issue = m.matched && m.issue ? m.issue : UNMATCHED;
       const category = d.category && known.has(d.category) ? d.category : m.matched ? issueById(issue).category : "Uncategorized";
       const weekly = Array(WEEKS).fill(0); weekly[WEEKS - 1] = d.count;
       return { id: `u${stamp}-${i}`, text: d.text, category, count: d.count, issue, sentiment: m.sentiment, weekly, source: "user", similarity: m.similarity };
     });
+    if (!list.length) return;
     addUser(list);
     close();
     router.push("/overview");
@@ -89,10 +94,13 @@ export function ImportDialog() {
 
   const s = result?.s;
   const nMatched = result?.matched.filter((x) => x.m.matched).length ?? 0;
+  const dupCount = result?.dupCount ?? 0;
+  const toAdd = result ? result.matched.filter((x) => addAnyway || !x.dup).reduce((a, x) => a + x.d.count, 0) : 0;
   const piiTotal = s ? s.pii.emails + s.pii.cards + s.pii.phones : 0;
   const checks = s ? [
     { ok: true, label: `${fmt(s.rows)} reviews read`, note: `${fmt(s.distinct.length)} distinct` },
     { ok: s.duplicateShare < 0.2, label: `${Math.round(s.duplicateShare * 100)}% repeated text`, note: "Merged into one row each. Counts are kept, so volume still reflects how many customers said it." },
+    { ok: dupCount === 0, label: dupCount ? `${dupCount} of ${s.distinct.length} distinct reviews are already in your dashboard` : "Nothing here is in your dashboard yet", note: dupCount ? "They are skipped by default so your counts don't double. Tick the box below to add them again." : "All reviews are new." },
     { ok: piiTotal === 0, label: piiTotal ? `Personal data found in ${s.pii.rows} ${s.pii.rows === 1 ? "review" : "reviews"}` : "No personal data found", note: piiTotal ? `${[s.pii.emails && `${s.pii.emails} email${s.pii.emails > 1 ? "s" : ""}`, s.pii.phones && `${s.pii.phones} phone number${s.pii.phones > 1 ? "s" : ""}`, s.pii.cards && `${s.pii.cards} card-like number${s.pii.cards > 1 ? "s" : ""}`].filter(Boolean).join(", ")}. Masked before anything is stored.` : "Checked for emails, phone and card numbers." },
     { ok: s.short === 0, label: s.short ? `${s.short} very short reviews` : "No very short reviews", note: s.short ? "Under 3 words. These are hard to classify." : "All reviews have enough text to analyze." },
     { ok: s.nonAsciiShare < 0.1, label: s.nonAsciiShare < 0.1 ? "Looks like English" : "Mixed languages likely", note: s.nonAsciiShare < 0.1 ? "Matching is tuned for English text." : "Matching works best on English text." },
@@ -161,6 +169,7 @@ export function ImportDialog() {
                       <div><p className="font-medium">{c.label}</p><p className="text-xs text-muted">{c.note}</p></div>
                     </li>))}
                 </ul>
+                {dupCount > 0 && <label className="mt-3 flex cursor-pointer items-start gap-2 text-sm"><input type="checkbox" checked={addAnyway} onChange={(e) => setAddAnyway(e.target.checked)} className="mt-0.5 size-4 accent-blue-700" /><span>Add the {dupCount} repeated {dupCount === 1 ? "review" : "reviews"} again anyway</span></label>}
               </div>
               <div>
                 <div className="mb-2 flex items-center gap-2"><Sparkles size={16} className="text-brand" /><h3 className="text-sm font-semibold">Matched to known issues</h3>
@@ -185,7 +194,7 @@ export function ImportDialog() {
           <Link href="/import" onClick={close} className="text-sm text-muted hover:text-brand">Adaption cleaning details</Link>
           <div className="ml-auto flex gap-2">
             {rows && <button className={btn} onClick={reset}>Back</button>}
-            {rows && !scanning && <button className={`${btnPrimary} step-in`} style={{ ["--i" as string]: checks.length + 2 }} onClick={commit}>Add {fmt(rows.length)} reviews to dashboard</button>}
+            {rows && !scanning && <button disabled={toAdd === 0} className={`${btnPrimary} step-in`} style={{ ["--i" as string]: checks.length + 2 }} onClick={commit}>{toAdd === 0 ? "Nothing new to add" : `Add ${fmt(toAdd)} ${toAdd === 1 ? "review" : "reviews"} to dashboard`}</button>}
           </div>
         </div>
       </div>
