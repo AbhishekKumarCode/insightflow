@@ -6,7 +6,7 @@ import { Card, PageHead, SentimentPill, Chip, btn } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
 
 const PAGE = 15;
-const STRIPE = { positive: "#2f8f5b", neutral: "#c98a1b", negative: "#c8372d" };
+const STRIPE = { positive: "#10b981", neutral: "#f59e0b", negative: "#f43f5e" };
 
 export default function Feedback() {
   const { filters, tracked, track } = useApp();
@@ -26,8 +26,8 @@ export default function Feedback() {
       <FilterBar />
       <Card className="!p-0 overflow-hidden">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-slate-200/70 px-5 py-4">
-          <div><p className="text-2xl font-semibold tabular-nums leading-none">{fmt(rows.length)}</p><p className="mt-1 text-xs text-muted">distinct reviews</p></div>
-          <div><p className="text-2xl font-semibold tabular-nums leading-none">{fmt(total)}</p><p className="mt-1 text-xs text-muted">total mentions</p></div>
+          <div><p className="font-display text-2xl font-semibold tabular-nums leading-none">{fmt(rows.length)}</p><p className="mt-1 text-xs text-muted">distinct reviews</p></div>
+          <div><p className="font-display text-2xl font-semibold tabular-nums leading-none">{fmt(total)}</p><p className="mt-1 text-xs text-muted">total mentions</p></div>
           <div className="min-w-48 flex-1 md:max-w-xs">
             <div className="flex h-2 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${pct(mix.positive, total)}% positive, ${pct(mix.negative, total)}% negative`}>
               {(["positive", "neutral", "negative"] as const).map((k) => <div key={k} className="grow" style={{ width: `${pct(mix[k], total)}%`, background: STRIPE[k] }} />)}
@@ -35,7 +35,7 @@ export default function Feedback() {
             <p className="mt-1.5 text-xs text-muted">{pct(mix.positive, total)}% positive, {pct(mix.negative, total)}% negative</p>
           </div>
           <label className="ml-auto flex items-center gap-2 text-sm text-muted">Sort
-            <select value={sort} onChange={(e) => setSort(e.target.value as "count" | "text")} className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-ink"><option value="count">Most mentioned</option><option value="text">A to Z</option></select></label>
+            <select value={sort} onChange={(e) => setSort(e.target.value as "count" | "text")} className="rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-ink"><option value="count">Most mentioned</option><option value="text">A to Z</option></select></label>
         </div>
 
         {rows.length === 0 ? <p className="py-14 text-center text-muted">No feedback matches these filters. Clear a filter or try another search.</p> : (
@@ -49,13 +49,13 @@ export default function Feedback() {
                   <tr key={r.id} className="align-top">
                     <td className="max-w-md py-3.5 pl-5 pr-3" style={{ boxShadow: `inset 3px 0 0 ${STRIPE[r.sentiment]}` }}>
                       <p className="leading-relaxed">{r.text}</p>
-                      <p className="mt-1.5 flex items-center gap-2"><Chip>{r.category}</Chip>{r.source === "user" && <span className="rounded-md bg-brand-soft px-2 py-0.5 text-xs font-medium text-brand">Added by you</span>}</p>
+                      <p className="mt-1.5 flex items-center gap-2"><Chip>{r.category}</Chip>{r.source === "user" && <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">Added by you</span>}</p>
                     </td>
                     <td className="px-3 py-3.5 text-slate-600">{issue.name}</td>
                     <td className="px-3 py-3.5"><SentimentPill s={r.sentiment} /></td>
                     <td className="px-3 py-3.5"><div className="flex items-center gap-2"><div className="h-1.5 flex-1 rounded-full bg-slate-100"><div className="grow h-1.5 rounded-full" style={{ width: `${Math.max(4, (w / maxW) * 100)}%`, background: STRIPE[r.sentiment] }} /></div><span className="w-10 text-right tabular-nums">{fmt(w)}</span></div></td>
                     <td className="px-3 py-3.5 text-right">{issue.polarity === "negative" && r.sentiment === "negative" && (
-                      <button onClick={() => track(r.issue)} disabled={tr} className="text-xs font-semibold text-brand disabled:text-muted">{tr ? "Tracked" : "Track"}</button>)}</td>
+                      <button onClick={() => track(r.issue)} disabled={tr} className="text-xs font-semibold text-indigo-600 disabled:text-muted">{tr ? "Tracked" : "Track"}</button>)}</td>
                   </tr>);
               })}
             </tbody></table></div>

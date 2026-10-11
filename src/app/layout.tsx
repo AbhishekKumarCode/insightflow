@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/store";
 import { Shell } from "@/components/shell";
 
-const plex = IBM_Plex_Sans({ variable: "--font-plex", subsets: ["latin"], weight: ["400", "500", "600"] });
+const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "InsightFlow: customer feedback to decisions",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={plex.variable}>
+    <html lang="en" className={geist.variable}>
       <body className="min-h-screen antialiased">
         <AppProvider>
           <Shell>{children}</Shell>

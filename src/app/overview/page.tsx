@@ -1,20 +1,25 @@
 "use client";
 import Link from "next/link";
 import { useMemo } from "react";
-import { Area, AreaChart, CartesianGrid, Cell, Line, Pie, PieChart, ReferenceLine, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
+import { ArrowRight } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, Cell, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
 import { rankIssues, summarize, pct, fmt, issueById, DATA } from "@/lib/data";
+import { ShieldAlert, ThumbsUp, TrendingDown } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { Card, PageHead, btn, btnPrimary } from "@/components/ui";
+import { Card, PageHead, ScoreBadge } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
+import { CountUp } from "@/components/count-up";
+import { CheckCircle2, ListPlus } from "lucide-react";
 
-const COLORS = { positive: "#2f8f5b", neutral: "#c98a1b", negative: "#c8372d" };
-const plural = (n: number, w: string) => `${fmt(n)} ${w}${n === 1 ? "" : "s"}`;
+const COLORS = { positive: "#16a34a", neutral: "#d97706", negative: "#dc2626" };
 
 export default function Overview() {
   const { filters: f, tracked, track } = useApp();
   const s = useMemo(() => summarize(f), [f]);
   const ranked = useMemo(() => rankIssues(f), [f]);
   const net = pct(s.sentiment.positive, s.total) - pct(s.sentiment.negative, s.total);
+  const donut = (["positive", "neutral", "negative"] as const).map((k) => ({ name: k, value: s.sentiment[k] }));
+  const cats = Object.entries(s.categories).sort((a, b) => b[1] - a[1]);
   const trend = s.weekly.map((v, i) => ({ week: `W${i + 1}`, volume: v, negPct: v ? pct(s.weeklyNeg[i], v) : 0 })).slice(f.from, f.to + 1);
   const top = ranked[0];
   const empty = s.total === 0;
@@ -35,187 +40,213 @@ export default function Overview() {
   }
   const lovedList = Object.entries(loved).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const worstCat = Object.entries(catSent).map(([c, v]) => ({ c, share: pct(v.negative, v.positive + v.neutral + v.negative) })).sort((a, b) => b.share - a.share)[0];
-  const highlights = [
-    negTotal ? `${pct(fraudNeg, negTotal)}% of negative reviews are in Fraud and Scam, the highest-severity category.` : "No negative feedback in this selection.",
-    worstCat ? `${worstCat.c} is the most negative category: ${worstCat.share}% of its reviews.` : "",
-    lovedList[0] ? `Customers praise ${issueById(lovedList[0][0]).name.toLowerCase()} most: ${plural(lovedList[0][1], "review")}.` : "",
-  ].filter(Boolean);
-  const donut = (["positive", "neutral", "negative"] as const).map((k) => ({ name: k === "neutral" ? "Mixed" : k[0].toUpperCase() + k.slice(1), value: s.sentiment[k], color: COLORS[k] }));
-  const matrix = ranked.map((i, n) => ({ n: n + 1, name: i.name, x: i.negative, y: Math.round(i.severity * 100), hot: i.severity >= 0.85 }));
-  const voice = s.rows.filter((x) => x.r.sentiment === "negative").sort((a, b) => b.w - a.w).slice(0, 5);
-  const topTracked = top ? tracked.some((t) => t.issueId === top.id) : false;
-  const top3 = ranked.slice(0, 3);
-  const top3Left = top3.filter((i) => !tracked.some((t) => t.issueId === i.id));
-  const maxNeg = Math.max(1, ...ranked.map((i) => i.negative));
+  const insights = [
+    { icon: ShieldAlert, tone: "text-neg bg-red-50", title: "Fraud drives the risk", body: negTotal ? `${pct(fraudNeg, negTotal)}% of all negative reviews are in Fraud and Scam, the highest-severity category.` : "No negative feedback in this selection." },
+    { icon: TrendingDown, tone: "text-amber-600 bg-amber-50", title: "Most negative category", body: worstCat ? `${worstCat.c} is ${worstCat.share}% negative, the highest of any category.` : "No data." },
+    { icon: ThumbsUp, tone: "text-pos bg-green-50", title: "Strongest positive", body: lovedList[0] ? `${issueById(lovedList[0][0]).name}: ${fmt(lovedList[0][1])} positive reviews.` : "No positive feedback in this selection." },
+  ];
 
   return (
     <>
-      <PageHead title="Overview" sub="What customers are saying, and what to fix first." />
+      <PageHead title="Overview" sub="Sentiment, recurring issues and what to fix first, across all feedback." />
       <FilterBar />
       {empty ? (
-        <Card className="py-16 text-center text-muted">No feedback matches these filters. Clear a filter to see everything.</Card>
+        <Card className="py-16 text-center text-muted">No feedback matches these filters. <span className="text-brand">Clear filters</span> to see everything.</Card>
       ) : (
-        <div className="space-y-10">
-          <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
-          <section>
-            {top ? (
-              <>
-                <h2 className="max-w-2xl text-[30px] font-semibold leading-tight">Fix {top.name.toLowerCase()} first.</h2>
-                <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-slate-600">
-                  {plural(top.negative, "customer")} reported it and {pct(top.negative, top.rows) === 100 ? "every report was" : `${pct(top.negative, top.rows)}% of reports were`} negative.
-                  It is in {top.category}{top.severity >= 0.85 ? ", where each case means lost money or trust" : ""}. Priority {top.score} out of 100.
+        <div className="space-y-6">
+          {top && (
+            <section className="grid overflow-hidden rounded-3xl bg-ink2 text-white lg:grid-cols-[1.05fr_1fr]">
+              <div className="flex flex-col p-7 md:p-9">
+                <p className="text-sm text-slate-400">What to fix first</p>
+                <h2 className="mt-3 text-[34px] font-semibold leading-[1.08] md:text-[40px]">{top.name}</h2>
+                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-300">
+                  {fmt(top.negative)} customers reported this, {pct(top.negative, top.rows)}% of them negative. It sits in {top.category}
+                  {top.severity >= 0.85 ? ", where each case means lost money or trust" : ""}. Priority {top.score} of 100.
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Link href="/priorities" className={btn}>See how it was scored</Link>
-                  <button onClick={() => track(top.id)} disabled={topTracked} className={btnPrimary}>{topTracked ? "Tracking" : "Track this issue"}</button>
+                <div className="mt-auto flex flex-wrap items-center gap-3 pt-7">
+                  <Link href="/priorities" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ink2 transition hover:bg-slate-100">See why it ranks first <ArrowRight size={16} /></Link>
+                  <button onClick={() => track(top.id)} disabled={tracked.some((t) => t.issueId === top.id)} className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-60">
+                    {tracked.some((t) => t.issueId === top.id) ? "Tracking" : "Track this issue"}
+                  </button>
                 </div>
-              </>
-            ) : <h2 className="text-2xl font-semibold">No negative feedback in this selection.</h2>}
+              </div>
+              <div className="border-t border-white/10 bg-white/[0.04] p-7 md:p-9 lg:border-l lg:border-t-0">
+                <div className="flex items-baseline justify-between"><h3 className="text-sm font-medium text-slate-300">Pressure board</h3>
+                  <Link href="/priorities" className="text-xs text-indigo-300 hover:underline">All {ranked.length} issues</Link></div>
+                <ol className="mt-4 space-y-4">
+                  {ranked.slice(0, 5).map((i, n) => (
+                    <li key={i.id}>
+                      <div className="flex items-baseline gap-3 text-sm">
+                        <span className="w-4 text-slate-500 tabular-nums">{n + 1}</span>
+                        <span className="flex-1 font-medium text-slate-100">{i.name}</span>
+                        <span className="font-display text-lg font-semibold tabular-nums">{i.score}</span>
+                      </div>
+                      <div className="ml-7 mt-1.5 h-2 rounded-full bg-white/10">
+                        <div className="grow h-2 rounded-full" style={{ width: `${Math.max(6, i.inputs.volume * 100)}%`, background: i.severity >= 0.85 ? "#fb7185" : i.severity >= 0.7 ? "#fbbf24" : "#a5b4fc", animationDelay: `${0.25 + n * 0.09}s` }} />
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+                  <span>Bar length: how many reported it</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-rose-400" />Money or trust</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-amber-400" />Broken or unresolved</span>
+                  <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-indigo-300" />Inconvenience</span>
+                </p>
+              </div>
+            </section>
+          )}
+          {!top && <Card><h2 className="text-lg font-semibold">What to fix first</h2><p className="mt-1 text-sm text-muted">No negative feedback in this selection.</p></Card>}
+
+          {ranked.length > 0 && (() => {
+            const top3 = ranked.slice(0, 3);
+            const left = top3.filter((i) => !tracked.some((t) => t.issueId === i.id));
+            return (
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-indigo-200 bg-indigo-50/70 px-5 py-3.5">
+                <span className={`grid size-9 shrink-0 place-items-center rounded-full bg-brand text-white ${left.length ? "pulse" : ""}`}>{left.length ? <ListPlus size={20} /> : <CheckCircle2 size={20} />}</span>
+                <div className="min-w-56 flex-1">
+                  <p className="font-semibold">{left.length ? "Recommended next step" : "Top issues are being tracked"}</p>
+                  <p className="text-sm text-slate-600">{left.length ? `Start tracking the top ${top3.length}: ${top3.map((i) => i.name.toLowerCase()).join(", ")}.` : "Move them forward in the Tracker, then export a report for your team."}</p>
+                </div>
+                {left.length > 0 ? <button onClick={() => top3.forEach((i) => track(i.id))} className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Track top {top3.length} issues</button>
+                  : <Link href="/tracker" className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Open Tracker <ArrowRight size={16} /></Link>}
+                <Link href="/reports" className="text-sm font-medium text-brand hover:underline">Create report</Link>
+              </div>
+            );
+          })()}
+
+          <section className="grid grid-cols-2 divide-slate-200/80 rounded-2xl border border-slate-200/70 bg-white lg:grid-cols-4 lg:divide-x [&>*:nth-child(-n+2)]:border-b [&>*:nth-child(-n+2)]:border-slate-200/80 lg:[&>*:nth-child(-n+2)]:border-b-0">
+            <Kpi label="Total feedback" num={s.total} sub={`${s.unique} distinct reviews`} />
+            <Kpi label="Net sentiment" num={net} format={(n) => `${Math.round(n) > 0 ? "+" : ""}${Math.round(n)}`} sub="Positive % minus negative %" />
+            <Kpi label="Negative share" num={pct(s.sentiment.negative, s.total)} format={(n) => `${Math.round(n)}%`} sub={`${fmt(s.sentiment.negative)} reviews`} />
+            <Kpi label="Issues ranked" num={ranked.length} sub={top ? `Highest priority ${top.score}` : "None"} />
           </section>
-            <section className="rounded-lg border border-line bg-white p-5" aria-label="Share of positive, mixed and negative reviews">
-              <div className="flex items-center gap-5">
-                <div className="relative size-36 shrink-0">
-                  <ResponsiveContainer><PieChart><Pie data={donut} dataKey="value" innerRadius={44} outerRadius={66} paddingAngle={2} stroke="none" isAnimationActive={false}>{donut.map((d) => <Cell key={d.name} fill={d.color} />)}</Pie></PieChart></ResponsiveContainer>
-                  <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-xl font-semibold tabular-nums leading-none">{fmt(s.total)}</p><p className="mt-1 text-[11px] text-muted">reviews</p></div></div>
+
+          <section className="grid divide-slate-200/80 rounded-2xl border border-slate-200/70 bg-white md:grid-cols-3 md:divide-x">
+            {insights.map(({ icon: Icon, tone, title, body }) => (
+              <div key={title} className="flex gap-3 p-5">
+                <Icon size={18} className={`mt-0.5 shrink-0 ${tone.split(" ")[0]}`} />
+                <div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-sm leading-relaxed text-muted">{body}</p></div>
+              </div>
+            ))}
+          </section>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <h2 className="text-lg font-semibold">Sentiment distribution</h2>
+              <div className="mt-2 flex items-center gap-6">
+                <div className="h-44 w-44 shrink-0">
+                  <ResponsiveContainer><PieChart><Pie data={donut} dataKey="value" innerRadius={52} outerRadius={80} paddingAngle={2} stroke="none">
+                    {donut.map((d) => <Cell key={d.name} fill={COLORS[d.name]} />)}</Pie><Tooltip formatter={(v) => fmt(Number(v))} /></PieChart></ResponsiveContainer>
                 </div>
                 <ul className="flex-1 space-y-2 text-sm">
-                  {donut.map((d) => <li key={d.name} className="flex items-center gap-2"><i className="size-2.5 rounded-full" style={{ background: d.color }} />{d.name}<span className="ml-auto tabular-nums text-muted">{pct(d.value, s.total)}%</span></li>)}
+                  {donut.map((d) => (
+                    <li key={d.name} className="flex items-center gap-2"><span className="size-2.5 rounded-full" style={{ background: COLORS[d.name] }} />
+                      <span className="capitalize">{d.name}</span><span className="ml-auto font-medium">{fmt(d.value)}</span><span className="w-10 text-right text-muted">{pct(d.value, s.total)}%</span></li>
+                  ))}
                 </ul>
               </div>
-            </section>
-          </div>
-
-          <section className="grid grid-cols-2 gap-y-6 border-y border-line py-6 lg:grid-cols-4 lg:divide-x lg:divide-line [&>*]:lg:px-6 [&>*:first-child]:lg:pl-0">
-            <Fig label="Reviews" value={fmt(s.total)} sub={`${s.unique} distinct`} />
-            <Fig label="Net sentiment" value={`${net > 0 ? "+" : ""}${net}`} sub="Positive % minus negative %" />
-            <Fig label="Negative" value={`${pct(s.sentiment.negative, s.total)}%`} sub={`${fmt(s.sentiment.negative)} reviews`} />
-            <Fig label="Issues ranked" value={String(ranked.length)} sub={top ? `Highest priority ${top.score}` : "None"} />
-          </section>
-
-          <div className="grid gap-10 lg:grid-cols-2">
-            <section>
-              <h2 className="text-lg font-semibold">Priority matrix</h2>
-              <p className="mt-1 text-sm text-muted">Each number is an issue from the table below. Top right means many customers and a high cost.</p>
-              <div className="mt-3 h-72 rounded-lg border border-line bg-white p-2">
-                <ResponsiveContainer>
-                  <ScatterChart margin={{ top: 14, right: 18, bottom: 22, left: 4 }}>
-                    <CartesianGrid stroke="#dde4ee" />
-                    <XAxis type="number" dataKey="x" name="Negative reviews" tickLine={false} axisLine={false} fontSize={11} domain={[0, "dataMax + 40"]} label={{ value: "Negative reviews", position: "insideBottom", offset: -12, fontSize: 11, fill: "#5b6b85" }} />
-                    <YAxis type="number" dataKey="y" name="Severity" tickLine={false} axisLine={false} fontSize={11} width={34} domain={[40, 100]} label={{ value: "Severity", angle: -90, position: "insideLeft", fontSize: 11, fill: "#5b6b85" }} />
-                    <ReferenceLine y={85} stroke="#c8372d" strokeDasharray="4 4" />
-                    <Tooltip cursor={{ strokeDasharray: "3 3" }} content={({ payload }) => payload?.[0] ? <div className="rounded-md border border-line bg-white px-3 py-2 text-xs shadow-sm"><p className="font-semibold">{payload[0].payload.n}. {payload[0].payload.name}</p><p className="text-muted">{fmt(payload[0].payload.x)} negative reviews, severity {payload[0].payload.y}</p></div> : null} />
-                    <Scatter data={matrix} isAnimationActive={false} shape={(props: { cx?: number; cy?: number; payload?: { n: number; hot: boolean } }) => (
-                      <g><circle cx={props.cx} cy={props.cy} r={11} fill={props.payload?.hot ? "#c8372d" : "#1d4ed8"} /><text x={props.cx} y={(props.cy ?? 0) + 4} textAnchor="middle" fontSize={11} fontWeight={600} fill="#fff">{props.payload?.n}</text></g>)} />
-                  </ScatterChart>
-                </ResponsiveContainer>
-              </div>
-            </section>
-            <section>
-              <h2 className="text-lg font-semibold">In customers&apos; words</h2>
-              <p className="mt-1 text-sm text-muted">The most repeated complaints, exactly as written.</p>
-              <ul className="mt-3 divide-y divide-line rounded-lg border border-line bg-white">
-                {voice.length === 0 && <li className="p-4 text-sm text-muted">No negative feedback in this selection.</li>}
-                {voice.map(({ r, w }) => (
-                  <li key={r.id} className="px-4 py-3">
-                    <p className="text-sm leading-relaxed">“{r.text}”</p>
-                    <p className="mt-1 flex justify-between text-xs text-muted"><span>{issueById(r.issue).name}</span><span className="font-medium tabular-nums text-neg">{fmt(w)} times</span></p>
-                  </li>))}
-              </ul>
-            </section>
-          </div>
-
-          <section>
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="text-lg font-semibold">Issues by priority</h2>
-              {top3Left.length > 0 && <button onClick={() => top3.forEach((i) => track(i.id))} className="text-sm font-medium text-brand underline underline-offset-4 hover:text-blue-800">Track the top {top3.length}</button>}
-            </div>
-            <div className="mt-3 overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b border-slate-900 text-left text-xs text-muted"><tr><th className="w-8 py-2 font-medium">#</th><th className="font-medium">Issue</th><th className="font-medium">Category</th><th className="w-56 font-medium">Negative reviews</th><th className="w-28 font-medium">Weekly</th><th className="w-14 text-right font-medium">Score</th><th className="w-28 pl-4 font-medium">Status</th></tr></thead>
-                <tbody className="divide-y divide-line">
-                  {ranked.map((i, n) => {
-                    const t = tracked.find((x) => x.issueId === i.id);
-                    const wk = (issueWeekly[i.id] ?? []).slice(f.from, f.to + 1).map((v, k) => ({ k, v }));
-                    return (
-                      <tr key={i.id}>
-                        <td className="py-3 tabular-nums text-muted">{n + 1}</td>
-                        <td className="font-medium">{i.name}</td><td className="text-slate-600">{i.category}</td>
-                        <td><div className="flex items-center gap-3"><div className="h-1.5 flex-1 bg-slate-200"><div className="grow h-full" style={{ width: `${(i.negative / maxNeg) * 100}%`, background: i.severity >= 0.85 ? "#c8372d" : "#1d4ed8" }} /></div><span className="w-10 text-right tabular-nums">{fmt(i.negative)}</span></div></td>
-                        <td><div className="h-7 w-24"><ResponsiveContainer><AreaChart data={wk}><Area dataKey="v" stroke="#1d4ed8" fill="#e8effd" strokeWidth={1.25} isAnimationActive={false} /></AreaChart></ResponsiveContainer></div></td>
-                        <td className={`text-right text-base font-semibold tabular-nums ${i.score >= 85 ? "text-neg" : ""}`}>{i.score}</td>
-                        <td className="pl-4 text-xs">{t ? <span className="font-medium">{t.status}</span> : <Link href="/priorities" className="text-muted hover:text-ink">Not tracked</Link>}</td>
-                      </tr>);
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-2 text-xs text-muted">Score is a ranking heuristic. Red bars are issues that mean lost money or trust. Weekly counts use a simulated timeline.</p>
-          </section>
-
-          <div className="grid gap-10 lg:grid-cols-2">
-            <section>
-              <h2 className="text-lg font-semibold">Sentiment by category</h2>
-              <p className="mt-1 text-sm text-muted">Every category mixes praise and complaints, so the category alone doesn&apos;t say what is wrong.</p>
-              <ul className="mt-4 space-y-4">
-                {Object.entries(catSent).sort((a, b) => b[1].negative / (b[1].positive + b[1].neutral + b[1].negative) - a[1].negative / (a[1].positive + a[1].neutral + a[1].negative)).map(([c, v]) => {
-                  const t = v.positive + v.neutral + v.negative;
-                  return (
-                    <li key={c}>
-                      <div className="mb-1 flex justify-between text-sm"><span className="font-medium">{c}</span><span className="tabular-nums text-muted">{fmt(t)} reviews, {pct(v.negative, t)}% negative</span></div>
-                      <div className="flex h-2 overflow-hidden bg-slate-200" role="img" aria-label={`${c}: ${pct(v.positive, t)}% positive, ${pct(v.negative, t)}% negative`}>
-                        <div style={{ width: `${pct(v.positive, t)}%`, background: COLORS.positive }} /><div style={{ width: `${pct(v.neutral, t)}%`, background: COLORS.neutral }} /><div style={{ width: `${pct(v.negative, t)}%`, background: COLORS.negative }} />
-                      </div>
-                    </li>);
-                })}
-              </ul>
-              <p className="mt-3 flex gap-4 text-xs text-muted"><span><i className="mr-1.5 inline-block size-2" style={{ background: COLORS.positive }} />Positive</span><span><i className="mr-1.5 inline-block size-2" style={{ background: COLORS.neutral }} />Mixed</span><span><i className="mr-1.5 inline-block size-2" style={{ background: COLORS.negative }} />Negative</span></p>
-            </section>
-            <section>
-              <h2 className="text-lg font-semibold">What customers like</h2>
-              <p className="mt-1 text-sm text-muted">Worth protecting while you fix the rest.</p>
-              <ul className="mt-4 divide-y divide-line border-y border-line text-sm">
-                {lovedList.length === 0 && <li className="py-3 text-muted">No positive feedback in this selection.</li>}
-                {lovedList.map(([id, n]) => (
-                  <li key={id} className="flex items-baseline gap-3 py-2.5"><span className="flex-1 font-medium">{issueById(id).name}</span><span className="text-muted">{issueById(id).category}</span><span className="w-14 text-right tabular-nums">{fmt(n)}</span></li>
+            </Card>
+            <Card>
+              <h2 className="text-lg font-semibold">Feedback by category</h2>
+              <div className="mt-4 space-y-4">
+                {cats.map(([c, n]) => (
+                  <div key={c}>
+                    <div className="mb-1 flex justify-between text-sm"><span>{c}</span><span className="font-medium">{fmt(n)} <span className="text-muted">({pct(n, s.total)}%)</span></span></div>
+                    <div className="h-2 rounded-full bg-slate-100"><div className="grow h-2 rounded-full bg-brand" style={{ width: `${pct(n, cats[0][1])}%` }} /></div>
+                  </div>
                 ))}
-              </ul>
-            </section>
+              </div>
+            </Card>
           </div>
 
-          <section>
-            <h2 className="text-lg font-semibold">Volume and negative share over time</h2>
-            <p className="mt-1 text-sm text-muted"><b className="font-semibold text-neu">Simulated timeline.</b> {DATA.timeline.note} Real dates are used when an imported file has a date column.</p>
+          <Card>
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div><h2 className="text-lg font-semibold">Volume and negative share over time <span className="ml-1 rounded bg-amber-50 px-2 py-0.5 align-middle text-xs font-medium text-amber-700">Demo timeline (simulated)</span></h2>
+                <p className="text-sm text-muted">{DATA.timeline.note} Real dates are used when an imported file has a date column.</p></div>
+            </div>
             <div className="mt-4 h-64">
               <ResponsiveContainer>
                 <ComposedChart data={trend}>
-                  <CartesianGrid vertical={false} stroke="#dde4ee" />
+                  <CartesianGrid vertical={false} stroke="#e2e8f0" />
                   <XAxis dataKey="week" tickLine={false} axisLine={false} fontSize={12} />
                   <YAxis yAxisId="l" tickLine={false} axisLine={false} fontSize={12} width={40} />
                   <YAxis yAxisId="r" orientation="right" unit="%" domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} width={40} />
                   <Tooltip />
-                  <Area yAxisId="l" dataKey="volume" name="Feedback volume" stroke="#1d4ed8" fill="#e8effd" strokeWidth={1.5} isAnimationActive={false} />
-                  <Line yAxisId="r" dataKey="negPct" name="Negative %" stroke="#c8372d" strokeWidth={2} dot={false} isAnimationActive={false} />
+                  <Area yAxisId="l" dataKey="volume" name="Feedback volume" stroke="#4f46e5" fill="#eef0ff" strokeWidth={2} />
+                  <Line yAxisId="r" dataKey="negPct" name="Negative %" stroke="#dc2626" strokeWidth={2} dot={false} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
-          </section>
+          </Card>
 
-          <section className="border-t border-line pt-6">
-            <h2 className="text-lg font-semibold">Worth knowing</h2>
-            <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[15px] text-slate-700 marker:text-slate-400">{highlights.map((h) => <li key={h}>{h}</li>)}</ul>
-          </section>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <h2 className="text-lg font-semibold">Sentiment by category</h2>
+              <p className="text-sm text-muted">Each category mixes praise and complaints, so category alone does not tell you what is wrong.</p>
+              <div className="mt-4 space-y-4">
+                {Object.entries(catSent).map(([c, v]) => {
+                  const t = v.positive + v.neutral + v.negative;
+                  return (
+                    <div key={c}>
+                      <div className="mb-1 flex justify-between text-sm"><span>{c}</span><span className="text-muted">{pct(v.negative, t)}% negative</span></div>
+                      <div className="flex h-3 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${c}: ${pct(v.positive, t)}% positive, ${pct(v.negative, t)}% negative`}>
+                        <div className="grow" style={{ width: `${pct(v.positive, t)}%`, background: COLORS.positive }} />
+                        <div className="grow" style={{ width: `${pct(v.neutral, t)}%`, background: COLORS.neutral }} />
+                        <div className="grow" style={{ width: `${pct(v.negative, t)}%`, background: COLORS.negative }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+            <Card>
+              <h2 className="text-lg font-semibold">What customers love</h2>
+              <p className="text-sm text-muted">The positive side, so you know what to protect.</p>
+              <ul className="mt-3 divide-y divide-line">
+                {lovedList.length === 0 && <li className="py-3 text-sm text-muted">No positive feedback in this selection.</li>}
+                {lovedList.map(([id, n]) => (
+                  <li key={id} className="flex items-center gap-3 py-2.5 text-sm">
+                    <ThumbsUp size={14} className="text-pos" /><span className="flex-1">{issueById(id).name}</span>
+                    <span className="text-muted">{issueById(id).category}</span><span className="w-14 text-right font-medium">{fmt(n)}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+
+          <Card className="!p-0 overflow-hidden">
+            <div className="px-5 pt-5"><h2 className="text-lg font-semibold">Issue watchlist</h2><p className="text-sm text-muted">Every ranked issue with its weekly negative volume (simulated timeline).</p></div>
+            <div className="overflow-x-auto"><table className="mt-3 w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-muted"><tr><th className="px-5 py-2">Issue</th><th className="px-3">Category</th><th className="px-3 text-right">Negative</th><th className="px-3">Weekly</th><th className="px-3">Score</th><th className="px-5 text-right">Status</th></tr></thead>
+              <tbody className="divide-y divide-line">
+                {ranked.map((i) => {
+                  const t = tracked.find((x) => x.issueId === i.id);
+                  const wk = (issueWeekly[i.id] ?? []).slice(f.from, f.to + 1).map((v, k) => ({ k, v }));
+                  return (
+                    <tr key={i.id}>
+                      <td className="px-5 py-2.5 font-medium">{i.name}</td><td className="px-3 text-muted">{i.category}</td>
+                      <td className="px-3 text-right tabular-nums">{fmt(i.negative)}</td>
+                      <td className="w-32 px-3"><div className="h-8 w-28"><ResponsiveContainer><AreaChart data={wk}><Area dataKey="v" stroke="#4f46e5" fill="#eef0ff" strokeWidth={1.5} /></AreaChart></ResponsiveContainer></div></td>
+                      <td className="px-3"><div className="flex items-center gap-2"><ScoreBadge score={i.score} /><div className="hidden h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 xl:block"><div className="grow h-full rounded-full" style={{ width: `${i.score}%`, background: i.score >= 85 ? "#dc2626" : i.score >= 70 ? "#d97706" : "#4f46e5" }} /></div></div></td>
+                      <td className="px-5 text-right">{t ? <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-medium text-brand">{t.status}</span> : <Link href="/priorities" className="text-xs font-medium text-muted hover:text-brand">Not tracked</Link>}</td>
+                    </tr>);
+                })}
+              </tbody></table></div>
+          </Card>
+
         </div>
       )}
     </>
   );
 }
 
-function Fig({ label, value, sub }: { label: string; value: string; sub: string }) {
+function Kpi({ label, num, format = fmt, text, sub }: { label: string; num?: number; format?: (n: number) => string; text?: string; sub: string }) {
   return (
-    <div>
+    <div className="p-5 md:p-6">
       <p className="text-sm text-muted">{label}</p>
-      <p className="mt-1 text-[32px] font-semibold leading-none tabular-nums">{value}</p>
-      <p className="mt-1.5 text-xs text-muted">{sub}</p>
+      <p className="font-display mt-1.5 text-[34px] font-semibold leading-none tabular-nums">{text ?? <CountUp value={num ?? 0} format={format} />}</p>
+      <p className="mt-2 text-xs text-muted">{sub}</p>
     </div>
   );
 }

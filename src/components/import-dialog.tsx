@@ -109,7 +109,7 @@ export function ImportDialog() {
 
   return (
     <dialog ref={ref} onClose={() => { setImportOpen(false); }} onClick={(e) => e.target === ref.current && close()}
-      aria-labelledby="import-title" className="m-auto w-[min(720px,calc(100vw-2rem))] rounded-lg border border-line bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm">
+      aria-labelledby="import-title" className="m-auto w-[min(720px,calc(100vw-2rem))] rounded-2xl border border-line bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm">
       <div className="flex max-h-[85vh] flex-col">
         <div className="flex items-start justify-between border-b border-line px-6 py-4">
           <div><h2 id="import-title" className="text-lg font-semibold">Import data</h2><p className="text-sm text-muted">Add feedback. We check it first, then match it to known issues.</p></div>
@@ -128,7 +128,7 @@ export function ImportDialog() {
           {!rows && tab === "upload" && (
             <div key="u" onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
               onDrop={(e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files[0]; if (f) onFile(f); }}
-              className={`tab-pane rounded-md border-2 border-dashed px-6 py-10 text-center transition-colors ${drag ? "scale-[1.01] border-brand bg-brand-soft" : "border-line"}`}>
+              className={`tab-pane rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors ${drag ? "scale-[1.01] border-brand bg-brand-soft" : "border-line"}`}>
               <UploadCloud className="mx-auto text-brand" size={30} />
               <p className="mt-3 font-medium">Drop a CSV here</p>
               <p className="mt-1 text-sm text-muted">Needs a <code>review</code> column. <code>category</code> is optional. Max 5 MB.</p>
@@ -169,7 +169,7 @@ export function ImportDialog() {
                       <div><p className="font-medium">{c.label}</p><p className="text-xs text-muted">{c.note}</p></div>
                     </li>))}
                 </ul>
-                {dupCount > 0 && <label className="mt-3 flex cursor-pointer items-start gap-2 text-sm"><input type="checkbox" checked={addAnyway} onChange={(e) => setAddAnyway(e.target.checked)} className="mt-0.5 size-4 accent-blue-700" /><span>Add the {dupCount} repeated {dupCount === 1 ? "review" : "reviews"} again anyway</span></label>}
+                {dupCount > 0 && <label className="mt-3 flex cursor-pointer items-start gap-2 text-sm"><input type="checkbox" checked={addAnyway} onChange={(e) => setAddAnyway(e.target.checked)} className="mt-0.5 size-4 accent-indigo-600" /><span>Add the {dupCount} repeated {dupCount === 1 ? "review" : "reviews"} again anyway</span></label>}
               </div>
               <div>
                 <div className="mb-2 flex items-center gap-2"><Sparkles size={16} className="text-brand" /><h3 className="text-sm font-semibold">Matched to known issues</h3>
