@@ -17,8 +17,7 @@
   --color-neu: #d97706;
   --color-neg: #dc2626;
   --color-ink2: #0f1226;
-  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --radius-card: 12px;
   --radius-ctl: 8px;
 }
@@ -27,6 +26,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-feature-settings: "tnum" 0, "ss01" 0;
 }
 
 @media print {
@@ -66,8 +66,8 @@ tbody tr:hover { background-color: #f8fafc; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
 }
 
-.font-display { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.02em; }
-h1, h2 { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.015em; }
+.font-display { letter-spacing: -0.025em; }
+h1, h2 { letter-spacing: -0.02em; }
 :focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
 
 @media print {

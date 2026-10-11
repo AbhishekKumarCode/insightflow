@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/store";
 import { Shell } from "@/components/shell";
 
-const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"] });
-const body = Instrument_Sans({ variable: "--font-body", subsets: ["latin"] });
+const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "InsightFlow: customer feedback to decisions",
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={geist.variable}>
       <body className="min-h-screen antialiased">
         <AppProvider>
           <Shell>{children}</Shell>
