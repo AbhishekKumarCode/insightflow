@@ -72,27 +72,27 @@ export default function Overview() {
         <div className="space-y-6">
           {top && (
             <section className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
-              <div className="flex flex-col rounded-3xl bg-ink2 p-7 text-white md:p-9">
+              <div className="flex flex-col rounded-3xl bg-blue-800 p-7 text-white md:p-9">
                 <div className="flex items-start justify-between gap-4">
-                  <p className="text-sm text-slate-400">What to fix first</p>
+                  <p className="text-sm text-blue-200">What to fix first</p>
                   <ScoreRing score={top.score} size={56} dark />
                 </div>
                 <h2 className="mt-3 max-w-md text-[34px] font-semibold leading-[1.08] md:text-[40px]">{top.name}</h2>
-                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-300">{top.recommendation?.why ?? `It sits in ${top.category}.`}</p>
-                <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-white/10 pt-5">
-                  <div><dt className="text-xs text-slate-400">Reported</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{fmt(top.negative)}</dd></div>
-                  <div><dt className="text-xs text-slate-400">Negative</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{pct(top.negative, top.rows)}%</dd></div>
-                  <div><dt className="text-xs text-slate-400">Category</dt><dd className="mt-1 text-[15px] font-medium leading-snug">{top.category}</dd></div>
+                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-blue-100">{top.recommendation?.why ?? `It sits in ${top.category}.`}</p>
+                <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-white/15 pt-5">
+                  <div><dt className="text-xs text-blue-200">Reported</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{fmt(top.negative)}</dd></div>
+                  <div><dt className="text-xs text-blue-200">Negative</dt><dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{pct(top.negative, top.rows)}%</dd></div>
+                  <div><dt className="text-xs text-blue-200">Category</dt><dd className="mt-1 text-[15px] font-medium leading-snug">{top.category}</dd></div>
                 </dl>
                 {top.recommendation?.actions[0] && (
-                  <div className="mt-5 rounded-2xl bg-white/[0.07] p-4">
-                    <p className="text-xs font-medium text-indigo-300">Do this first</p>
-                    <p className="mt-1 text-sm leading-relaxed text-slate-100">{top.recommendation.actions[0]}</p>
+                  <div className="mt-5 rounded-2xl bg-white/10 p-4">
+                    <p className="text-xs font-medium text-sky-200">Do this first</p>
+                    <p className="mt-1 text-sm leading-relaxed text-white">{top.recommendation.actions[0]}</p>
                   </div>
                 )}
                 <div className="mt-auto flex flex-wrap items-center gap-3 pt-6">
-                  <Link href="/priorities" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ink2 transition hover:bg-slate-100">See why it ranks first <ArrowRight size={16} /></Link>
-                  <button onClick={() => track(top.id)} disabled={tracked.some((t) => t.issueId === top.id)} className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-60">
+                  <Link href="/priorities" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-50">See why it ranks first <ArrowRight size={16} /></Link>
+                  <button onClick={() => track(top.id)} disabled={tracked.some((t) => t.issueId === top.id)} className="rounded-xl border border-white/30 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-60">
                     {tracked.some((t) => t.issueId === top.id) ? "Tracking" : "Track this issue"}
                   </button>
                 </div>
