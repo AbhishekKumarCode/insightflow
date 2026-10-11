@@ -37,4 +37,18 @@ await p.getByRole("button", { name: /Save report/ }).click();
 ok("saved report listed", await p.getByText("Saved reports").isVisible());
 ok("no page errors", errs.length === 0);
 if (errs.length) console.log(errs);
+
+// Import dialog: paste three reviews, add them, dashboard total changes.
+await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
+await p.getByRole("button", { name: "Import data" }).first().click();
+await p.getByRole("tab", { name: /Paste feedback/ }).click();
+await p.getByLabel("Pasted feedback").fill("No fraudulent activity or scam during my transaction\nI was scammed, they took my money. Contact me at jane@example.com\nThe app crashes every time I pay");
+await p.getByRole("button", { name: "Check feedback" }).click();
+ok("pre-flight flags the email", await p.getByText(/Personal data found/).isVisible());
+ok("shows a match", await p.getByText(/similar to/).first().isVisible());
+await p.getByRole("button", { name: /Add 3 reviews/ }).click();
+await p.waitForURL(/overview/);
+ok("total becomes 7,003", await p.getByText("7,003").first().isVisible());
+await p.reload({ waitUntil: "networkidle" });
+ok("added reviews persist", await p.getByText("7,003").first().isVisible());
 await b.close();

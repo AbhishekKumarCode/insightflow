@@ -1,15 +1,16 @@
 "use client";
 import Link from "next/link";
+import { useMemo } from "react";
 import { Trash2 } from "lucide-react";
 import { issueById, rankIssues, DEFAULT_FILTERS } from "@/lib/data";
 import { useApp, type TrackedStatus } from "@/lib/store";
 import { Card, PageHead, ScoreBadge, Chip, btnPrimary } from "@/components/ui";
 
 const STATUSES: TrackedStatus[] = ["New", "Investigating", "In progress", "Resolved"];
-const score = Object.fromEntries(rankIssues(DEFAULT_FILTERS).map((i) => [i.id, i.score]));
 
 export default function Tracker() {
-  const { tracked, updateTracked, untrack, ready } = useApp();
+  const { tracked, updateTracked, untrack, ready, filters } = useApp();
+  const score = useMemo(() => Object.fromEntries(rankIssues(DEFAULT_FILTERS).map((i) => [i.id, i.score])), [filters]);
   return (
     <>
       <PageHead title="Tracker" sub="Issues you decided to act on. Status, owner and notes are saved in this browser." />

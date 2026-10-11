@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { BarChart3, MessageSquare, Flag, ListChecks, FileText, Upload, Search, Sparkles, Database, FilePlus2 } from "lucide-react";
 import { useApp } from "@/lib/store";
+import { ImportDialog } from "./import-dialog";
 
 const NAV = [
   { href: "/overview", label: "Overview", icon: BarChart3 },
@@ -15,7 +16,7 @@ const NAV = [
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
-  const { filters, setFilters, tracked } = useApp();
+  const { filters, setFilters, tracked, setImportOpen } = useApp();
   
   return (
     <div className="flex min-h-screen">
@@ -23,9 +24,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/import" className="flex items-center gap-2 px-2 py-3 text-lg font-semibold">
           <span className="grid size-8 place-items-center rounded-lg bg-brand text-white"><Sparkles size={16} /></span>InsightFlow
         </Link>
-        <Link href="/import" className="mb-3 flex items-center justify-center gap-2 rounded-lg bg-brand px-3 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
+        <button onClick={() => setImportOpen(true)} className="mb-3 flex items-center justify-center gap-2 rounded-lg bg-brand px-3 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
           <Upload size={16} /> Import data
-        </Link>
+        </button>
         {NAV.map(({ href, label, icon: Icon }) => {
           const on = path.startsWith(href);
           return (
@@ -49,6 +50,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="hidden items-center gap-2 rounded-full border border-line bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 lg:flex">
               <Database size={14} className="text-brand" />Sample dataset · 7,000 reviews
             </span>
+            <button onClick={() => setImportOpen(true)} aria-label="Import data" className="grid size-9 place-items-center rounded-lg border border-line text-slate-600 hover:bg-slate-50 md:hidden"><Upload size={18} /></button>
             <Link href="/tracker" aria-label={`${tracked.length} tracked issues`} className="relative grid size-9 place-items-center rounded-lg border border-line text-slate-600 hover:bg-slate-50">
               <ListChecks size={18} />
               {tracked.length > 0 && <span className="absolute -right-1.5 -top-1.5 grid min-w-5 place-items-center rounded-full bg-brand px-1 text-[11px] font-semibold text-white">{tracked.length}</span>}
@@ -59,6 +61,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </header>
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>
+      <ImportDialog />
       <nav className="no-print fixed inset-x-0 bottom-0 z-20 flex border-t border-line bg-white md:hidden">
         {NAV.map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href} className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] ${path.startsWith(href) ? "text-brand" : "text-muted"}`}>

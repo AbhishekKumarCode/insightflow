@@ -6,9 +6,9 @@ import { useApp } from "@/lib/store";
 import { Card, PageHead, ScoreBadge, btn, btnPrimary } from "@/components/ui";
 
 export default function Reports() {
-  const { tracked, reports, saveReport } = useApp();
-  const s = useMemo(() => summarize(DEFAULT_FILTERS), []);
-  const ranked = useMemo(() => rankIssues(DEFAULT_FILTERS), []);
+  const { tracked, reports, saveReport, filters } = useApp();
+  const s = useMemo(() => summarize(DEFAULT_FILTERS), [filters]);
+  const ranked = useMemo(() => rankIssues(DEFAULT_FILTERS), [filters]);
   const top = ranked.slice(0, 5);
   const [date, setDate] = useState("");
   useEffect(() => setDate(new Date().toLocaleDateString("en-US", { dateStyle: "long" })), []);

@@ -1,9 +1,9 @@
 import raw from "../../data/analyzed.json";
 
 export type Sentiment = "positive" | "neutral" | "negative";
-export type Review = { id: string; text: string; category: string; count: number; issue: string; sentiment: Sentiment; weekly: number[] };
+export type Review = { id: string; text: string; category: string; count: number; issue: string; sentiment: Sentiment; weekly: number[]; source?: "user"; similarity?: number };
 export type Issue = {
-  id: string; category: string; name: string; polarity: "positive" | "negative";
+  id: string; category: string; name: string; polarity: "positive" | "negative" | "unknown";
   severity: number; rows: number; uniqueReviews: number; negative: number; positive: number; neutral: number;
   share: number; weekly: number[]; inputs: { volume: number; negativeShare: number; severity: number };
   score: number | null; quotes: { id: string; text: string; count: number }[];
@@ -17,8 +17,16 @@ export const DATA = raw as unknown as {
   issues: Issue[]; reviews: Review[];
 };
 export const WEEKS = DATA.timeline.weeks;
-export const CATEGORIES = [...new Set(DATA.reviews.map((r) => r.category))];
-export const issueById = (id: string) => DATA.issues.find((i) => i.id === id)!;
+export const UNMATCHED = "unmatched";
+const UNMATCHED_ISSUE: Issue = { id: UNMATCHED, category: "Uncategorized", name: "Not matched to a known issue", polarity: "unknown", severity: 0, rows: 0, uniqueReviews: 0, negative: 0, positive: 0, neutral: 0, share: 0, weekly: [], inputs: { volume: 0, negativeShare: 0, severity: 0 }, score: null, quotes: [], recommendation: null };
+
+/** Feedback added by the user in this browser. Set by the store; read by every aggregate below. */
+let USER: Review[] = [];
+export const setUserReviews = (r: Review[]) => { USER = r; };
+export const userReviews = () => USER;
+export const allReviews = () => (USER.length ? [...DATA.reviews, ...USER] : DATA.reviews);
+export const categories = () => [...new Set(allReviews().map((r) => r.category))];
+export const issueById = (id: string) => DATA.issues.find((i) => i.id === id) ?? UNMATCHED_ISSUE;
 export const DEFAULT_FILTERS: Filters = { category: "all", sentiment: "all", from: 0, to: WEEKS - 1, q: "" };
 
 /** Rows of a review that fall in the selected week range (original duplicate counts). */
@@ -26,7 +34,7 @@ export const weight = (r: Review, f: Filters) => r.weekly.slice(f.from, f.to + 1
 
 export function filterReviews(f: Filters) {
   const q = f.q.trim().toLowerCase();
-  return DATA.reviews
+  return allReviews()
     .filter((r) => (f.category === "all" || r.category === f.category) && (f.sentiment === "all" || r.sentiment === f.sentiment) && (!q || r.text.toLowerCase().includes(q) || issueById(r.issue).name.toLowerCase().includes(q)))
     .map((r) => ({ r, w: weight(r, f) }))
     .filter((x) => x.w > 0);
