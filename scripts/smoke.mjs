@@ -45,7 +45,7 @@ if (errs.length) console.log(errs);
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
 await p.getByRole("button", { name: "New session" }).first().click();
 await p.getByRole("tab", { name: /Paste feedback/ }).click();
-await p.getByLabel("Pasted feedback").fill("Refund took six weeks to arrive\nI was scammed, they took my money. Contact me at jane@example.com\nThe app crashes every time I pay");
+await p.getByLabel("Pasted feedback", { exact: true }).fill("Refund took six weeks to arrive\nI was scammed, they took my money. Contact me at jane@example.com\nThe app crashes every time I pay");
 await p.getByRole("button", { name: "Check feedback" }).click();
 await p.getByText(/Personal data found/).waitFor({ timeout: 5000 });
 await p.getByLabel(/This session/).check();
@@ -63,7 +63,7 @@ ok("added reviews persist", await p.getByText("7,003").first().isVisible());
 // Adding the same text again must not double the counts.
 await p.getByRole("button", { name: "New session" }).first().click();
 await p.getByRole("tab", { name: /Paste feedback/ }).click();
-await p.getByLabel("Pasted feedback").fill("Refund took six weeks to arrive\nThe app crashes every time I pay");
+await p.getByLabel("Pasted feedback", { exact: true }).fill("Refund took six weeks to arrive\nThe app crashes every time I pay");
 await p.getByRole("button", { name: "Check feedback" }).click();
 await p.getByLabel(/This session/).waitFor({ timeout: 5000 });
 await p.getByLabel(/This session/).check();
@@ -108,7 +108,7 @@ await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
 ok("starts with one session (the sample)", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 1);
 await p.getByRole("button", { name: "New session" }).first().click();
 await p.getByRole("tab", { name: /Paste feedback/ }).click();
-await p.getByLabel("Pasted feedback").fill("Checkout crashed twice on my phone\nSupport answered in minutes, thank you");
+await p.getByLabel("Pasted feedback", { exact: true }).fill("Checkout crashed twice on my phone\nSupport answered in minutes, thank you");
 await p.getByRole("button", { name: "Check feedback" }).click();
 await p.getByRole("button", { name: /Create session with 2 reviews/ }).waitFor({ timeout: 5000 });
 ok("sidebar New session defaults to a new session", await p.getByLabel(/^New session/).isChecked());
@@ -136,11 +136,26 @@ ok("session deletes after confirmation", (await p.getByRole("list", { name: "Ses
 // Sessions survive a reload, and the sample can't be deleted.
 await p.getByRole("button", { name: "New session" }).first().click();
 await p.getByRole("tab", { name: /Paste feedback/ }).click();
-await p.getByLabel("Pasted feedback").fill("The delivery was a week late");
+await p.getByLabel("Pasted feedback", { exact: true }).fill("The delivery was a week late");
 await p.getByRole("button", { name: "Check feedback" }).click();
 await p.getByRole("button", { name: /Create session with 1 review/ }).click();
 await p.waitForURL(/overview/);
 await p.reload({ waitUntil: "networkidle" });
 ok("sessions and the active one persist after reload", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 2 && (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Pasted feedback"));
 ok("the sample session has no delete option", (await p.getByRole("button", { name: /Options for Sample dataset/ }).count()) === 0);
+
+// --- security: spreadsheet formulas in imported text must not survive into exported CSV ---
+await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
+await p.getByRole("button", { name: "New session" }).first().click();
+await p.getByRole("tab", { name: /Paste feedback/ }).click();
+await p.getByLabel("Pasted feedback", { exact: true }).fill("=HYPERLINK(\"http://evil.example\",\"click\") my refund never arrived and nobody replied\n=HYPERLINK(\"http://evil.example\",\"click\") my refund never arrived and nobody replied again");
+await p.getByRole("button", { name: "Check feedback" }).click();
+await p.getByRole("button", { name: /Create session with/ }).waitFor({ timeout: 5000 });
+await p.getByRole("button", { name: /Create session with/ }).click();
+await p.waitForURL(/overview/);
+await p.goto(`${base}/reports`, { waitUntil: "networkidle" });
+const [dl2] = await Promise.all([p.waitForEvent("download"), p.getByRole("button", { name: /Export CSV/ }).click()]);
+const csvText = (await import("node:fs")).readFileSync(await dl2.path(), "utf8");
+ok("CSV export has no cell starting with a formula character", !/(^|\n)"[=+@-]/.test(csvText) && !/,"[=+@-]/.test(csvText));
+ok("CSV export keeps the text, defused with an apostrophe", csvText.includes("\"'=HYPERLINK"));
 await b.close();

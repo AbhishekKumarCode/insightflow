@@ -35,7 +35,9 @@ export default function Reports() {
   };
 
   const exportCsv = () => {
-    const esc = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+    // Cells that start with = + - @ (or a tab/CR) run as formulas in Excel and Sheets. Issue names and quotes come from
+    // imported reviews, so neutralize them with a leading apostrophe before quoting.
+    const esc = (v: string | number) => { let t = String(v); if (/^[=+\-@\t\r]/.test(t)) t = `'${t}`; return `"${t.replace(/"/g, '""')}"`; };
     const lines = [["Rank", "Issue", "Category", "Priority score", "Negative reviews", "Why", "Actions", "Tracked status"].map(esc).join(",")];
     ranked.forEach((i, n) => lines.push([n + 1, i.name, i.category, i.score, i.negative, i.recommendation?.why ?? "", i.recommendation?.actions.join(" | ") ?? "", tracked.find((t) => t.issueId === i.id)?.status ?? ""].map(esc).join(",")));
     const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" })), download: "insightflow-issues.csv" });
