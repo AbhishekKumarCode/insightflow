@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
-import { Check, ChevronDown, Copy, Download, FileText, Printer, Save, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, Copy, Download, FileText, Printer, Save, SlidersHorizontal, Table2, Trash2, X } from "lucide-react";
 import { categories, rankIssues, summarize, DEFAULT_FILTERS, pct, fmt, issueById } from "@/lib/data";
 import { csvRow, downloadFile } from "@/lib/csv";
 import { useApp } from "@/lib/store";
+import { useDismiss } from "@/lib/use-dismiss";
 import { Card, PageHead, ScoreRing, btn, btnPrimary } from "@/components/ui";
 
 const COLORS = { positive: "#16a34a", neutral: "#d97706", negative: "#dc2626" };
@@ -20,7 +21,11 @@ type Key = (typeof SECTIONS)[number]["key"];
 export default function Reports() {
   const { tracked, reports, saveReport, deleteReport, filters, session } = useApp();
   const [copied, setCopied] = useState(false);
-  const [showOpts, setShowOpts] = useState(false);
+  const [sheet, setSheet] = useState(false);
+  const [dl, setDl] = useState(false);
+  const dlRef = useDismiss(dl, () => setDl(false));
+  const sheetEl = useRef<HTMLDialogElement>(null);
+  useEffect(() => { const d = sheetEl.current; if (!d) return; if (sheet && !d.open) d.showModal(); if (!sheet && d.open) d.close(); }, [sheet]);
   const [date, setDate] = useState("");
   // Date is read after mount: reading the clock during render is not allowed in a prerendered page.
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -91,21 +96,8 @@ export default function Reports() {
   };
   const save = () => saveReport({ id: crypto.randomUUID(), title, createdAt: new Date().toISOString(), topIssueIds: top.map((i) => i.id), items: top.map((i) => ({ name: i.name, score: i.score })), totals: { reviews: s.total, negativePct: negPct }, scope });
 
-  return (
+  const optionsJsx = (
     <>
-      <PageHead title="Reports" sub="Choose what goes in, check the preview, then print, download or save." right={
-        <div className="no-print snap-row flex w-full min-w-0 gap-2 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:overflow-visible [&>button]:shrink-0 [&>button]:whitespace-nowrap">
-          <button className={btn} onClick={exportCsv}><Download size={16} />Export CSV</button>
-          <button className={btn} onClick={() => download("insightflow-report.md", markdown(), "text/markdown")}><FileText size={16} />Download .md</button>
-          <button className={btn} onClick={copySummary}>{copied ? <><Check size={16} />Copied</> : <><Copy size={16} />Copy summary</>}</button>
-          <button className={btn} onClick={() => window.print()}><Printer size={16} />Print / PDF</button>
-          <button className={btnPrimary} onClick={save}><Save size={16} />Save report</button>
-        </div>} />
-
-      <div className="grid gap-6 print:block lg:grid-cols-[18rem_1fr]">
-        <aside className="no-print self-start rounded-2xl border border-slate-200/70 bg-white p-5 lg:sticky lg:top-24 lg:space-y-5" aria-label="Report options">
-          <button type="button" onClick={() => setShowOpts((v) => !v)} aria-expanded={showOpts} className="flex w-full items-center justify-between text-left text-base font-semibold lg:pointer-events-none">Customize<ChevronDown size={18} className={`text-muted transition lg:hidden ${showOpts ? "rotate-180" : ""}`} /></button>
-          <div className={`${showOpts ? "block" : "hidden"} space-y-5 lg:block`}>
           <label className="block text-sm"><span className="font-medium">Title</span>
             <input value={title} onChange={(e) => setTitleDraft(e.target.value)} className="mt-1 w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand" /></label>
           <label className="block text-sm"><span className="font-medium">Cover</span>
@@ -117,7 +109,47 @@ export default function Reports() {
               <label key={key} className="flex cursor-pointer items-center gap-2"><input type="checkbox" checked={on[key]} onChange={(e) => setOn((o) => ({ ...o, [key]: e.target.checked }))} className="size-4 accent-indigo-600" />{label}</label>))}</div></fieldset>
           <label className="block text-sm"><span className="font-medium">Note for readers</span>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={4} placeholder="One or two sentences of context for your team" className="mt-1 w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand" /></label>
+              </>
+  );
+
+  return (
+    <>
+      <PageHead title="Reports" sub="Choose what goes in, check the preview, then print, download or save." right={
+        <div className="no-print grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:items-center">
+          <button className={`${btn} w-full sm:w-auto`} onClick={copySummary} aria-label={copied ? "Copied" : "Copy summary"}>{copied ? <><Check size={16} /><span>Copied</span></> : <><Copy size={16} /><span className="max-sm:hidden">Copy summary</span><span className="sm:hidden">Copy</span></>}</button>
+          <div ref={dlRef} className="relative min-w-0">
+            <button className={`${btn} w-full sm:w-auto`} onClick={() => setDl((v) => !v)} aria-haspopup="menu" aria-expanded={dl}><Download size={16} />Download<ChevronDown size={14} className={`hidden text-muted transition sm:block ${dl ? "rotate-180" : ""}`} /></button>
+            {dl && (
+              <div role="menu" className="absolute left-1/2 top-12 z-30 w-64 -translate-x-1/2 rounded-xl border border-line bg-white p-1.5 text-sm shadow-lg sm:left-auto sm:right-0 sm:translate-x-0">
+                <button role="menuitem" onClick={() => { exportCsv(); setDl(false); }} className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-slate-50"><Table2 size={16} className="mt-0.5 text-brand" /><span><span className="block font-medium">Export CSV</span><span className="block text-xs text-muted">All ranked issues, for a spreadsheet</span></span></button>
+                <button role="menuitem" onClick={() => { download("insightflow-report.md", markdown(), "text/markdown"); setDl(false); }} className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-slate-50"><FileText size={16} className="mt-0.5 text-brand" /><span><span className="block font-medium">Download .md</span><span className="block text-xs text-muted">This report as Markdown</span></span></button>
+                <button role="menuitem" onClick={() => { setDl(false); setTimeout(() => window.print(), 50); }} className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-slate-50"><Printer size={16} className="mt-0.5 text-brand" /><span><span className="block font-medium">Print / PDF</span><span className="block text-xs text-muted">Save as PDF from the print dialog</span></span></button>
+              </div>)}
           </div>
+          <button className={`${btnPrimary} w-full sm:w-auto`} onClick={save} aria-label="Save report"><Save size={16} /><span className="max-sm:hidden">Save report</span><span className="sm:hidden">Save</span></button>
+        </div>} />
+
+      {/* Phones and tablets: one button that shows the current settings and opens the options in a sheet */}
+      <button onClick={() => setSheet(true)} aria-haspopup="dialog" className="no-print -mt-2 mb-5 flex min-h-14 w-full items-center gap-3 rounded-2xl border border-slate-200/70 bg-white px-4 text-left lg:hidden">
+        <SlidersHorizontal size={18} className="shrink-0 text-brand" />
+        <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">Customize report</span><span className="block truncate text-xs text-muted">Top {topN} priorities · {scopeLabel} · {Object.values(on).filter(Boolean).length} sections{note.trim() ? " · note" : ""}</span></span>
+        <ChevronDown size={18} className="text-muted" />
+      </button>
+      <dialog ref={sheetEl} onClose={() => setSheet(false)} onClick={(e) => e.target === sheetEl.current && setSheet(false)} aria-label="Customize report"
+        className="m-auto mb-0 max-h-[88dvh] w-full max-w-none rounded-t-3xl border-0 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm lg:hidden">
+        {sheet && (
+          <div className="flex max-h-[88dvh] flex-col">
+            <div aria-hidden className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-slate-300" />
+            <div className="flex shrink-0 items-center justify-between px-5 pb-1 pt-2"><h2 className="text-lg font-semibold">Customize report</h2><button onClick={() => setSheet(false)} aria-label="Close" className="grid size-10 place-items-center rounded-full text-muted hover:bg-slate-100"><X size={18} /></button></div>
+            <div className="space-y-5 overflow-y-auto px-5 py-3">{optionsJsx}</div>
+            <div className="shrink-0 border-t border-line px-5 py-3"><button onClick={() => setSheet(false)} className="h-12 w-full rounded-xl bg-brand text-sm font-semibold text-white">Done</button></div>
+          </div>)}
+      </dialog>
+
+      <div className="grid gap-6 print:block lg:grid-cols-[18rem_1fr]">
+        <aside className="no-print hidden self-start space-y-5 rounded-2xl border border-slate-200/70 bg-white p-5 lg:sticky lg:top-24 lg:block" aria-label="Report options">
+          <h2 className="text-base font-semibold">Customize</h2>
+          {optionsJsx}
         </aside>
 
         <article className="min-w-0 overflow-hidden rounded-3xl border border-slate-200/70 bg-white">

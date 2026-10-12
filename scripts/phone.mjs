@@ -79,9 +79,25 @@ ok("status menu moves a card on a phone", (await p.locator("section[data-col='In
 
 // Reports: options start collapsed so the preview comes first.
 await go("reports");
-ok("report options start collapsed", !(await p.getByLabel("Note for readers").isVisible()));
-await p.getByRole("button", { name: /^Customize/ }).click();
-ok("report options expand on tap", await p.getByLabel("Note for readers").isVisible());
+const custom = p.getByRole("button", { name: /^Customize report/ });
+ok("report options are one button that shows the current settings", (await custom.innerText()).includes("Top 5") && !(await p.getByLabel("Note for readers").isVisible()));
+await custom.click();
+await p.waitForTimeout(500);
+const cs = p.locator("dialog[open]");
+const cb = await cs.boundingBox();
+ok("report options open in a bottom sheet", !!cb && Math.abs(cb.y + cb.height - 844) < 3);
+await cs.getByLabel("Priorities to include").selectOption("3");
+await cs.getByRole("button", { name: "Done" }).click();
+await p.waitForTimeout(400);
+ok("the button reflects the new settings", (await custom.innerText()).includes("Top 3"));
+
+// Feedback toolbar: the view toggle has its own row; sort and export share the next one, and the sort menu shows its full text.
+await go("feedback");
+const midY = async (loc) => { const x = await loc.boundingBox(); return Math.round(x.y + x.height / 2); };
+const [yView, ySort, yExport] = [await midY(p.getByRole("tab", { name: "Reviews" })), await midY(p.getByLabel("Sort reviews")), await midY(p.getByRole("button", { name: /^Export/ }))];
+ok("sort and export share a row below the view toggle", Math.abs(ySort - yExport) <= 2 && ySort > yView + 20);
+ok("the sort menu is wide enough to read", (await p.getByLabel("Sort reviews").evaluate((sel) => { const c = document.createElement("canvas").getContext("2d"); const cs = getComputedStyle(sel); c.font = `${cs.fontSize} ${cs.fontFamily}`; return c.measureText(sel.options[sel.selectedIndex].text).width + parseFloat(cs.paddingLeft) + 28 <= sel.getBoundingClientRect().width; })));
+ok("sentiment chips are one swipeable row", await p.getByRole("group", { name: "Show only" }).evaluate((e) => e.scrollWidth > e.clientWidth || e.getBoundingClientRect().height < 60));
 
 // Header: search, session chip and avatar are one height and share a center line.
 await go("overview");

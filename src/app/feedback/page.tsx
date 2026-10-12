@@ -60,37 +60,35 @@ export default function Feedback() {
       <FilterBar />
 
       <Card className="!p-0 overflow-hidden">
-        {/* Summary and controls */}
-        <div className="space-y-4 border-b border-slate-200/70 px-4 py-4 md:px-5">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <div><p className="font-display text-2xl font-semibold tabular-nums leading-none">{fmt(rows.length)}</p><p className="mt-1 text-xs text-muted">distinct reviews</p></div>
-            <div><p className="font-display text-2xl font-semibold tabular-nums leading-none">{fmt(total)}</p><p className="mt-1 text-xs text-muted">total mentions</p></div>
-            <div className="min-w-40 flex-1 md:max-w-xs">
-              <div className="flex h-2 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${pct(mix.positive, total)}% positive, ${pct(mix.negative, total)}% negative`}>
+        {/* Summary and controls: one line of numbers, one row of chips, one row of options */}
+        <div className="border-b border-slate-200/70 px-4 pb-3 pt-4 md:px-5">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+            <p className="text-sm text-muted"><b className="font-display text-xl font-semibold tabular-nums text-ink">{fmt(rows.length)}</b> distinct reviews <span aria-hidden>·</span> <b className="font-semibold tabular-nums text-ink">{fmt(total)}</b> mentions</p>
+            <div className="flex w-full items-center gap-3 sm:w-72">
+              <div className="flex h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${pct(mix.positive, total)}% positive, ${pct(mix.negative, total)}% negative`}>
                 {(["positive", "neutral", "negative"] as const).map((k) => <div key={k} style={{ width: `${pct(mix[k], total)}%`, background: STRIPE[k] }} />)}
               </div>
-              <p className="mt-1.5 text-xs text-muted">{pct(mix.positive, total)}% positive, {pct(mix.negative, total)}% negative</p>
+              <span className="shrink-0 text-xs tabular-nums text-muted">{pct(mix.positive, total)}% / {pct(mix.negative, total)}%</span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Sentiment">
+          <div className="snap-row -mx-4 mt-3 flex items-center gap-2 overflow-x-auto px-4 md:mx-0 md:px-0" role="group" aria-label="Show only">
             {SENTIMENTS.map(([k, label]) => (
               <button key={k} onClick={() => { setFilters({ sentiment: k }); setPage(0); }} aria-pressed={filters.sentiment === k}
-                className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-sm transition ${filters.sentiment === k ? "border-brand bg-brand-soft font-semibold text-brand" : "border-line bg-white text-slate-600 hover:bg-slate-50"}`}>
+                className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm transition ${filters.sentiment === k ? "border-brand bg-brand-soft font-semibold text-brand" : "border-line bg-white text-slate-600 hover:bg-slate-50"}`}>
                 {k !== "all" && <i className="size-2 rounded-full" style={{ background: STRIPE[k] }} />}{label}<span className="tabular-nums text-xs opacity-70">{fmt(counts[k])}</span>
               </button>))}
             {filters.q.trim() && (
-              <button onClick={() => setFilters({ q: "" })} aria-label={`Clear search ${filters.q}`} className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-amber-50 px-3 text-sm text-amber-800 hover:bg-amber-100">Search: {filters.q}<X size={14} /></button>)}
+              <button onClick={() => setFilters({ q: "" })} aria-label={`Clear search ${filters.q}`} className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full bg-amber-50 px-3 text-sm text-amber-800 hover:bg-amber-100">Search: {filters.q}<X size={14} /></button>)}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="inline-flex rounded-lg border border-line bg-slate-50 p-0.5 text-sm" role="tablist" aria-label="View">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <div className="flex w-full shrink-0 rounded-lg border border-line bg-slate-50 p-0.5 text-sm sm:inline-flex sm:w-auto" role="tablist" aria-label="View">
               {([["reviews", "Reviews"], ["issues", "By issue"]] as const).map(([v, label]) => (
-                <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)} className={`min-h-9 rounded-md px-3.5 font-medium transition ${view === v ? "bg-white text-ink shadow-sm" : "text-muted hover:text-ink"}`}>{label}</button>))}
+                <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)} className={`min-h-9 flex-1 rounded-md px-3 font-medium transition sm:flex-none ${view === v ? "bg-white text-ink shadow-sm" : "text-muted hover:text-ink"}`}>{label}</button>))}
             </div>
-            <label className="flex items-center gap-2 text-sm text-muted">Sort
-              <select value={sort} onChange={(e) => { setSort(e.target.value as Sort); setPage(0); }} className="min-h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-ink"><option value="count">Most mentioned</option><option value="negative">Negative first</option><option value="text">A to Z</option></select></label>
-            <button onClick={exportRows} disabled={!rows.length} className={`${btn} ml-auto min-h-9 !py-1.5`}><Download size={15} />Export {fmt(rows.length)}</button>
+            <select aria-label="Sort reviews" value={sort} onChange={(e) => { setSort(e.target.value as Sort); setPage(0); }} className="h-10 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white pl-2 text-sm text-ink sm:max-w-48 sm:flex-none"><option value="count">Most mentioned</option><option value="negative">Negative first</option><option value="text">A to Z</option></select>
+            <button onClick={exportRows} disabled={!rows.length} aria-label={`Export ${fmt(rows.length)} reviews`} title="Export these reviews as CSV" className={`${btn} ml-auto h-10 shrink-0 !px-3`}><Download size={16} /><span className="hidden sm:inline">Export {fmt(rows.length)}</span></button>
           </div>
         </div>
 

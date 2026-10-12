@@ -3,6 +3,7 @@ const base = process.env.BASE ?? "http://localhost:3100";
 const b = await chromium.launch({ executablePath: "/opt/google/chrome/chrome", args: ["--no-sandbox"] });
 const p = await b.newPage({ viewport: { width: 1400, height: 1000 } });
 const errs = []; p.on("pageerror", (e) => errs.push(String(e)));
+const download = async (item) => { await p.getByRole("button", { name: "Download", exact: true }).click(); return p.getByRole("menuitem", { name: item }); };
 const ok = (name, cond) => { console.log(cond ? "PASS" : "FAIL", name); if (!cond) process.exitCode = 1; };
 
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
@@ -45,7 +46,7 @@ ok("by-issue view groups reviews under an issue", await p.locator("details[open]
 
 
 await p.goto(`${base}/reports`, { waitUntil: "networkidle" });
-const [dl] = await Promise.all([p.waitForEvent("download"), p.getByRole("button", { name: /Export CSV/ }).click()]);
+const [dl] = await Promise.all([p.waitForEvent("download"), (await download("Export CSV")).click()]);
 ok("csv export downloads", dl.suggestedFilename() === "insightflow-issues.csv");
 await p.getByRole("button", { name: /Save report/ }).click();
 ok("saved report listed", await p.getByText("Saved reports").isVisible());
@@ -94,6 +95,10 @@ await p.keyboard.press("Escape");
 // 2) Reports: copy summary (share) and saved reports can be opened and deleted.
 await p.context().grantPermissions(["clipboard-read", "clipboard-write"]).catch(() => {});
 await p.goto(`${base}/reports`, { waitUntil: "networkidle" });
+await p.getByRole("button", { name: "Download", exact: true }).click();
+ok("Download menu offers CSV, Markdown and Print", (await p.getByRole("menuitem").allInnerTexts()).join("|").includes("Export CSV") && (await p.getByRole("menuitem").count()) === 3);
+await p.keyboard.press("Escape");
+ok("Download menu closes on Escape", (await p.getByRole("menuitem").count()) === 0);
 await p.getByRole("button", { name: /Copy summary/ }).click();
 await p.getByText("Copied").waitFor({ timeout: 3000 });
 ok("copy summary confirms", await p.getByText("Copied").isVisible());
@@ -127,7 +132,7 @@ ok("preview shows the custom title and the note", artText.includes("Q4 fraud rev
 ok("scope limits the report to that category", !artText.includes("Website crashes and checkout glitches"));
 ok("an unchecked section leaves the preview", (await art.getByRole("heading", { name: "Summary" }).count()) === 0);
 ok("only the chosen number of priorities is listed", (await art.locator("ol > li").count()) === 3);
-const [md] = await Promise.all([p.waitForEvent("download"), p.getByRole("button", { name: /Download \.md/ }).click()]);
+const [md] = await Promise.all([p.waitForEvent("download"), (await download("Download .md")).click()]);
 const mdText = (await import("node:fs")).readFileSync(await md.path(), "utf8");
 ok("markdown download follows the options", mdText.startsWith("# Q4 fraud review") && mdText.includes("## Priorities") && mdText.includes("payments team"));
 await p.getByRole("button", { name: "Save report" }).click();
@@ -187,7 +192,7 @@ await p.getByRole("button", { name: /Create session with/ }).waitFor({ timeout: 
 await p.getByRole("button", { name: /Create session with/ }).click();
 await p.waitForURL(/overview/);
 await p.goto(`${base}/reports`, { waitUntil: "networkidle" });
-const [dl2] = await Promise.all([p.waitForEvent("download"), p.getByRole("button", { name: /Export CSV/ }).click()]);
+const [dl2] = await Promise.all([p.waitForEvent("download"), (await download("Export CSV")).click()]);
 const csvText = (await import("node:fs")).readFileSync(await dl2.path(), "utf8");
 ok("CSV export has no cell starting with a formula character", !/(^|\n)"[=+@-]/.test(csvText) && !/,"[=+@-]/.test(csvText));
 ok("CSV export keeps the text, defused with an apostrophe", csvText.includes("\"'=HYPERLINK"));

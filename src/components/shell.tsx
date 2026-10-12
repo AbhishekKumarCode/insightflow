@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BarChart3, MessageSquare, Flag, ListChecks, FileText, Search, Database, FilePlus2, Plus, MoreHorizontal, ChevronDown, Check } from "lucide-react";
 import { useApp, type Session } from "@/lib/store";
+import { useDismiss } from "@/lib/use-dismiss";
 import { DATA, DEFAULT_FILTERS, summarize, fmt } from "@/lib/data";
 import { ImportDialog } from "./import-dialog";
 
@@ -24,19 +25,6 @@ function Mark() {
       <rect x="20.5" y="6" width="4.5" height="19" rx="1.5" fill="#fff" />
     </svg>
   );
-}
-
-/** Close a popover on outside click or Escape. */
-function useDismiss(open: boolean, close: () => void) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const off = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) close(); };
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && close();
-    document.addEventListener("mousedown", off); document.addEventListener("keydown", esc);
-    return () => { document.removeEventListener("mousedown", off); document.removeEventListener("keydown", esc); };
-  }, [open, close]);
-  return ref;
 }
 
 function sessionCount(s: Session) { return (s.kind === "sample" ? DATA.totals.rows : 0) + s.extra.reduce((a, r) => a + r.count, 0); }
