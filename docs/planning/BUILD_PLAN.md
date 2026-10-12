@@ -1,3 +1,5 @@
+> **Early planning notes, kept for the record.** The build changed after this was written (for example: deployed on Vercel, no Supabase, and no model call at request time). See the README for what was actually built.
+
 # InsightFlow: 1-Day Build Plan (Build Battle 2026)
 
 Goal: ship a deployed, demoable app in ~24 hours. Cut scope before cutting polish.

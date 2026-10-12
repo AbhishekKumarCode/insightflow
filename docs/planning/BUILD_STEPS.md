@@ -1,3 +1,5 @@
+> **Early planning notes, kept for the record.** The build changed after this was written (for example: deployed on Vercel, no Supabase, and no model call at request time). See the README for what was actually built.
+
 # InsightFlow: build steps (what gets built, in order)
 
 Reference screens: `design/README.md`. Data: `ps/BuildBattle_2026_Customer_Feedback_Dataset.csv` (7,000 rows, 320 unique, 4 categories).

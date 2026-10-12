@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# InsightFlow
 
-## Getting Started
+**Turn raw customer feedback into decisions: what to fix first, and why.**
 
-First, run the development server:
+Live app: **https://insightflow-blond.vercel.app**
+Built for Build Battle 2026 (Frontend Arena, AI × Web Development).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+![Overview](docs/screens/overview.png)
+
+## What it does
+
+| Requirement | Where it lives |
+|---|---|
+| **Feedback management**: submit, import CSV, search, filter, sample data | `Import data` popup (upload CSV, paste, add one), `/feedback`, "Use sample data" on `/import` |
+| **AI-powered analysis**: sentiment, topics, grouping, Adaption | Issue groups and sentiment for all 320 distinct reviews; a key-free matcher for new feedback; Adaption cleaning on `/import` |
+| **Analytics dashboard**: metrics, sentiment, issues, trends, filters | `/overview`: category, sentiment and period filters drive every widget |
+| **Recommendations**: priorities with a reason | `/priorities`: ranked issues, the score arithmetic, quotes, and actions |
+| **Reports and tracking**: save/track, export | `/tracker` (drag cards between columns), `/reports` (print to PDF, CSV export, saved reports) |
+
+## The dataset, and why cleaning comes first
+
+The sample file has 7,000 reviews but only **320 distinct** ones. A few sentences repeat hundreds of times, so treating rows as customers gives the wrong ranking.
+
+- Every distinct review keeps its **original repeat count**, so a complaint said 295 times weighs 295.
+- The file was run through **Adaption** (Prompt Deduplication + Checklist verification). Quality went **2.0 → 9.6 out of 10** (grade E → A, percentile 0.6 → 57.7), and 7,223 rows became 441. See [docs/ADAPTION.md](docs/ADAPTION.md) for the full explanation, including where Adaption fell short.
+
+![Adaption results](docs/screens/adaption.png)
+
+## How priorities are decided
+
+```
+score = 100 × (0.40 × volume + 0.35 × negative share + 0.25 × severity)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **volume**: negative reviews for the issue ÷ the most-reported issue, using original repeat counts
+- **negative share**: how one-sided the feedback on that issue is
+- **severity**: set by hand (money loss and fraud rank highest, inconvenience lowest)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+It is a ranking heuristic, not a measurement, and the app shows the arithmetic for every issue.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+![Priorities](docs/screens/priorities.png)
 
-## Learn More
+## What is real, and what is not
 
-To learn more about Next.js, take a look at the following resources:
+Being plain about this matters more than sounding impressive.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **No model runs in the browser or on the server at request time.** The deployed app needs no API keys.
+- **Sample labels** (sentiment, issue group, severity) come from `scripts/label.mjs`: rules written after reading all 320 distinct reviews. I cross-checked them with a live language model (DeepSeek, `scripts/validate-llm.mjs`): **sentiment agreed on 318 of 320 reviews (99%)**. The model used finer issue names (74 vs my 21), so the curated groups are kept for stability. The model output is committed in `data/llm-labels.json`.
+- **New feedback** is matched against the 320 labeled reviews with TF-IDF similarity (`src/lib/match.ts`), with no key. Leave-one-out accuracy on the sample: **88% on issue, 96% on sentiment**. When nothing is close it says "No close match" instead of guessing.
+- **Trends are simulated.** The sample has no dates, so the weekly timeline is a seeded random spread across 13 weeks, and the chart is labelled "Demo timeline (simulated)".
+- `src/lib/analyze.ts` has a server-side model labeling function (AI SDK + DeepSeek, schema-validated) that is **not wired into the UI**.
+- Data you add, track or save stays **in your browser** (localStorage). Nothing is sent anywhere.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Details worth knowing
 
-## Deploy on Vercel
+- **Duplicate protection**: uploading the same file again is detected ("320 of 320 distinct reviews are already in your dashboard") and skipped, so counts never double.
+- **Personal data**: emails, phone numbers and card-like numbers are masked as `[email]`, `[phone]`, `[card]` before anything is stored.
+- **Honest limits**: the matcher only recognises problems similar to the sample, and unmatched reviews count in totals but not in priorities.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Run it
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+npm run dev          # http://localhost:3000
+npm run build && npm start
+```
+
+No environment variables are required. To re-run the offline model cross-check, put `DEEPSEEK_API_KEY` in `.env.local` and run `node --env-file=.env.local scripts/validate-llm.mjs`.
+
+## Tests
+
+A browser test walks the full flow (filters, tracking, drag and drop, search, CSV export, saved reports, the import popup, personal-data flagging, duplicate protection):
+
+```bash
+npm start                                  # in one terminal
+node scripts/smoke.mjs                     # or: BASE=https://insightflow-blond.vercel.app node scripts/smoke.mjs
+```
+
+## Stack
+
+Next.js 16 (App Router, TypeScript), Tailwind CSS 4, Recharts, PapaParse, zod, Playwright (tests). Deployed on Vercel.
+
+## Repository map
+
+```
+src/app/           pages: overview, feedback, priorities, tracker, reports, import
+src/components/    shell, import popup, filters, shared UI
+src/lib/           data layer, store, matcher, scan, Adaption results
+scripts/           dedupe → label → build-analysis pipeline, Adaption summary, tests
+data/              sample.csv, analyzed.json, Adaption summary + trimmed output
+docs/              ADAPTION.md, DEMO.md, screens/, planning/ (early notes)
+```
+
+Data pipeline: `node scripts/dedupe.mjs && node scripts/label.mjs && node scripts/build-analysis.mjs` regenerates `data/analyzed.json` from `data/sample.csv`.
