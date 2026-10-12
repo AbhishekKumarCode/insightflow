@@ -4,7 +4,7 @@ import { DEFAULT_FILTERS, setSessionData, type Filters, type IssueDef, type Revi
 
 export type TrackedStatus = "New" | "Investigating" | "In progress" | "Resolved";
 export type Tracked = { issueId: string; status: TrackedStatus; owner: string; note: string; addedAt: string };
-export type SavedReport = { id: string; title: string; createdAt: string; topIssueIds: string[]; items?: { name: string; score: number }[]; totals?: { reviews: number; negativePct: number } };
+export type SavedReport = { id: string; title: string; createdAt: string; topIssueIds: string[]; items?: { name: string; score: number }[]; totals?: { reviews: number; negativePct: number }; scope?: string };
 
 /** A session is one dataset with its own tracked issues and saved reports. The sample session also includes the 320 built-in reviews. */
 export type Session = { id: string; name: string; createdAt: string; kind: "sample" | "import"; extra: Review[]; issues: IssueDef[]; tracked: Tracked[]; reports: SavedReport[] };

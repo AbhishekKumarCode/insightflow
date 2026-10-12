@@ -88,7 +88,7 @@ await p.getByText("Copied").waitFor({ timeout: 3000 });
 ok("copy summary confirms", await p.getByText("Copied").isVisible());
 const clip = await p.evaluate(() => navigator.clipboard.readText()).catch(() => "");
 ok("clipboard holds the report", clip.includes("Top priorities") && clip.includes("Charged but order never arrived"));
-await p.getByText(/Insight report,/).first().click();
+await p.locator("summary").filter({ hasText: /Insight report,/ }).first().click();
 ok("saved report opens with its issues", await p.getByText(/when saved/).first().isVisible());
 const before = await p.getByRole("button", { name: /^Delete Insight report/ }).count();
 await p.getByRole("button", { name: /^Delete Insight report/ }).first().click();
@@ -102,6 +102,28 @@ await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
 await p.getByText("7,000").first().waitFor({ timeout: 5000 });
 ok("reset returns to the 7,000-review sample", await p.getByText("7,000").first().isVisible());
 ok("reset clears tracked issues", (await p.evaluate(() => JSON.parse(localStorage.getItem("if.sessions") ?? "[]")[0]?.tracked?.length)) === 0);
+
+// --- report builder: options change the preview, downloads follow the options, and saved reports are compared ---
+await p.goto(`${base}/reports`, { waitUntil: "networkidle" });
+await p.getByLabel("Title", { exact: true }).fill("Q4 fraud review");
+await p.getByLabel("Cover").selectOption("Fraud and Scam");
+await p.getByLabel("Priorities to include").selectOption("3");
+await p.getByRole("checkbox", { name: "Summary" }).uncheck();
+await p.getByLabel("Note for readers").fill("Shared with the payments team on Monday.");
+const art = p.locator("article");
+const artText = await art.innerText();
+ok("preview shows the custom title and the note", artText.includes("Q4 fraud review") && artText.includes("payments team"));
+ok("scope limits the report to that category", !artText.includes("Website crashes and checkout glitches"));
+ok("an unchecked section leaves the preview", (await art.getByRole("heading", { name: "Summary" }).count()) === 0);
+ok("only the chosen number of priorities is listed", (await art.locator("ol > li").count()) === 3);
+const [md] = await Promise.all([p.waitForEvent("download"), p.getByRole("button", { name: /Download \.md/ }).click()]);
+const mdText = (await import("node:fs")).readFileSync(await md.path(), "utf8");
+ok("markdown download follows the options", mdText.startsWith("# Q4 fraud review") && mdText.includes("## Priorities") && mdText.includes("payments team"));
+await p.getByRole("button", { name: "Save report" }).click();
+await p.getByRole("checkbox", { name: "Summary" }).check();
+await p.getByText(/Since your last saved report/).waitFor({ timeout: 4000 });
+ok("report compares itself with the last saved one", await p.getByText(/Since your last saved report/).isVisible());
+
 
 // --- sessions: every import can be its own dataset, with its own dashboard ---
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
