@@ -60,13 +60,14 @@ export default function Tracker() {
             </div>
           </Card>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <p className="mb-3 text-xs text-muted md:hidden">Swipe sideways for the other columns. On a phone, change a card&apos;s status with its Status menu.</p>
+          <div className="snap-row -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 md:pb-0 xl:grid-cols-4">
             {STATUSES.map(({ s, color, hint }) => (
-              <section key={s} aria-label={s}
+              <section key={s} aria-label={s} data-col={s}
                 onDragOver={(e) => { if (e.dataTransfer.types.includes("text/plain")) { e.preventDefault(); setOver(s); } }}
                 onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOver(null); }}
                 onDrop={(e) => { e.preventDefault(); drop(s, e.dataTransfer.getData("text/plain")); }}
-                className={`rounded-2xl p-3 transition-colors ${over === s ? "bg-indigo-100/70 ring-2 ring-indigo-400 ring-offset-2 ring-offset-[#f3f5fa]" : "bg-slate-200/40"}`}>
+                className={`w-[84vw] shrink-0 snap-center rounded-2xl p-3 transition-colors md:w-auto ${over === s ? "bg-indigo-100/70 ring-2 ring-indigo-400 ring-offset-2 ring-offset-[#f3f5fa]" : "bg-slate-200/40"}`}>
                 <header className="mb-3 px-1"><h2 className="flex items-center gap-2 text-sm font-semibold"><i className="size-2.5 rounded-full" style={{ background: color }} />{s}<span className="ml-auto rounded-full bg-white px-2 text-xs text-muted">{count(s)}</span></h2><p className="mt-0.5 text-xs text-muted">{hint}</p></header>
                 <div className="space-y-3">
                   {tracked.filter((t) => t.status === s).map((t) => {

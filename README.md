@@ -77,6 +77,12 @@ npm start                                  # in one terminal
 node scripts/smoke.mjs                     # or: BASE=https://insightflow-blond.vercel.app node scripts/smoke.mjs
 ```
 
+A second test covers the phone layout (bottom bar, bottom-sheet popup, card lists, swipeable rows, no sideways scroll at 320 to 414px wide):
+
+```bash
+node scripts/phone.mjs                     # or: BASE=https://insightflow-blond.vercel.app node scripts/phone.mjs
+```
+
 ## Stack
 
 Next.js 16 (App Router, TypeScript), Tailwind CSS 4, Recharts, PapaParse, zod, Playwright (tests). Deployed on Vercel.

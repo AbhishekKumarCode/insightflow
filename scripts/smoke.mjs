@@ -32,6 +32,17 @@ await p.goto(`${base}/feedback`, { waitUntil: "networkidle" });
 await p.getByLabel("Search feedback").fill("crashing");
 await p.waitForTimeout(300);
 ok("search narrows rows", (await p.locator("tbody tr").count()) > 0 && (await p.locator("tbody tr").count()) < 15);
+ok("search highlights the matching text", await p.locator("tbody mark").first().isVisible());
+await p.getByRole("button", { name: /Clear search/ }).click();
+await p.getByRole("button", { name: /^Negative/ }).click();
+ok("sentiment chip filters the feed to negative reviews", (await p.getByRole("button", { name: /^Negative/ }).getAttribute("aria-pressed")) === "true" && (await p.locator("tbody tr").first().innerText()).includes("Negative"));
+const [fbCsv] = await Promise.all([p.waitForEvent("download"), p.getByRole("button", { name: /^Export/ }).click()]);
+const fbText = (await import("node:fs")).readFileSync(await fbCsv.path(), "utf8");
+ok("feedback export holds only the filtered reviews", fbText.startsWith('"Review","Category"') && !fbText.includes('"positive"') && fbText.includes('"negative"'));
+await p.getByRole("tab", { name: "By issue" }).click();
+await p.locator("details > summary").first().click();
+ok("by-issue view groups reviews under an issue", await p.locator("details[open] li").first().isVisible());
+
 
 await p.goto(`${base}/reports`, { waitUntil: "networkidle" });
 const [dl] = await Promise.all([p.waitForEvent("download"), p.getByRole("button", { name: /Export CSV/ }).click()]);

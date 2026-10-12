@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Check, Plus } from "lucide-react";
 import { rankIssues, fmt } from "@/lib/data";
 import { useApp } from "@/lib/store";
@@ -10,6 +10,7 @@ export default function Priorities() {
   const { filters, tracked, track } = useApp();
   const ranked = useMemo(() => rankIssues(filters), [filters]);
   const [pick, setPick] = useState<string | null>(null);
+  const detail = useRef<HTMLElement>(null);
   const sel = ranked.find((i) => i.id === pick) ?? ranked[0];
   const isTracked = sel ? tracked.some((t) => t.issueId === sel.id) : false;
   const parts = sel ? [
@@ -26,10 +27,10 @@ export default function Priorities() {
       {ranked.length === 0 && <Card className="py-12 text-center text-muted">No negative feedback matches these filters.</Card>}
       {sel && (
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
-          <ol className="min-w-0 space-y-2" aria-label="Ranked issues">
+          <ol className="snap-row -mx-4 flex min-w-0 snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-2 lg:mx-0 lg:block lg:space-y-2 lg:overflow-visible lg:px-0 lg:pb-0" aria-label="Ranked issues">
             {ranked.map((i, n) => (
-              <li key={i.id}>
-                <button onClick={() => setPick(i.id)} aria-current={sel.id === i.id} className={`relative flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${sel.id === i.id ? "border-indigo-300 bg-white shadow-sm" : "border-transparent hover:bg-white/70"}`}>
+              <li key={i.id} className="w-[16.5rem] shrink-0 snap-start lg:w-auto">
+                <button onClick={() => { setPick(i.id); if (typeof window !== "undefined" && !window.matchMedia("(min-width: 1024px)").matches) requestAnimationFrame(() => detail.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} aria-current={sel.id === i.id} className={`relative flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${sel.id === i.id ? "border-indigo-300 bg-white shadow-sm" : "border-transparent hover:bg-white/70"}`}>
                   {sel.id === i.id && <span className="absolute -left-px top-3 h-[calc(100%-1.5rem)] w-1 rounded-r-full bg-indigo-500" />}
                   <ScoreRing score={i.score} />
                   <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{i.name}</span>
@@ -40,7 +41,7 @@ export default function Priorities() {
             ))}
           </ol>
 
-          <article key={sel.id} className="tab-pane min-w-0 space-y-7 self-start rounded-3xl border border-slate-200/70 bg-white p-6 shadow-[0_1px_2px_rgba(15,18,38,0.04)] md:p-8 lg:sticky lg:top-24">
+          <article ref={detail} key={sel.id} className="scroll-mt-20 tab-pane min-w-0 space-y-7 self-start rounded-3xl border border-slate-200/70 bg-white p-6 shadow-[0_1px_2px_rgba(15,18,38,0.04)] md:p-8 lg:sticky lg:top-24">
             <header className="flex flex-wrap items-start justify-between gap-4">
               <div><Chip>{sel.category}</Chip><h2 className="mt-2 text-[28px] font-semibold leading-tight">{sel.name}</h2></div>
               <button disabled={isTracked} onClick={() => track(sel.id)} className={isTracked ? btn : btnPrimary}>

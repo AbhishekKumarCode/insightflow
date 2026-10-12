@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/store";
@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   title: "InsightFlow: customer feedback to decisions",
   description: "Turn raw customer feedback into prioritized, explained decisions.",
 };
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#0f1226" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

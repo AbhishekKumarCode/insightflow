@@ -115,8 +115,9 @@ export function ImportDialog() {
 
   return (
     <dialog ref={ref} onClose={() => { setImportOpen(false); }} onClick={(e) => e.target === ref.current && close()}
-      aria-labelledby="import-title" className="m-auto w-[min(720px,calc(100vw-2rem))] rounded-2xl border border-line bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm">
-      <div className="flex max-h-[85vh] flex-col">
+      aria-labelledby="import-title" className="m-auto w-[min(720px,calc(100vw-2rem))] rounded-2xl border border-line bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm max-sm:mb-0 max-sm:w-full max-sm:max-w-none max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0">
+      <div className="flex max-h-[85vh] flex-col max-sm:max-h-[88dvh]">
+        <div aria-hidden className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-slate-300 sm:hidden" />
         <div className="flex items-start justify-between border-b border-line px-6 py-4">
           <div><h2 id="import-title" className="text-lg font-semibold">Import data</h2><p className="text-sm text-muted">Add feedback. We check it first, then match it to known issues.</p></div>
           <button onClick={close} aria-label="Close" className="rounded-lg p-1.5 text-muted hover:bg-slate-100"><X size={18} /></button>

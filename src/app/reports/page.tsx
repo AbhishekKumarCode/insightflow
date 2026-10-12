@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Download, FileText, Printer, Save, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Copy, Download, FileText, Printer, Save, Trash2 } from "lucide-react";
 import { categories, rankIssues, summarize, DEFAULT_FILTERS, pct, fmt, issueById } from "@/lib/data";
+import { csvRow, downloadFile } from "@/lib/csv";
 import { useApp } from "@/lib/store";
 import { Card, PageHead, ScoreRing, btn, btnPrimary } from "@/components/ui";
 
@@ -19,6 +20,7 @@ type Key = (typeof SECTIONS)[number]["key"];
 export default function Reports() {
   const { tracked, reports, saveReport, deleteReport, filters, session } = useApp();
   const [copied, setCopied] = useState(false);
+  const [showOpts, setShowOpts] = useState(false);
   const [date, setDate] = useState("");
   // Date is read after mount: reading the clock during render is not allowed in a prerendered page.
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -76,21 +78,15 @@ export default function Reports() {
     ...(on.method ? ["", "---", "Priority score = 100 × (0.40 volume + 0.35 negative share + 0.25 severity). It ranks issues and is not a measurement."] : []),
   ].join("\n");
 
-  const download = (name: string, text: string, type: string) => {
-    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([text], { type })), download: name });
-    a.click(); URL.revokeObjectURL(a.href);
-  };
+  const download = downloadFile;
   const copySummary = async () => {
     try { await navigator.clipboard.writeText(summaryText()); }
     catch { const t = Object.assign(document.createElement("textarea"), { value: summaryText() }); document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
     setCopied(true); setTimeout(() => setCopied(false), 2000);
   };
   const exportCsv = () => {
-    // Cells that start with = + - @ (or a tab/CR) run as formulas in Excel and Sheets. Issue names and quotes come from
-    // imported reviews, so neutralize them with a leading apostrophe before quoting.
-    const esc = (v: string | number) => { let t = String(v); if (/^[=+\-@\t\r]/.test(t)) t = `'${t}`; return `"${t.replace(/"/g, '""')}"`; };
-    const lines = [["Rank", "Issue", "Category", "Priority score", "Negative reviews", "Why", "Actions", "Tracked status"].map(esc).join(",")];
-    ranked.forEach((i, n) => lines.push([n + 1, i.name, i.category, i.score, i.negative, i.recommendation?.why ?? "", i.recommendation?.actions.join(" | ") ?? "", tracked.find((t) => t.issueId === i.id)?.status ?? ""].map(esc).join(",")));
+    const lines = [csvRow(["Rank", "Issue", "Category", "Priority score", "Negative reviews", "Why", "Actions", "Tracked status"])];
+    ranked.forEach((i, n) => lines.push(csvRow([n + 1, i.name, i.category, i.score, i.negative, i.recommendation?.why ?? "", i.recommendation?.actions.join(" | ") ?? "", tracked.find((t) => t.issueId === i.id)?.status ?? ""])));
     download("insightflow-issues.csv", lines.join("\n"), "text/csv");
   };
   const save = () => saveReport({ id: crypto.randomUUID(), title, createdAt: new Date().toISOString(), topIssueIds: top.map((i) => i.id), items: top.map((i) => ({ name: i.name, score: i.score })), totals: { reviews: s.total, negativePct: negPct }, scope });
@@ -98,7 +94,7 @@ export default function Reports() {
   return (
     <>
       <PageHead title="Reports" sub="Choose what goes in, check the preview, then print, download or save." right={
-        <div className="no-print flex flex-wrap gap-2">
+        <div className="no-print snap-row flex w-full min-w-0 gap-2 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:overflow-visible [&>button]:shrink-0 [&>button]:whitespace-nowrap">
           <button className={btn} onClick={exportCsv}><Download size={16} />Export CSV</button>
           <button className={btn} onClick={() => download("insightflow-report.md", markdown(), "text/markdown")}><FileText size={16} />Download .md</button>
           <button className={btn} onClick={copySummary}>{copied ? <><Check size={16} />Copied</> : <><Copy size={16} />Copy summary</>}</button>
@@ -107,8 +103,9 @@ export default function Reports() {
         </div>} />
 
       <div className="grid gap-6 print:block lg:grid-cols-[18rem_1fr]">
-        <aside className="no-print space-y-5 self-start rounded-2xl border border-slate-200/70 bg-white p-5 lg:sticky lg:top-24" aria-label="Report options">
-          <h2 className="text-base font-semibold">Customize</h2>
+        <aside className="no-print self-start rounded-2xl border border-slate-200/70 bg-white p-5 lg:sticky lg:top-24 lg:space-y-5" aria-label="Report options">
+          <button type="button" onClick={() => setShowOpts((v) => !v)} aria-expanded={showOpts} className="flex w-full items-center justify-between text-left text-base font-semibold lg:pointer-events-none">Customize<ChevronDown size={18} className={`text-muted transition lg:hidden ${showOpts ? "rotate-180" : ""}`} /></button>
+          <div className={`${showOpts ? "block" : "hidden"} space-y-5 lg:block`}>
           <label className="block text-sm"><span className="font-medium">Title</span>
             <input value={title} onChange={(e) => setTitleDraft(e.target.value)} className="mt-1 w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand" /></label>
           <label className="block text-sm"><span className="font-medium">Cover</span>
@@ -120,6 +117,7 @@ export default function Reports() {
               <label key={key} className="flex cursor-pointer items-center gap-2"><input type="checkbox" checked={on[key]} onChange={(e) => setOn((o) => ({ ...o, [key]: e.target.checked }))} className="size-4 accent-indigo-600" />{label}</label>))}</div></fieldset>
           <label className="block text-sm"><span className="font-medium">Note for readers</span>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={4} placeholder="One or two sentences of context for your team" className="mt-1 w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand" /></label>
+          </div>
         </aside>
 
         <article className="min-w-0 overflow-hidden rounded-3xl border border-slate-200/70 bg-white">

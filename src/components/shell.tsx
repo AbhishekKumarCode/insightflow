@@ -48,8 +48,16 @@ function groupLabel(s: Session) {
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
-  const { filters, setFilters, tracked, openImport, user, reports, clearUser, clearTracked, clearReports, sessions, session, switchSession, renameSession, deleteSession, resetAll } = useApp();
+  const { filters, setFilters, tracked, openImport, importOpen, user, reports, clearUser, clearTracked, clearReports, sessions, session, switchSession, renameSession, deleteSession, resetAll } = useApp();
   const [menu, setMenu] = useState(false);
+  const [fabHidden, setFabHidden] = useState(false);
+  useEffect(() => {
+    // The floating button gets out of the way while you read down the page and comes back when you scroll up.
+    let last = window.scrollY;
+    const onScroll = () => { const y = window.scrollY; if (y > last + 8 && y > 160) setFabHidden(true); else if (y < last - 8 || y < 160) setFabHidden(false); last = y; };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   const [chip, setChip] = useState(false);
   const [rowMenu, setRowMenu] = useState<string | null>(null);
   const [confirmDel, setConfirmDel] = useState<string | null>(null);
@@ -131,13 +139,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <p className="mt-3 px-3 text-[11px] leading-relaxed text-slate-500">Sessions are saved in this browser only.</p>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col pb-16 md:pb-0">
+      <div className="flex min-w-0 flex-1 flex-col pb-24 md:pb-0">
         <header className="no-print sticky top-0 z-10 flex items-center gap-3 border-b border-line bg-background/90 px-4 py-3 backdrop-blur md:px-8">
           <label className="relative w-full min-w-0 max-w-md">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input value={filters.q} onChange={(e) => setFilters({ q: e.target.value })}
               onKeyDown={(e) => e.key === "Enter" && path !== "/feedback" && router.push("/feedback")}
-              placeholder="Search feedback or issues…" aria-label="Search feedback"
+              placeholder="Search…" aria-label="Search feedback"
               className="w-full min-w-0 rounded-lg border border-line bg-white py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10" />
           </label>
           <div className="ml-auto flex shrink-0 items-center gap-2 md:gap-3">
@@ -183,12 +191,24 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </div>
 
       <ImportDialog />
-      <nav className="no-print fixed inset-x-0 bottom-0 z-20 flex border-t border-line bg-white md:hidden">
-        {NAV.map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href} className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] ${path.startsWith(href) ? "text-brand" : "text-muted"}`}>
-            <Icon size={20} />{label}
-          </Link>
-        ))}
+      {/* Phones: a floating button for the main action, and a bottom bar for the pages */}
+      {!importOpen && (
+        <button onClick={() => openImport("new")} aria-label="New session" className={`no-print fixed right-4 z-20 grid size-14 place-items-center rounded-full bg-brand text-white shadow-[0_10px_24px_-6px_rgba(79,70,229,0.55)] transition duration-300 active:scale-95 md:hidden ${fabHidden ? "pointer-events-none translate-y-24 opacity-0" : ""}`} style={{ bottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
+          <Plus size={24} />
+        </button>)}
+      <nav aria-label="Pages" className="no-print fixed inset-x-0 bottom-0 z-20 flex border-t border-line bg-white/90 px-1 pt-1.5 backdrop-blur-md md:hidden" style={{ paddingBottom: "max(0.375rem, env(safe-area-inset-bottom))" }}>
+        {NAV.map(({ href, label, icon: Icon }) => {
+          const on = path.startsWith(href);
+          return (
+            <Link key={href} href={href} aria-current={on ? "page" : undefined} className="flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium">
+              <span className={`relative grid h-7 w-14 place-items-center rounded-full transition-colors ${on ? "bg-brand-soft text-brand" : "text-slate-500"}`}>
+                <Icon size={20} />
+                {href === "/tracker" && tracked.length > 0 && <span className="absolute right-1.5 top-0 grid min-w-4 place-items-center rounded-full bg-brand px-1 text-[10px] font-semibold leading-4 text-white">{tracked.length}</span>}
+              </span>
+              <span className={on ? "text-brand" : "text-slate-500"}>{label}</span>
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );
