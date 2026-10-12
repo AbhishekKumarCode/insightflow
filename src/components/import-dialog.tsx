@@ -21,7 +21,7 @@ const TABS: { id: Tab; label: string; icon: typeof UploadCloud }[] = [
 const MAX_ROWS = 20000;
 
 export function ImportDialog() {
-  const { importOpen, setImportOpen, addUser, user, clearUser, importDest, createSession, session } = useApp();
+  const { importOpen, setImportOpen, addUser, user, clearUser, importDest, createSession, session, sessions, switchSession } = useApp();
   const router = useRouter();
   const ref = useRef<HTMLDialogElement>(null);
   const [tab, setTab] = useState<Tab>("upload");
@@ -98,6 +98,9 @@ export function ImportDialog() {
     router.push("/overview");
   };
 
+  // The same file imported before as its own session?
+  const baseName = name.replace(/\.csv$/i, "") || "New session";
+  const sameSource = dest === "new" ? sessions.filter((x) => x.kind === "import" && (x.source ?? x.name) === baseName) : [];
   const s = result?.s;
   const nMatched = result?.matched.filter((x) => x.m.matched).length ?? 0;
   const dupCount = result?.dupCount ?? 0;
@@ -114,7 +117,7 @@ export function ImportDialog() {
   ] : [];
 
   return (
-    <dialog ref={ref} onClose={() => { setImportOpen(false); }} onClick={(e) => e.target === ref.current && close()}
+    <dialog ref={ref} onClose={() => { setImportOpen(false); reset(); }} onClick={(e) => e.target === ref.current && close()}
       aria-labelledby="import-title" className="m-auto w-[min(720px,calc(100vw-2rem))] rounded-2xl border border-line bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm max-sm:mb-0 max-sm:w-full max-sm:max-w-none max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0">
       <div className="flex max-h-[85vh] flex-col max-sm:max-h-[88dvh]">
         <div aria-hidden className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-slate-300 sm:hidden" />
@@ -189,6 +192,11 @@ export function ImportDialog() {
                   ))}
                 </div>
               </fieldset>
+              {sameSource.length > 0 && (
+                <div role="status" className="flex flex-wrap items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                  <span className="min-w-0 flex-1">You already imported “{baseName}” as the session “{sameSource[0].name}”. A new session makes a separate copy.</span>
+                  <button onClick={() => { switchSession(sameSource[0].id); close(); router.push("/overview"); }} className="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-1.5 font-medium hover:bg-amber-100">Open existing</button>
+                </div>)}
               <div>
                 <div className="mb-2 flex items-center gap-2"><Sparkles size={16} className="text-brand" /><h3 className="text-sm font-semibold">Matched to known issues</h3>
                   <span className="text-xs text-muted">{nMatched} of {result.matched.length} distinct reviews matched</span></div>

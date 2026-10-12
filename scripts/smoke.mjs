@@ -196,4 +196,21 @@ const [dl2] = await Promise.all([p.waitForEvent("download"), (await download("Ex
 const csvText = (await import("node:fs")).readFileSync(await dl2.path(), "utf8");
 ok("CSV export has no cell starting with a formula character", !/(^|\n)"[=+@-]/.test(csvText) && !/,"[=+@-]/.test(csvText));
 ok("CSV export keeps the text, defused with an apostrophe", csvText.includes("\"'=HYPERLINK"));
+
+// --- the same file again: a warning with a way to open the existing session, distinct names, and a clean popup after Escape ---
+await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
+await p.getByRole("button", { name: "New session" }).first().click();
+await p.getByRole("tab", { name: /Paste feedback/ }).click();
+await p.getByLabel("Pasted feedback", { exact: true }).fill("Delivery was a week late again");
+await p.getByRole("button", { name: "Check feedback" }).click();
+await p.getByRole("status").filter({ hasText: /already imported/ }).waitFor({ timeout: 5000 });
+ok("importing the same source again warns and offers the existing session", await p.getByRole("button", { name: "Open existing" }).isVisible());
+await p.keyboard.press("Escape");
+await p.getByRole("button", { name: "New session" }).first().click();
+ok("closing with Escape leaves a clean popup", await p.getByLabel("Pasted feedback", { exact: true }).isVisible());
+await p.getByLabel("Pasted feedback", { exact: true }).fill("Delivery was a week late again");
+await p.getByRole("button", { name: "Check feedback" }).click();
+await p.getByRole("button", { name: /Create session with 1 review/ }).click();
+await p.waitForURL(/overview/);
+ok("a second import of the same source gets its own name", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").allInnerTexts()).join("|").includes("Pasted feedback (2)"));
 await b.close();

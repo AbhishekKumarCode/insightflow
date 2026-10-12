@@ -7,7 +7,7 @@ export type Tracked = { issueId: string; status: TrackedStatus; owner: string; n
 export type SavedReport = { id: string; title: string; createdAt: string; topIssueIds: string[]; items?: { name: string; score: number }[]; totals?: { reviews: number; negativePct: number }; scope?: string };
 
 /** A session is one dataset with its own tracked issues and saved reports. The sample session also includes the 320 built-in reviews. */
-export type Session = { id: string; name: string; createdAt: string; kind: "sample" | "import"; extra: Review[]; issues: IssueDef[]; tracked: Tracked[]; reports: SavedReport[] };
+export type Session = { id: string; name: string; createdAt: string; kind: "sample" | "import"; extra: Review[]; issues: IssueDef[]; tracked: Tracked[]; reports: SavedReport[]; source?: string };
 export const SAMPLE_ID = "sample";
 const freshSample = (): Session => ({ id: SAMPLE_ID, name: "Sample dataset", createdAt: "", kind: "sample", extra: [], issues: [], tracked: [], reports: [] });
 
@@ -78,7 +78,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const createSession = (name: string, reviews: Review[], issues: IssueDef[] = []) => {
     const id = `s${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
-    setSessions((l) => [...l, { id, name: name.trim() || "New session", createdAt: new Date().toISOString(), kind: "import", extra: reviews.slice(-3000), issues, tracked: [], reports: [] }]);
+    const base = name.trim() || "New session";
+    // Two imports of the same file get distinct names: "feb", "feb (2)", "feb (3)".
+    setSessions((l) => {
+      const taken = new Set(l.map((s) => s.name));
+      let unique = base, n = 2;
+      while (taken.has(unique)) unique = `${base} (${n++})`;
+      return [...l, { id, name: unique, source: base, createdAt: new Date().toISOString(), kind: "import", extra: reviews.slice(-3000), issues, tracked: [], reports: [] }];
+    });
     setActiveId(id); setF(DEFAULT_FILTERS);
     return id;
   };
