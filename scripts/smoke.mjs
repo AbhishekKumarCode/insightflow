@@ -253,4 +253,28 @@ await p.getByRole("button", { name: "Load the sample dataset" }).click();
 await p.getByRole("button", { name: "Switch session" }).filter({ hasText: "Sample dataset · 7,000" }).waitFor({ timeout: 5000 });
 ok("one click brings the sample back", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Sample dataset · 7,000"));
 ok("sessions survive a reload when the sample was removed and restored", await (async () => { await p.reload({ waitUntil: "networkidle" }); return (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 1; })());
+
+// --- first visit: a playful welcome. After one click-through, the root URL goes straight to the dashboard ---
+{
+  const ctx2 = await b.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
+  const q = await ctx2.newPage();
+  await q.goto(`${base}/`, { waitUntil: "networkidle" });
+  ok("a first visit opens the welcome, not the Import page", await q.getByRole("heading", { level: 1 }).innerText().then((t) => t.includes("One thing to fix first")) && !q.url().includes("/import"));
+  ok("the welcome has no app chrome in the way", (await q.locator("aside").count()) === 0);
+  const card = q.getByRole("button", { name: /Not sorted yet/ }).first();
+  await card.click();
+  ok("tapping a review sorts it into its issue", await q.getByText("1 of 8 sorted").isVisible());
+  ok("a sorted card shows its issue and how many said it", /said \d+×/.test(await q.locator("button[aria-pressed='true']").first().innerText()));
+  await q.getByRole("button", { name: "Open the dashboard" }).click();
+  await q.waitForURL(/\/overview/);
+  ok("Open the dashboard goes to the dashboard with the sample loaded", (await q.getByRole("button", { name: "Switch session" }).innerText()).includes("Sample dataset"));
+  await q.goto(`${base}/`, { waitUntil: "networkidle" });
+  await q.waitForURL(/\/overview/, { timeout: 8000 });
+  ok("after that, the root URL goes straight to the dashboard", q.url().includes("/overview"));
+  await q.getByRole("button", { name: "My data" }).click();
+  await q.getByRole("menuitem", { name: "Show the welcome screen" }).click();
+  await q.getByRole("heading", { level: 1, name: /One thing to fix first/ }).waitFor({ timeout: 8000 });
+  ok("the welcome can be reopened from the avatar menu", q.url().includes("welcome=1"));
+  await ctx2.close();
+}
 await b.close();

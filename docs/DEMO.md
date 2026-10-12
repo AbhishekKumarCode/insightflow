@@ -6,7 +6,7 @@ Tip: do one dry run before recording. Use a fresh browser window so the Tracker 
 
 ## 0:00 to 0:15, the problem
 
-**Show:** the Import page (`/import`), click **Use sample data**.
+**Show:** the live URL's welcome screen. Tap two or three review cards so they flip into their issue, then click **Open the dashboard**. (If you have opened the site before, use the avatar menu, then **Show the welcome screen**.)
 
 > "A business gets thousands of reviews and has to decide what to fix first. This file has 7,000 reviews, but only 320 are different. Some sentences repeat hundreds of times, so counting rows would give the wrong answer."
 

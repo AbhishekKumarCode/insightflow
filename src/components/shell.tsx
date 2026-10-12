@@ -64,6 +64,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const pick = (id: string) => { switchSession(id); setChip(false); setRowMenu(null); if (path === "/import") router.push("/overview"); };
   const startRename = (s: Session) => { setRenaming(s.id); setDraft(s.name); setRowMenu(null); };
 
+  if (path === "/") return <>{children}<ImportDialog /></>;
+
   return (
     <div className="flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-ink2 px-3 py-4 text-slate-300 md:flex">
@@ -187,6 +189,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               {menu && (
                 <div role="menu" className="absolute right-0 top-12 z-30 w-72 rounded-xl border border-line bg-white p-2 text-sm shadow-lg">
                   <p className="px-3 py-2 text-xs text-muted">Applies to this session. Everything is saved in this browser only.</p>
+                  <Link role="menuitem" href="/?welcome=1" onClick={() => setMenu(false)} className="flex w-full rounded-lg px-3 py-2 text-left hover:bg-slate-50">Show the welcome screen</Link>
                   <button role="menuitem" disabled={!user.length} onClick={() => { clearUser(); setMenu(false); }} className="flex w-full justify-between rounded-lg px-3 py-2 text-left hover:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-transparent">Remove reviews I added<span className="tabular-nums">{user.length}</span></button>
                   <button role="menuitem" disabled={!tracked.length} onClick={() => { clearTracked(); setMenu(false); }} className="flex w-full justify-between rounded-lg px-3 py-2 text-left hover:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-transparent">Clear tracked issues<span className="tabular-nums">{tracked.length}</span></button>
                   <button role="menuitem" disabled={!reports.length} onClick={() => { clearReports(); setMenu(false); }} className="flex w-full justify-between rounded-lg px-3 py-2 text-left hover:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-transparent">Delete saved reports<span className="tabular-nums">{reports.length}</span></button>

@@ -157,6 +157,20 @@ ok("no sessions left gives a welcome screen with two clear choices", await p.get
 await p.getByRole("button", { name: "Load the sample dataset" }).click();
 await p.waitForTimeout(400);
 ok("the sample returns with one tap", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Sample dataset"));
+// First visit on a phone: the welcome fits, the board is tappable, and the main button is reachable.
+{
+  const c2 = await b.newContext({ viewport: { width: 360, height: 780 }, isMobile: true, hasTouch: true, reducedMotion: "reduce" });
+  const q = await c2.newPage();
+  await q.goto(`${base}/`, { waitUntil: "networkidle" });
+  ok("welcome fits a small phone without sideways scroll", await q.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth));
+  ok("welcome board is two columns of tappable cards", (await q.getByRole("button", { name: /Not sorted yet/ }).count()) === 8);
+  await q.getByRole("button", { name: /Not sorted yet/ }).first().tap();
+  ok("a card flips when tapped on a phone", await q.getByText("1 of 8 sorted").isVisible());
+  const cta = q.getByRole("button", { name: "Open the dashboard" });
+  await cta.scrollIntoViewIfNeeded();
+  ok("the main button is easy to reach (44px tall)", (await cta.boundingBox()).height >= 44);
+  await c2.close();
+}
 ok("no page errors", errs.length === 0);
 if (errs.length) console.log(errs);
 await b.close();

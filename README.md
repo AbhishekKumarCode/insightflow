@@ -59,6 +59,8 @@ Being plain about this matters more than sounding impressive.
 - **Personal data**: emails, phone numbers and card-like numbers are masked as `[email]`, `[phone]`, `[card]` before anything is stored.
 - **Honest limits**: auto-grouped issues have plain names (a representative review, not a written label) and keyword-based severity, so check them before acting. Imported data has no dates, so only the sample shows a (simulated) weekly timeline.
 
+**First visit.** The root URL opens a short welcome: real reviews on a board that you tap to sort into their issue, and the path from 7,000 reviews to one decision. After you continue once, the root URL goes straight to the dashboard. The welcome can be reopened from the avatar menu.
+
 ## Run it
 
 ```bash
