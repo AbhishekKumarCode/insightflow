@@ -8,6 +8,7 @@ import { ShieldAlert, ThumbsUp, TrendingDown } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { Card, PageHead } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
+import { MobileHome } from "@/components/mobile-home";
 import { CountUp } from "@/components/count-up";
 import { CheckCircle2, ListPlus } from "lucide-react";
 
@@ -52,12 +53,12 @@ export default function Overview() {
 
   return (
     <>
-      <PageHead title="Overview" sub="Sentiment, recurring issues and what to fix first, across all feedback." />
+      <div className="max-md:hidden"><PageHead title="Overview" sub="Sentiment, recurring issues and what to fix first, across all feedback." /></div>
       {ranked.length > 0 && (() => {
         const top3 = ranked.slice(0, 3);
         const left = top3.filter((i) => !tracked.some((t) => t.issueId === i.id));
         return (
-          <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-indigo-200 bg-indigo-50/70 px-5 py-3.5">
+          <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-indigo-200 max-md:hidden bg-indigo-50/70 px-5 py-3.5">
             <span className={`grid size-9 shrink-0 place-items-center rounded-full bg-brand text-white ${left.length ? "pulse" : ""}`}>{left.length ? <ListPlus size={20} /> : <CheckCircle2 size={20} />}</span>
             <div className="min-w-56 flex-1">
               <p className="font-semibold">{left.length ? "Recommended next step" : "Top issues are being tracked"}</p>
@@ -69,11 +70,13 @@ export default function Overview() {
           </div>
         );
       })()}
+      <div className="mb-4 md:hidden"><h1 className="text-[26px] font-semibold leading-tight">Overview</h1><p className="mt-0.5 text-sm text-muted">{session.name} · {fmt(s.total)} reviews</p></div>
       <FilterBar />
       {empty ? (
         <Card className="py-16 text-center text-muted">No feedback matches these filters. <span className="text-brand">Clear filters</span> to see everything.</Card>
       ) : (
-        <div className="space-y-6">
+        <>
+        <div className="space-y-6 max-md:hidden">
           {top && (
             <section className="grid text-white lg:grid-cols-[1.05fr_1fr]">
               <div className="flex flex-col rounded-t-3xl bg-hero p-7 md:p-9 lg:rounded-3xl lg:rounded-tr-none">
@@ -160,28 +163,7 @@ export default function Overview() {
           <section>
             <h2 className="text-lg font-semibold">Which problems matter most?</h2>
             <p className="mt-1 text-sm text-muted"><b className="font-medium text-ink">What this tells you:</b> issues at the top reach the most customers and cost the most. A red bar means lost money or trust.</p>
-            <ul className="mt-3 space-y-3 md:hidden">
-              {ranked.map((i, n) => {
-                const t = tracked.find((x) => x.issueId === i.id);
-                return (
-                  <li key={i.id} className="rounded-2xl border border-slate-200/70 bg-white p-4">
-                    <div className="flex items-start gap-3">
-                      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-slate-100 text-xs font-semibold tabular-nums text-slate-600">{n + 1}</span>
-                      <div className="min-w-0 flex-1"><p className="font-semibold leading-snug">{i.name}</p><p className="mt-0.5 text-xs text-muted">{i.category}</p></div>
-                      <span className={`font-display text-2xl font-semibold tabular-nums leading-none ${i.score >= 85 ? "text-neg" : ""}`}>{i.score}</span>
-                    </div>
-                    <div className="mt-3 flex items-center gap-3">
-                      <div className="h-2 flex-1 rounded-full bg-slate-100"><div className="h-2 rounded-full" style={{ width: `${(i.negative / maxNeg) * 100}%`, background: i.severity >= 0.85 ? "#f43f5e" : "#6366f1" }} /></div>
-                      <span className="text-sm tabular-nums text-slate-600">{fmt(i.negative)} negative</span>
-                    </div>
-                    <div className="mt-3 flex items-center justify-between text-xs">
-                      {t ? <span className="rounded-full bg-brand-soft px-2.5 py-1 font-medium text-brand">{t.status}</span> : <button onClick={() => track(i.id)} className="min-h-9 rounded-lg border border-line px-3 font-semibold text-brand">Track this issue</button>}
-                      <Link href="/priorities" className="font-medium text-muted hover:text-brand">Why this score</Link>
-                    </div>
-                  </li>);
-              })}
-            </ul>
-            <Card className="mt-3 hidden !p-0 overflow-hidden md:block">
+            <Card className="mt-3 !p-0 overflow-hidden">
               <div className="overflow-x-auto"><table className="w-full text-sm">
                 <thead className="bg-slate-50 text-left text-xs text-muted"><tr><th className="w-10 px-5 py-2.5 font-medium">#</th><th className="font-medium">Issue</th><th className="hidden font-medium md:table-cell">Category</th><th className="w-52 font-medium">Negative reviews</th><th className="w-16 text-right font-medium">Score</th><th className="w-28 px-5 font-medium">Status</th></tr></thead>
                 <tbody className="divide-y divide-slate-100">
@@ -257,6 +239,8 @@ export default function Overview() {
             )}
           </section>
         </div>
+        <MobileHome />
+        </>
       )}
     </>
   );

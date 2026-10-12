@@ -42,7 +42,14 @@ await p.keyboard.press("Escape");
 
 // Overview: issues are cards, not a table.
 await go("overview");
-ok("overview lists issues as cards on phones", (await p.locator("ul.md\\:hidden > li").count()) >= 5 && !(await p.locator("table").first().isVisible()));
+const home = p.locator("[data-mobile-home]");
+ok("phone dashboard is its own layout, not the desktop page", await home.isVisible() && (await p.locator("table").count()) === 0 || !(await p.locator("table").first().isVisible()));
+ok("phone dashboard leads with the one thing to fix", (await home.locator("section[aria-label='What to fix first'] h2").innerText()).includes("Charged but order never arrived"));
+ok("key numbers swipe sideways", await home.locator("section[aria-label='Key numbers']").evaluate((e) => e.scrollWidth > e.clientWidth));
+ok("phone dashboard lists the top issues", (await home.locator("[data-issue-card]").count()) === 5);
+ok("phone dashboard is short (under 4 screens)", (await p.evaluate(() => document.documentElement.scrollHeight)) < 844 * 4);
+await home.getByRole("button", { name: "Track top 3" }).click();
+ok("Track top 3 works from the phone dashboard", await home.getByRole("button", { name: "Top 3 tracked" }).isVisible());
 
 // Feedback: cards, sentiment chips with counts, by-issue view.
 await go("feedback");
@@ -64,8 +71,7 @@ ok("picking an issue shows its detail", (await p.locator("article h2").first().i
 
 // Tracker: columns swipe sideways, status menu works.
 await go("overview");
-await p.getByRole("button", { name: /Track top 3 issues/ }).click();
-await go("tracker");
+await go("tracker"); // the top 3 were already tracked from the phone dashboard above
 const cols = p.locator("section[data-col]");
 ok("tracker columns are wide cards in a swipeable row", (await cols.count()) === 4 && (await cols.first().boundingBox()).width > 300 && (await p.locator("section[data-col]").first().evaluate((e) => e.parentElement.scrollWidth > e.parentElement.clientWidth)));
 await cols.first().locator("select[aria-label='Status']").first().selectOption("In progress");
