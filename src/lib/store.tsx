@@ -9,6 +9,7 @@ export type SavedReport = { id: string; title: string; createdAt: string; topIss
 /** A session is one dataset with its own tracked issues and saved reports. The sample session also includes the 320 built-in reviews. */
 export type Session = { id: string; name: string; createdAt: string; kind: "sample" | "import"; extra: Review[]; issues: IssueDef[]; tracked: Tracked[]; reports: SavedReport[]; source?: string };
 export const SAMPLE_ID = "sample";
+const EMPTY: Session = { id: "empty", name: "No data yet", createdAt: "", kind: "import", extra: [], issues: [], tracked: [], reports: [] };
 const freshSample = (): Session => ({ id: SAMPLE_ID, name: "Sample dataset", createdAt: "", kind: "sample", extra: [], issues: [], tracked: [], reports: [] });
 
 type Ctx = {
@@ -19,7 +20,8 @@ type Ctx = {
   clearTracked: () => void; clearReports: () => void;
   user: Review[]; addUser: (r: Review[], issues?: IssueDef[]) => void; clearUser: () => void;
   sessions: Session[]; session: Session; createSession: (name: string, reviews: Review[], issues?: IssueDef[]) => string;
-  switchSession: (id: string) => void; renameSession: (id: string, name: string) => void; deleteSession: (id: string) => void; resetAll: () => void;
+  restoreSample: () => void; switchSession: (id: string) => void; renameSession: (id: string, name: string) => void; deleteSession: (id: string) => void; resetAll: () => void;
+  storageFull: boolean;
   importOpen: boolean; setImportOpen: (v: boolean) => void; importDest: "new" | "this"; openImport: (dest?: "new" | "this") => void;
   ready: boolean;
 };
@@ -38,11 +40,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [importDest, setImportDest] = useState<"new" | "this">("this");
   const openImport = (d: "new" | "this" = "this") => { setImportDest(d); setImportOpen(true); };
   const [ready, setReady] = useState(false);
+  const [storageFull, setStorageFull] = useState(false);
 
   useEffect(() => {
     // Load after mount so server and first client render match (localStorage is client-only).
     let list = readJSON<Session[]>("if.sessions");
-    if (!Array.isArray(list) || !list.some((s) => s.id === SAMPLE_ID)) {
+    if (!Array.isArray(list)) {
       // First run on this version: carry over anything saved by the single-dataset version into the sample session.
       list = [{ ...freshSample(), tracked: readJSON<Tracked[]>("if.tracked") ?? [], reports: readJSON<SavedReport[]>("if.reports") ?? [], extra: readJSON<Review[]>("if.user") ?? [] }];
     }
@@ -50,12 +53,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const act = localStorage.getItem("if.active");
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessions(list);
-    setActiveId(act && list.some((s) => s.id === act) ? act : SAMPLE_ID);
+    setActiveId(act && list.some((s) => s.id === act) ? act : (list[0]?.id ?? ""));
     setReady(true);
   }, []);
-  useEffect(() => { if (ready) { localStorage.setItem("if.sessions", JSON.stringify(sessions)); localStorage.setItem("if.active", activeId); } }, [sessions, activeId, ready]);
+  useEffect(() => {
+    if (!ready) return;
+    // Browsers allow about 5 MB per site. If it is full, say so instead of failing silently.
+    try { localStorage.setItem("if.sessions", JSON.stringify(sessions)); localStorage.setItem("if.active", activeId); setStorageFull(false); } catch { setStorageFull(true); } // eslint-disable-line react-hooks/set-state-in-effect
+  }, [sessions, activeId, ready]);
 
-  const session = sessions.find((s) => s.id === activeId) ?? sessions[0];
+  // With every session removed there is an empty stand-in, so pages never see an undefined session.
+  const session = sessions.find((s) => s.id === activeId) ?? sessions[0] ?? EMPTY;
   // Aggregates read the active session's data from module-level state, so set it during render and
   // give `filters` a new identity whenever it changes: every memo keyed on `filters` recomputes.
   setSessionData(session.kind === "sample", session.extra, session.issues);
@@ -91,11 +99,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
   const switchSession = (id: string) => { setActiveId(id); setF(DEFAULT_FILTERS); };
   const renameSession = (id: string, name: string) => setSessions((l) => l.map((s) => (s.id === id && s.kind === "import" && name.trim() ? { ...s, name: name.trim() } : s)));
-  const deleteSession = (id: string) => { if (id === SAMPLE_ID) return; setSessions((l) => l.filter((s) => s.id !== id)); if (activeId === id) { setActiveId(SAMPLE_ID); setF(DEFAULT_FILTERS); } };
+  const deleteSession = (id: string) => {
+    const rest = sessions.filter((s) => s.id !== id);
+    setSessions(rest);
+    if (activeId === id) { setActiveId(rest[0]?.id ?? ""); setF(DEFAULT_FILTERS); }
+  };
+  // The sample is built into the app, so removing it from this browser loses nothing and it can come back any time.
+  const restoreSample = () => { setSessions((l) => (l.some((s) => s.id === SAMPLE_ID) ? l : [freshSample(), ...l])); setActiveId(SAMPLE_ID); setF(DEFAULT_FILTERS); };
   const resetAll = () => { setSessions([freshSample()]); setActiveId(SAMPLE_ID); setF(DEFAULT_FILTERS); };
 
   return (
-    <C.Provider value={{ filters, setFilters, resetFilters, tracked: session.tracked, track, untrack, updateTracked, reports: session.reports, saveReport, deleteReport, clearTracked, clearReports, user: session.extra, addUser, clearUser, sessions, session, createSession, switchSession, renameSession, deleteSession, resetAll, importOpen, setImportOpen, importDest, openImport, ready }}>
+    <C.Provider value={{ filters, setFilters, resetFilters, tracked: session.tracked, track, untrack, updateTracked, reports: session.reports, saveReport, deleteReport, clearTracked, clearReports, user: session.extra, addUser, clearUser, sessions, session, createSession, restoreSample, switchSession, renameSession, deleteSession, resetAll, storageFull, importOpen, setImportOpen, importDest, openImport, ready }}>
       {children}
     </C.Provider>
   );

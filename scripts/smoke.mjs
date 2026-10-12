@@ -156,7 +156,7 @@ await p.getByRole("button", { name: "Switch session" }).filter({ hasText: "Paste
 ok("new session is created and active", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Pasted feedback · 2"));
 ok("sidebar now lists two sessions", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 2);
 
-await p.getByRole("list", { name: "Sessions" }).getByRole("button", { name: /Sample dataset/ }).click();
+await p.getByRole("list", { name: "Sessions" }).getByRole("button", { name: /^Sample dataset/ }).click();
 await p.getByRole("button", { name: "Switch session" }).filter({ hasText: "Sample dataset" }).waitFor({ timeout: 5000 });
 ok("switching back shows the 7,000-review sample", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Sample dataset · 7,000"));
 
@@ -180,7 +180,7 @@ await p.getByRole("button", { name: /Create session with 1 review/ }).click();
 await p.waitForURL(/overview/);
 await p.reload({ waitUntil: "networkidle" });
 ok("sessions and the active one persist after reload", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 2 && (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Pasted feedback"));
-ok("the sample session has no delete option", (await p.getByRole("button", { name: /Options for Sample dataset/ }).count()) === 0);
+ok("the sample session can be removed too (it is built in, so it can come back)", (await p.getByRole("button", { name: /Options for Sample dataset/ }).count()) === 1);
 
 // --- security: spreadsheet formulas in imported text must not survive into exported CSV ---
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
@@ -222,4 +222,35 @@ await p.getByRole("button", { name: "Delete Pasted feedback (2)" }).click();
 await p.getByRole("button", { name: "Delete", exact: true }).click();
 await p.waitForTimeout(300);
 ok("a session can be deleted from the header menu", (await countSessions()) === beforeDel - 1);
+
+// --- a big file (about 14 MB, over the old 5 MB limit) is read in the browser without trouble ---
+const fs2 = await import("node:fs");
+const bigPath = "/tmp/insightflow-big.csv";
+const phrases = ["The delivery was late again and nobody told me", "Great product, works exactly as described", "I was charged twice for one order", "Support never answered my emails", "The website crashed at checkout"];
+const bigRows = ["review,category,notes"];
+for (let i = 0; i < 150000; i++) bigRows.push(`"${phrases[i % 5]}",Operational Issues,row ${i} padding padding padding padding`);
+fs2.writeFileSync(bigPath, bigRows.join("\n"));
+const t0 = Date.now();
+await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
+await p.getByRole("button", { name: "New session" }).first().click();
+await p.getByLabel("CSV file").setInputFiles(bigPath);
+await p.getByText(/150,000 reviews read/).waitFor({ timeout: 60000 });
+ok("a 14 MB file is accepted and counted", (fs2.statSync(bigPath).size > 5_000_000) && await p.getByText(/150,000 reviews read/).isVisible());
+ok("the big file reads quickly", Date.now() - t0 < 30000);
+ok("repeats are merged while reading", await p.getByText(/5 distinct/).first().isVisible());
+await p.keyboard.press("Escape");
+fs2.unlinkSync(bigPath);
+
+// --- removing the sample is safe: a welcome screen appears, and one click brings the sample back ---
+await p.getByRole("button", { name: "My data" }).click();
+await p.getByRole("menuitem", { name: /Reset everything/ }).click();
+await p.getByRole("button", { name: /^Options for Sample dataset/ }).click();
+await p.getByRole("menuitem", { name: "Remove sample" }).click();
+await p.getByRole("menuitem", { name: /Click again to remove/ }).click();
+await p.getByRole("heading", { name: "No data yet" }).waitFor({ timeout: 5000 });
+ok("removing the last session shows a welcome screen, not a broken page", await p.getByRole("button", { name: "Load the sample dataset" }).isVisible());
+await p.getByRole("button", { name: "Load the sample dataset" }).click();
+await p.getByRole("button", { name: "Switch session" }).filter({ hasText: "Sample dataset · 7,000" }).waitFor({ timeout: 5000 });
+ok("one click brings the sample back", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Sample dataset · 7,000"));
+ok("sessions survive a reload when the sample was removed and restored", await (async () => { await p.reload({ waitUntil: "networkidle" }); return (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 1; })());
 await b.close();

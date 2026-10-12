@@ -36,7 +36,7 @@ function groupLabel(s: Session) {
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
-  const { filters, setFilters, tracked, openImport, importOpen, user, reports, clearUser, clearTracked, clearReports, sessions, session, switchSession, renameSession, deleteSession, resetAll } = useApp();
+  const { filters, setFilters, tracked, storageFull, openImport, importOpen, user, reports, clearUser, clearTracked, clearReports, sessions, session, switchSession, renameSession, deleteSession, resetAll, restoreSample } = useApp();
   const [menu, setMenu] = useState(false);
   const [fabHidden, setFabHidden] = useState(false);
   useEffect(() => {
@@ -88,6 +88,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
         <div ref={rowRef} className="mt-4 flex min-h-0 flex-1 flex-col border-t border-white/10 pt-3">
           <p className="px-3 pb-1 text-xs font-medium text-slate-400">Sessions</p>
+          {sessions.length === 0 && <p className="px-3 py-2 text-xs text-slate-500">No sessions yet</p>}
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1" role="list" aria-label="Sessions">
             {groups.map((g) => (
               <div key={g}>
@@ -107,14 +108,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
                             <span className="block text-[11px] text-slate-400">{plural(sessionCount(s), "review")}</span></span>
                         </button>
                       )}
-                      {s.kind === "import" && renaming !== s.id && (
+                      {renaming !== s.id && (
                         <>
                           <button aria-label={`Options for ${s.name}`} aria-haspopup="menu" onClick={() => { setRowMenu(rowMenu === s.id ? null : s.id); setConfirmDel(null); }}
                             className={`mr-1 grid size-7 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-white/10 hover:text-white ${rowMenu === s.id ? "bg-white/10" : "opacity-60 group-hover:opacity-100"}`}><MoreHorizontal size={16} /></button>
                           {rowMenu === s.id && (
                             <div role="menu" className={`absolute right-1 z-30 w-44 rounded-lg border border-white/10 bg-slate-900 p-1 text-sm shadow-xl ${s.id === sessions[sessions.length - 1].id ? "bottom-9" : "top-9"}`}>
-                              <button role="menuitem" onClick={() => startRename(s)} className="w-full rounded-md px-3 py-1.5 text-left text-slate-200 hover:bg-white/10">Rename</button>
-                              <button role="menuitem" onClick={() => { if (confirmDel === s.id) { deleteSession(s.id); setRowMenu(null); setConfirmDel(null); } else setConfirmDel(s.id); }} className="w-full rounded-md px-3 py-1.5 text-left text-rose-300 hover:bg-white/10">{confirmDel === s.id ? "Click again to delete" : "Delete session"}</button>
+                              {s.kind === "import" && <button role="menuitem" onClick={() => startRename(s)} className="w-full rounded-md px-3 py-1.5 text-left text-slate-200 hover:bg-white/10">Rename</button>}
+                              <button role="menuitem" onClick={() => { if (confirmDel === s.id) { deleteSession(s.id); setRowMenu(null); setConfirmDel(null); } else setConfirmDel(s.id); }} className="w-full rounded-md px-3 py-1.5 text-left text-rose-300 hover:bg-white/10">{confirmDel === s.id ? (s.kind === "sample" ? "Click again to remove" : "Click again to delete") : (s.kind === "sample" ? "Remove sample" : "Delete session")}</button>
                             </div>
                           )}
                         </>
@@ -150,9 +151,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
                     <div key={x.id} className="flex items-center gap-1 rounded-lg hover:bg-slate-50">
                       {popConfirm === x.id ? (
                         <div className="flex w-full items-center gap-2 px-3 py-2">
-                          <span className="min-w-0 flex-1 truncate">Delete “{x.name}”?</span>
+                          <span className="min-w-0 flex-1 truncate">{x.kind === "sample" ? "Remove the sample?" : `Delete “${x.name}”?`}</span>
                           <button onClick={() => setPopConfirm(null)} className="rounded-md border border-line px-2.5 py-1.5 text-xs font-medium">Cancel</button>
-                          <button onClick={() => { deleteSession(x.id); setPopConfirm(null); setChip(false); }} className="rounded-md bg-rose-600 px-2.5 py-1.5 text-xs font-semibold text-white">Delete</button>
+                          <button onClick={() => { deleteSession(x.id); setPopConfirm(null); setChip(false); }} className="rounded-md bg-rose-600 px-2.5 py-1.5 text-xs font-semibold text-white">{x.kind === "sample" ? "Remove" : "Delete"}</button>
                         </div>
                       ) : popRename === x.id ? (
                         <input autoFocus aria-label="Session name" value={draft} onChange={(e) => setDraft(e.target.value)} onBlur={() => { renameSession(x.id, draft); setPopRename(null); }}
@@ -164,11 +165,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
                             <span className="min-w-0 flex-1"><span className="block truncate font-medium">{x.name}</span><span className="block text-xs text-muted">{plural(sessionCount(x), "review")}</span></span>
                             {x.id === session.id && <Check size={16} className="shrink-0 text-brand" />}
                           </button>
-                          {x.kind === "import" && (
-                            <>
-                              <button aria-label={`Rename ${x.name}`} onClick={() => { setDraft(x.name); setPopRename(x.id); }} className="grid size-10 shrink-0 place-items-center rounded-lg text-muted hover:bg-slate-100 hover:text-ink"><Pencil size={15} /></button>
-                              <button aria-label={`Delete ${x.name}`} onClick={() => setPopConfirm(x.id)} className="mr-1 grid size-10 shrink-0 place-items-center rounded-lg text-muted hover:bg-rose-50 hover:text-rose-600"><Trash2 size={15} /></button>
-                            </>)}
+                          <>
+                            {x.kind === "import" && <button aria-label={`Rename ${x.name}`} onClick={() => { setDraft(x.name); setPopRename(x.id); }} className="grid size-10 shrink-0 place-items-center rounded-lg text-muted hover:bg-slate-100 hover:text-ink"><Pencil size={15} /></button>}
+                            <button aria-label={x.kind === "sample" ? `Remove ${x.name}` : `Delete ${x.name}`} onClick={() => setPopConfirm(x.id)} className="mr-1 grid size-10 shrink-0 place-items-center rounded-lg text-muted hover:bg-rose-50 hover:text-rose-600"><Trash2 size={15} /></button>
+                          </>
                         </>)}
                     </div>
                   ))}
@@ -197,7 +197,20 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8 md:py-8">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8 md:py-8">
+          {storageFull && <div role="alert" className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Your browser&apos;s storage is full, so recent changes are not being saved. Delete a session you no longer need to free space.</div>}
+          {sessions.length === 0 && path !== "/import" ? (
+            <section className="mx-auto max-w-lg py-12 text-center" aria-label="No data yet">
+              <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-brand-soft text-brand"><Database size={26} /></span>
+              <h1 className="mt-5 text-2xl font-semibold">No data yet</h1>
+              <p className="mx-auto mt-2 max-w-sm text-[15px] leading-relaxed text-muted">Import your own feedback, or load the sample dataset (7,000 customer reviews) to see how InsightFlow works. The sample is built into the app, so removing it never loses anything.</p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                <button onClick={restoreSample} className="h-11 rounded-xl bg-brand px-5 text-sm font-semibold text-white hover:bg-blue-800">Load the sample dataset</button>
+                <button onClick={() => openImport("new")} className="h-11 rounded-xl border border-line bg-white px-5 text-sm font-semibold hover:bg-slate-50">Import your own data</button>
+              </div>
+            </section>
+          ) : children}
+        </main>
       </div>
 
       <ImportDialog />

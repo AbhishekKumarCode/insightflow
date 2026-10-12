@@ -146,6 +146,17 @@ ok("a session can be deleted from the phone", (await p.getByRole("button", { nam
 // Header keeps the session switcher on a phone.
 await p.getByRole("button", { name: "Switch session" }).click();
 ok("session switcher works on a phone", await p.getByRole("menuitem", { name: /New session/ }).isVisible());
+// Removing the sample from a phone gives a welcome screen, and the sample comes back with one tap.
+await go("overview");
+await p.getByRole("button", { name: "Switch session" }).click();
+await p.getByRole("button", { name: "Remove Sample dataset" }).click();
+ok("removing the sample asks first", await p.getByText("Remove the sample?").isVisible());
+await p.getByRole("button", { name: "Remove", exact: true }).click();
+await p.getByRole("heading", { name: "No data yet" }).waitFor({ timeout: 5000 });
+ok("no sessions left gives a welcome screen with two clear choices", await p.getByRole("button", { name: "Load the sample dataset" }).isVisible() && await p.getByRole("button", { name: "Import your own data" }).isVisible());
+await p.getByRole("button", { name: "Load the sample dataset" }).click();
+await p.waitForTimeout(400);
+ok("the sample returns with one tap", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Sample dataset"));
 ok("no page errors", errs.length === 0);
 if (errs.length) console.log(errs);
 await b.close();

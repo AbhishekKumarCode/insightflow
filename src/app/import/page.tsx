@@ -8,7 +8,7 @@ import { DATA, fmt, pct } from "@/lib/data";
 import { useApp } from "@/lib/store";
 
 export default function ImportPage() {
-  const { openImport } = useApp();
+  const { openImport, restoreSample } = useApp();
   const [loaded, setLoaded] = useState(false);
   const top = [...DATA.reviews].sort((a, b) => b.count - a.count).slice(0, 5).map((r) => ({ text: r.text, n: r.count }));
   const res = loaded ? { name: "BuildBattle sample dataset", rows: DATA.totals.rows, unique: DATA.totals.uniqueReviews, top, isSample: true } : null;
@@ -24,7 +24,7 @@ export default function ImportPage() {
           <p className="mt-1 text-sm text-muted">Upload a CSV with a <code>review</code> column, paste reviews, or add one. Everything is checked before it joins the dashboard.</p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <button className={btn} onClick={() => openImport("new")}>Import your own data</button>
-            <button className={btnPrimary} onClick={() => setLoaded(true)}>Use sample data</button>
+            <button className={btnPrimary} onClick={() => { restoreSample(); setLoaded(true); }}>Use sample data</button>
           </div>
         </div>
       </Card>

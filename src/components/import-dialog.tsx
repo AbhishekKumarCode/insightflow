@@ -18,7 +18,9 @@ const TABS: { id: Tab; label: string; icon: typeof UploadCloud }[] = [
   { id: "paste", label: "Paste feedback", icon: ClipboardPaste },
   { id: "one", label: "Add one", icon: PenLine },
 ];
-const MAX_ROWS = 20000;
+const MAX_FILE = 100_000_000; // bytes. The file is read in the browser, in chunks, so size is not the constraint.
+const MAX_DISTINCT_READ = 50_000; // distinct reviews tracked while reading
+const MAX_STORED = 3_000; // distinct reviews kept in a session (browser storage is about 5 MB)
 
 export function ImportDialog() {
   const { importOpen, setImportOpen, addUser, user, clearUser, importDest, createSession, session, sessions, switchSession } = useApp();
@@ -32,6 +34,7 @@ export function ImportDialog() {
   const [cat, setCat] = useState("");
   const [drag, setDrag] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [loadNote, setLoadNote] = useState("");
   const [addAnyway, setAddAnyway] = useState(false);
   const [destChoice, setDestChoice] = useState<"new" | "this" | null>(null);
   const dest = destChoice ?? importDest;
@@ -43,7 +46,7 @@ export function ImportDialog() {
   }, [importOpen]);
 
   const reveal = (r: RawRow[]) => { setRows(r); setScanning(true); setTimeout(() => setScanning(false), 750); };
-  const reset = () => { setDestChoice(null); setAddAnyway(false); setScanning(false); setRows(null); setErr(""); setText(""); setName(""); setCat(""); };
+  const reset = () => { setLoadNote(""); setDestChoice(null); setAddAnyway(false); setScanning(false); setRows(null); setErr(""); setText(""); setName(""); setCat(""); };
   const close = () => { setImportOpen(false); reset(); };
 
   const index = useMemo(() => buildIndex(DATA.reviews.map((r) => ({ text: r.text, issue: r.issue, sentiment: r.sentiment }))), []);
@@ -58,23 +61,37 @@ export function ImportDialog() {
   }, [rows, index, existing]);
 
   const onFile = (file: File) => {
-    setErr(""); setRows(null);
+    setErr(""); setRows(null); setLoadNote("");
     if (!file.name.toLowerCase().endsWith(".csv")) return setErr("Please choose a .csv file.");
-    if (file.size > 5_000_000) return setErr("This file is over 5 MB. Please upload a smaller CSV.");
+    if (file.size > MAX_FILE) return setErr(`This file is ${(file.size / 1e6).toFixed(0)} MB. The limit is 100 MB. Export fewer columns or rows and try again.`);
+    // Stream the file: keep only review and category, and count repeats as we go, so a big file uses little memory.
+    const agg = new Map<string, RawRow>();
+    let fields: string[] | undefined, ignored = 0;
     Papa.parse<Record<string, string>>(file, {
       header: true, skipEmptyLines: true, transformHeader: (h) => h.trim().toLowerCase(),
-      complete: ({ data, meta }) => {
-        if (!meta.fields?.includes("review")) return setErr(`Couldn't find a "review" column. Columns found: ${meta.fields?.join(", ") || "none"}.`);
-        const good = data.filter((r) => r.review?.trim()).slice(0, MAX_ROWS).map((r) => ({ review: r.review, category: r.category }));
-        if (!good.length) return setErr("The file has a review column but no review text.");
-        setName(file.name); reveal(good);
+      step: (res) => {
+        fields ??= res.meta.fields;
+        const text = (res.data.review ?? "").trim();
+        if (!text) return;
+        const category = res.data.category?.trim() || undefined;
+        const key = `${(category ?? "").toLowerCase()}||${text.replace(/\s+/g, " ").toLowerCase()}`;
+        const hit = agg.get(key);
+        if (hit) hit.count = (hit.count ?? 1) + 1;
+        else if (agg.size < MAX_DISTINCT_READ) agg.set(key, { review: text, category, count: 1 });
+        else ignored++;
+      },
+      complete: () => {
+        if (!fields?.includes("review")) return setErr(`Couldn't find a "review" column. Columns found: ${fields?.join(", ") || "none"}.`);
+        if (!agg.size) return setErr("The file has a review column but no review text.");
+        if (ignored) setLoadNote(`This file has more than ${fmt(MAX_DISTINCT_READ)} distinct reviews. The first ${fmt(MAX_DISTINCT_READ)} were analyzed and ${fmt(ignored)} later reviews with new wording were left out.`);
+        setName(file.name); reveal([...agg.values()]);
       },
       error: (e) => setErr(`Couldn't read the file: ${e.message}`),
     });
   };
   const fromText = (mode: "paste" | "one") => {
     setErr("");
-    const lines = (mode === "paste" ? text.split(/\r?\n/) : [text]).map((l) => l.trim()).filter(Boolean).slice(0, MAX_ROWS);
+    const lines = (mode === "paste" ? text.split(/\r?\n/) : [text]).map((l) => l.trim()).filter(Boolean).slice(0, 20000);
     if (!lines.length) return setErr(mode === "paste" ? "Paste at least one review, one per line." : "Write the feedback first.");
     setName(mode === "paste" ? "Pasted feedback" : "Single entry");
     reveal(lines.map((review) => ({ review, category: mode === "one" ? cat || undefined : undefined })));
@@ -82,7 +99,7 @@ export function ImportDialog() {
 
   const commit = () => {
     if (!result) return;
-    const chosen = result.matched.filter((x) => addAnyway || !x.dup);
+    const chosen = result.matched.filter((x) => addAnyway || !x.dup).sort((a, b) => b.d.count - a.d.count).slice(0, MAX_STORED);
     const stamp = Date.now();
     // Reviews that match no known issue are grouped with each other into new issues, so they can still be ranked.
     const grouped = groupUnmatched(index, chosen.filter((x) => !x.m.matched).map(({ d, m }) => ({ text: d.text, count: d.count, category: d.category?.trim() || undefined, sentiment: m.sentiment })), `x${stamp.toString(36)}`);
@@ -107,6 +124,8 @@ export function ImportDialog() {
   const toAdd = result ? result.matched.filter((x) => addAnyway || !x.dup).reduce((a, x) => a + x.d.count, 0) : 0;
   const piiTotal = s ? s.pii.emails + s.pii.cards + s.pii.phones : 0;
   const checks = s ? [
+    ...(loadNote ? [{ ok: false, label: "Very large file", note: loadNote }] : []),
+    ...(s.distinct.length > MAX_STORED ? [{ ok: false, label: `Only the ${fmt(MAX_STORED)} most repeated reviews are kept`, note: `This file has ${fmt(s.distinct.length)} distinct reviews. A session stores up to ${fmt(MAX_STORED)} in this browser, starting with the ones customers repeat most.` }] : []),
     { ok: true, label: `${fmt(s.rows)} reviews read`, note: `${fmt(s.distinct.length)} distinct` },
     { ok: s.duplicateShare < 0.2, label: `${Math.round(s.duplicateShare * 100)}% repeated text`, note: "Merged into one row each. Counts are kept, so volume still reflects how many customers said it." },
     { ok: dupCount === 0, label: dupCount ? `${dupCount} of ${s.distinct.length} distinct reviews are already in your dashboard` : "Nothing here is in your dashboard yet", note: dupCount ? "They are skipped by default so your counts don't double. Tick the box below to add them again." : "All reviews are new." },
@@ -141,7 +160,7 @@ export function ImportDialog() {
               className={`tab-pane rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors ${drag ? "scale-[1.01] border-brand bg-brand-soft" : "border-line"}`}>
               <UploadCloud className="mx-auto text-brand" size={30} />
               <p className="mt-3 font-medium">Drop a CSV here</p>
-              <p className="mt-1 text-sm text-muted">Needs a <code>review</code> column. <code>category</code> is optional. Max 5 MB.</p>
+              <p className="mt-1 text-sm text-muted">Needs a <code>review</code> column. <code>category</code> is optional. Up to 100 MB.</p>
               <label className={`${btn} mt-4 cursor-pointer`}>Choose file<input type="file" accept=".csv,text/csv" aria-label="CSV file" className="sr-only" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} /></label>
             </div>
           )}
@@ -165,7 +184,7 @@ export function ImportDialog() {
           {result && s && scanning && (
             <div role="status" className="tab-pane py-10 text-center">
               <div className="relative mx-auto h-1.5 w-56 overflow-hidden rounded-full bg-slate-100"><div className="absolute inset-y-0 w-1/3 rounded-full bg-brand" style={{ animation: "scan 0.9s ease-in-out infinite" }} /></div>
-              <p className="mt-3 text-sm text-muted">Checking {fmt(rows?.length ?? 0)} reviews: duplicates, personal data, language…</p>
+              <p className="mt-3 text-sm text-muted">Checking {fmt(rows?.reduce((a, r) => a + (r.count ?? 1), 0) ?? 0)} reviews: duplicates, personal data, language…</p>
             </div>
           )}
           {result && s && !scanning && (

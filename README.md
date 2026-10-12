@@ -54,6 +54,7 @@ Being plain about this matters more than sounding impressive.
 
 ## Details worth knowing
 
+- **Large files and removing the sample**: CSVs up to 100 MB are read in the browser in chunks, keeping only the review and category columns and merging repeats as it goes, so a 150,000-row file is fine. A session stores up to 3,000 distinct reviews (browser storage is about 5 MB), starting with the most repeated, and the pre-flight check says so when a file has more. The sample dataset is built into the app, so you can remove it from your sessions and bring it back with one click; nothing is lost.
 - **Duplicate protection**: uploading the same file again is detected ("320 of 320 distinct reviews are already in your dashboard") and skipped, so counts never double.
 - **Personal data**: emails, phone numbers and card-like numbers are masked as `[email]`, `[phone]`, `[card]` before anything is stored.
 - **Honest limits**: auto-grouped issues have plain names (a representative review, not a written label) and keyword-based severity, so check them before acting. Imported data has no dates, so only the sample shows a (simulated) weekly timeline.
