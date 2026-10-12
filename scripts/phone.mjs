@@ -83,6 +83,31 @@ ok("report options start collapsed", !(await p.getByLabel("Note for readers").is
 await p.getByRole("button", { name: /^Customize/ }).click();
 ok("report options expand on tap", await p.getByLabel("Note for readers").isVisible());
 
+// Header: search, session chip and avatar are one height and share a center line.
+await go("overview");
+const hb = async (loc) => { const x = await loc.boundingBox(); return { h: Math.round(x.height), mid: Math.round(x.y + x.height / 2) }; };
+const hs = [await hb(p.getByRole("textbox", { name: "Search feedback" })), await hb(p.getByRole("button", { name: "Switch session" })), await hb(p.getByRole("button", { name: "My data" }))];
+ok("header items are the same height", hs.every((x) => x.h === hs[0].h));
+ok("header items share one center line", hs.every((x) => Math.abs(x.mid - hs[0].mid) <= 1));
+
+// Filters: one button with a count, a bottom sheet, and removable chips.
+const filterBtn = p.getByRole("button", { name: /^Filters/ });
+ok("phone shows a single Filters button, not a row of dropdowns", await filterBtn.isVisible() && !(await p.locator("select").first().isVisible()));
+await filterBtn.click();
+await p.waitForTimeout(500);
+const sheet = p.locator("dialog[open]");
+const sb = await sheet.boundingBox();
+ok("filters open in a bottom sheet", !!sb && Math.abs(sb.y + sb.height - 844) < 3 && sb.width >= 388);
+await sheet.getByLabel("Category").selectOption("Fraud and Scam");
+await sheet.getByLabel("Sentiment").selectOption("negative");
+await sheet.getByRole("button", { name: "Show results" }).click();
+await p.waitForTimeout(500);
+ok("active filters appear as chips with a count", await p.getByRole("button", { name: "Remove filter Fraud and Scam" }).isVisible() && (await filterBtn.innerText()).includes("2"));
+ok("the dashboard follows the filter", (await p.locator("[data-mobile-home]").innerText()).includes("Fraud and Scam"));
+await p.getByRole("button", { name: "Remove filter Negative" }).click();
+await p.getByRole("button", { name: "Remove filter Fraud and Scam" }).click();
+ok("chips remove filters", (await p.getByRole("button", { name: /^Remove filter/ }).count()) === 0);
+
 // Header keeps the session switcher on a phone.
 await p.getByRole("button", { name: "Switch session" }).click();
 ok("session switcher works on a phone", await p.getByRole("menuitem", { name: /New session/ }).isVisible());

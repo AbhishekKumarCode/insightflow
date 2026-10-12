@@ -146,11 +146,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <input value={filters.q} onChange={(e) => setFilters({ q: e.target.value })}
               onKeyDown={(e) => e.key === "Enter" && path !== "/feedback" && router.push("/feedback")}
               placeholder="Search…" aria-label="Search feedback"
-              className="w-full min-w-0 rounded-lg border border-line bg-white py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10" />
+              className="h-11 w-full min-w-0 rounded-lg border border-line bg-white pl-10 pr-3 text-sm outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10 md:h-10" />
           </label>
           <div className="ml-auto flex shrink-0 items-center gap-2 md:gap-3">
             <div ref={chipRef} className="relative">
-              <button onClick={() => setChip((v) => !v)} aria-haspopup="menu" aria-expanded={chip} aria-label="Switch session" className="flex max-w-[8.5rem] items-center gap-2 rounded-full border border-line bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 sm:max-w-[16rem]">
+              <button onClick={() => setChip((v) => !v)} aria-haspopup="menu" aria-expanded={chip} aria-label="Switch session" className="flex h-11 max-w-[8.5rem] items-center gap-2 rounded-full border border-line bg-white px-3 text-xs font-medium text-slate-600 hover:bg-slate-50 md:h-10 sm:max-w-[16rem]">
                 <Database size={14} className="shrink-0 text-brand" /><span className="truncate">{session.name} · {fmt(all.total)}</span><ChevronDown size={14} className="shrink-0 text-muted" />
               </button>
               {chip && (
@@ -173,7 +173,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link href="/reports" className="hidden items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 sm:flex"><FilePlus2 size={16} />Create report</Link>
             <div ref={menuRef} className="relative">
-              <button onClick={() => setMenu((v) => !v)} aria-label="My data" aria-haspopup="menu" aria-expanded={menu} className="grid size-10 place-items-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-200">AK</button>
+              <button onClick={() => setMenu((v) => !v)} aria-label="My data" aria-haspopup="menu" aria-expanded={menu} className="grid size-11 place-items-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-200 md:size-10">AK</button>
               {menu && (
                 <div role="menu" className="absolute right-0 top-12 z-30 w-72 rounded-xl border border-line bg-white p-2 text-sm shadow-lg">
                   <p className="px-3 py-2 text-xs text-muted">Applies to this session. Everything is saved in this browser only.</p>
