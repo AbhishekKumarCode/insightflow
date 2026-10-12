@@ -21,7 +21,21 @@ export default function Tracker() {
   const score = useMemo(() => Object.fromEntries(rankIssues(DEFAULT_FILTERS).map((i) => [i.id, i.score])), [filters]);
   const [dragging, setDragging] = useState<string | null>(null);
   const [over, setOver] = useState<TrackedStatus | null>(null);
-  const drop = (s: TrackedStatus, id: string) => { if (id) updateTracked(id, { status: s }); setDragging(null); setOver(null); };
+  const [landed, setLanded] = useState<string | null>(null);
+  const draggedStatus = dragging ? tracked.find((t) => t.issueId === dragging)?.status : undefined;
+  const drop = (s: TrackedStatus, id: string) => {
+    if (id) { updateTracked(id, { status: s }); setLanded(id); setTimeout(() => setLanded(null), 700); }
+    setDragging(null); setOver(null);
+  };
+  // The browser drags a snapshot of the card. Hand it a lifted copy (tilted, big shadow) so it looks like it is in the air.
+  const lift = (e: React.DragEvent<HTMLElement>) => {
+    const el = e.currentTarget;
+    const ghost = el.cloneNode(true) as HTMLElement;
+    Object.assign(ghost.style, { position: "fixed", top: "-9999px", left: "-9999px", width: `${el.offsetWidth}px`, background: "#fff", borderColor: "#6366f1", transform: "rotate(3deg) scale(1.03)", boxShadow: "0 28px 44px -14px rgba(15,18,38,0.45)", opacity: "0.98", pointerEvents: "none" });
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, 36, 28);
+    setTimeout(() => ghost.remove(), 0);
+  };
   const count = (s: TrackedStatus) => tracked.filter((t) => t.status === s).length;
 
   return (
@@ -59,9 +73,9 @@ export default function Tracker() {
                     const i = issueById(t.issueId);
                     return (
                       <article key={t.issueId} draggable data-issue={t.issueId}
-                        onDragStart={(e) => { setDragging(t.issueId); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", t.issueId); }}
+                        onDragStart={(e) => { setDragging(t.issueId); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", t.issueId); lift(e); }}
                         onDragEnd={() => { setDragging(null); setOver(null); }}
-                        className={`cursor-grab space-y-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(15,18,38,0.04)] transition active:cursor-grabbing ${dragging === t.issueId ? "scale-[0.98] opacity-40" : "hover:shadow-md"}`}>
+                        className={`cursor-grab space-y-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-[0_1px_2px_rgba(15,18,38,0.04)] transition active:cursor-grabbing ${dragging === t.issueId ? "border-dashed border-indigo-300 bg-indigo-50/50 opacity-50" : "hover:shadow-md"} ${landed === t.issueId ? "landed" : ""}`}>
                         <div className="flex items-start gap-3">
                           <GripVertical size={14} aria-hidden className="mt-1 shrink-0 text-slate-300" />
                           {score[t.issueId] != null && <ScoreRing score={score[t.issueId]} size={40} />}
@@ -75,7 +89,8 @@ export default function Tracker() {
                         <textarea aria-label="Notes" placeholder="Notes" value={t.note} onChange={(e) => updateTracked(t.issueId, { note: e.target.value })} rows={2} className="w-full rounded-xl border border-slate-200 px-2.5 py-2 text-sm" />
                       </article>);
                   })}
-                  {count(s) === 0 && <p className="rounded-xl border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-muted">{dragging ? "Drop here" : "Nothing here"}</p>}
+                  {dragging && over === s && draggedStatus !== s && <div className="slot-in rounded-2xl border-2 border-dashed border-indigo-300 bg-indigo-50/70 px-3 py-6 text-center text-xs font-medium text-indigo-600">Move to {s}</div>}
+                  {count(s) === 0 && !(dragging && over === s) && <p className="rounded-xl border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-muted">{dragging ? "Drop here" : "Nothing here"}</p>}
                 </div>
               </section>
             ))}

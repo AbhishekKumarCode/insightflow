@@ -81,3 +81,13 @@ h1, h2 { letter-spacing: -0.02em; }
   .report-mast { background: #fff !important; color: #111 !important; border-bottom: 2px solid #111; }
   .report-mast * { color: #111 !important; border-color: #ccc !important; }
 }
+
+/* ---- tracker drag: the card settles when it lands, and the target column shows a slot ---- */
+@keyframes land {
+  0% { transform: scale(1.06) rotate(1.5deg); box-shadow: 0 20px 32px -10px rgba(79, 70, 229, 0.5); }
+  55% { transform: scale(0.985) rotate(-0.4deg); }
+  100% { transform: none; box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+@keyframes slot-in { from { opacity: 0; transform: scaleY(0.6); } to { opacity: 1; transform: none; } }
+.landed { animation: land 0.55s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.slot-in { animation: slot-in 0.18s ease-out both; transform-origin: top; }
