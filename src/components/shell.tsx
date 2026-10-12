@@ -112,7 +112,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                           <button aria-label={`Options for ${s.name}`} aria-haspopup="menu" onClick={() => { setRowMenu(rowMenu === s.id ? null : s.id); setConfirmDel(null); }}
                             className={`mr-1 grid size-7 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-white/10 hover:text-white ${rowMenu === s.id ? "bg-white/10" : "opacity-60 group-hover:opacity-100"}`}><MoreHorizontal size={16} /></button>
                           {rowMenu === s.id && (
-                            <div role="menu" className="absolute right-1 top-9 z-30 w-44 rounded-lg border border-white/10 bg-slate-900 p-1 text-sm shadow-xl">
+                            <div role="menu" className={`absolute right-1 z-30 w-44 rounded-lg border border-white/10 bg-slate-900 p-1 text-sm shadow-xl ${s.id === sessions[sessions.length - 1].id ? "bottom-9" : "top-9"}`}>
                               <button role="menuitem" onClick={() => startRename(s)} className="w-full rounded-md px-3 py-1.5 text-left text-slate-200 hover:bg-white/10">Rename</button>
                               <button role="menuitem" onClick={() => { if (confirmDel === s.id) { deleteSession(s.id); setRowMenu(null); setConfirmDel(null); } else setConfirmDel(s.id); }} className="w-full rounded-md px-3 py-1.5 text-left text-rose-300 hover:bg-white/10">{confirmDel === s.id ? "Click again to delete" : "Delete session"}</button>
                             </div>
