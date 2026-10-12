@@ -15,7 +15,7 @@ Built for Build Battle 2026 (Frontend Arena, AI × Web Development).
 | **AI-powered analysis**: sentiment, topics, grouping, Adaption | Issue groups and sentiment for all 320 distinct reviews; a key-free matcher for new feedback; Adaption cleaning on `/import` |
 | **Analytics dashboard**: metrics, sentiment, issues, trends, filters | `/overview`: category, sentiment and period filters drive every widget |
 | **Recommendations**: priorities with a reason | `/priorities`: ranked issues, the score arithmetic, quotes, and actions |
-| **Reports and tracking**: save/track, export | `/tracker` (drag cards between columns), `/reports` (print to PDF, CSV export, saved reports) |
+| **Reports and tracking**: save/track, export | `/tracker` (drag cards between columns), `/reports` (print to PDF, CSV export, **copy summary** to share in chat or email, saved reports you can reopen and delete) |
 
 ## The dataset, and why cleaning comes first
 
@@ -49,7 +49,8 @@ Being plain about this matters more than sounding impressive.
 - **New feedback** is matched against the 320 labeled reviews with TF-IDF similarity (`src/lib/match.ts`), with no key. Leave-one-out accuracy on the sample: **88% on issue, 96% on sentiment**. When nothing is close it says "No close match" instead of guessing.
 - **Trends are simulated.** The sample has no dates, so the weekly timeline is a seeded random spread across 13 weeks, and the chart is labelled "Demo timeline (simulated)".
 - `src/lib/analyze.ts` has a server-side model labeling function (AI SDK + DeepSeek, schema-validated) that is **not wired into the UI**.
-- Data you add, track or save stays **in your browser** (localStorage). Nothing is sent anywhere.
+- Data you add, track or save stays **in your browser** (localStorage). Nothing is sent anywhere. The avatar menu (top right) clears it, so the app can be reset between demos.
+- There is no shareable link: reports are shared by copying the summary, printing to PDF or exporting CSV, because a link would need a server to store the report.
 
 ## Details worth knowing
 

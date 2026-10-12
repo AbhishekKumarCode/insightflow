@@ -1,76 +1,33 @@
 "use client";
 import Link from "next/link";
-import { useRef, useState } from "react";
-import Papa from "papaparse";
-import { z } from "zod";
-import { UploadCloud, FileText, ArrowRight, AlertCircle, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { UploadCloud, ArrowRight, ShieldCheck } from "lucide-react";
 import { Card, PageHead, Chip, btn, btnPrimary } from "@/components/ui";
 import { ADAPTION } from "@/lib/adaption";
 import { DATA, fmt, pct } from "@/lib/data";
-
-const Row = z.object({ review: z.string().min(1) }).passthrough();
-type Result = { name: string; rows: number; unique: number; top: { text: string; n: number }[]; isSample: boolean };
-
-function dedupe(rows: Record<string, string>[], name: string, isSample: boolean): Result {
-  const m = new Map<string, { text: string; n: number }>();
-  for (const r of rows) {
-    const text = r.review.trim().replace(/\s+/g, " ");
-    const k = text.toLowerCase();
-    const e = m.get(k) ?? { text, n: 0 };
-    e.n++; m.set(k, e);
-  }
-  const top = [...m.values()].sort((a, b) => b.n - a.n).slice(0, 5);
-  return { name, rows: rows.length, unique: m.size, top, isSample };
-}
+import { useApp } from "@/lib/store";
 
 export default function ImportPage() {
-  const [res, setRes] = useState<Result | null>(null);
-  const [err, setErr] = useState("");
-  const [drag, setDrag] = useState(false);
-  const input = useRef<HTMLInputElement>(null);
-
-  const useSample = () => {
-    setErr("");
-    const top = [...DATA.reviews].sort((a, b) => b.count - a.count).slice(0, 5).map((r) => ({ text: r.text, n: r.count }));
-    setRes({ name: "BuildBattle sample dataset", rows: DATA.totals.rows, unique: DATA.totals.uniqueReviews, top, isSample: true });
-  };
-
-  const onFile = (file: File) => {
-    setErr(""); setRes(null);
-    if (!file.name.toLowerCase().endsWith(".csv")) return setErr("Please choose a .csv file.");
-    if (file.size > 5_000_000) return setErr("This file is over 5 MB. Please upload a smaller CSV.");
-    Papa.parse<Record<string, string>>(file, {
-      header: true, skipEmptyLines: true,
-      transformHeader: (h) => h.trim().toLowerCase(),
-      complete: ({ data, meta }) => {
-        if (!meta.fields?.includes("review")) return setErr(`Couldn't find a "review" column. Columns found: ${meta.fields?.join(", ") || "none"}.`);
-        const good = data.filter((r) => Row.safeParse(r).success);
-        if (!good.length) return setErr("The file has a review column but no review text.");
-        setRes(dedupe(good, file.name, false));
-      },
-      error: (e) => setErr(`Couldn't read the file: ${e.message}`),
-    });
-  };
+  const { setImportOpen } = useApp();
+  const [loaded, setLoaded] = useState(false);
+  const top = [...DATA.reviews].sort((a, b) => b.count - a.count).slice(0, 5).map((r) => ({ text: r.text, n: r.count }));
+  const res = loaded ? { name: "BuildBattle sample dataset", rows: DATA.totals.rows, unique: DATA.totals.uniqueReviews, top, isSample: true } : null;
 
   const a = ADAPTION;
   return (
     <>
-      <PageHead title="Import and clean" sub="Bring in a CSV with a review column (and optionally category). We clean it first, then analyze it." />
-      <Card
-        className={`mb-6 border-dashed text-center ${drag ? "border-brand bg-brand-soft" : ""}`}>
-        <div onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
-          onDrop={(e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files[0]; if (f) onFile(f); }} className="py-8">
+      <PageHead title="Import and clean" sub="Bring in feedback, or start with the sample. We clean it first, then analyze it." />
+      <Card className="mb-6 text-center">
+        <div className="py-8">
           <UploadCloud className="mx-auto text-brand" size={32} />
-          <p className="mt-3 font-medium">Drop a CSV here, or choose a file</p>
-          <p className="mt-1 text-sm text-muted">Needs a <code>review</code> column. Max 5 MB.</p>
+          <p className="mt-3 font-medium">Where is your feedback?</p>
+          <p className="mt-1 text-sm text-muted">Upload a CSV with a <code>review</code> column, paste reviews, or add one. Everything is checked before it joins the dashboard.</p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <button className={btn} onClick={() => input.current?.click()}><FileText size={16} />Choose CSV</button>
-            <button className={btnPrimary} onClick={useSample}>Use sample data</button>
+            <button className={btn} onClick={() => setImportOpen(true)}>Import your own data</button>
+            <button className={btnPrimary} onClick={() => setLoaded(true)}>Use sample data</button>
           </div>
-          <input ref={input} type="file" accept=".csv,text/csv" className="hidden" aria-label="CSV file" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
         </div>
       </Card>
-      {err && <div role="alert" className="mb-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><AlertCircle size={18} className="mt-0.5 shrink-0" />{err}</div>}
 
       {res && (
         <div className="space-y-6">
@@ -119,8 +76,7 @@ export default function ImportPage() {
           )}
 
           <div className="flex justify-end gap-3">
-            {res.isSample ? <Link href="/overview" className={btnPrimary}>Open dashboard <ArrowRight size={16} /></Link>
-              : <div className="max-w-md text-right text-sm text-muted">Live analysis of uploaded files needs the server model key, which isn’t configured yet. Use the sample data to explore the full product.</div>}
+            <Link href="/overview" className={btnPrimary}>Open dashboard <ArrowRight size={16} /></Link>
           </div>
         </div>
       )}

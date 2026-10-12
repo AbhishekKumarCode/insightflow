@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BarChart3, MessageSquare, Flag, ListChecks, FileText, Upload, Search, Database, FilePlus2 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { DEFAULT_FILTERS, summarize, pct, fmt } from "@/lib/data";
@@ -29,7 +29,16 @@ function Mark() {
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
-  const { filters, setFilters, tracked, setImportOpen, user } = useApp();
+  const { filters, setFilters, tracked, setImportOpen, user, reports, clearUser, clearTracked, clearReports } = useApp();
+  const [menu, setMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!menu) return;
+    const off = (e: MouseEvent) => { if (!menuRef.current?.contains(e.target as Node)) setMenu(false); };
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setMenu(false);
+    document.addEventListener("mousedown", off); document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("mousedown", off); document.removeEventListener("keydown", esc); };
+  }, [menu]);
   // `filters` changes identity when feedback is added, which must refresh this.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const all = useMemo(() => summarize(DEFAULT_FILTERS), [filters]);
@@ -85,7 +94,19 @@ export function Shell({ children }: { children: React.ReactNode }) {
               {tracked.length > 0 && <span className="absolute -right-1.5 -top-1.5 grid min-w-5 place-items-center rounded-full bg-indigo-600 px-1 text-[11px] font-semibold text-white">{tracked.length}</span>}
             </Link>
             <Link href="/reports" className="hidden items-center gap-2 rounded-xl bg-ink2 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 sm:flex"><FilePlus2 size={16} />Create report</Link>
-            <span aria-hidden className="grid size-10 place-items-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">AK</span>
+            <div ref={menuRef} className="relative">
+              <button onClick={() => setMenu((v) => !v)} aria-label="My data" aria-haspopup="menu" aria-expanded={menu} className="grid size-10 place-items-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-200">AK</button>
+              {menu && (
+                <div role="menu" className="absolute right-0 top-12 z-30 w-72 rounded-xl border border-line bg-white p-2 text-sm shadow-lg">
+                  <p className="px-3 py-2 text-xs text-muted">Your data is saved in this browser only.</p>
+                  <button role="menuitem" disabled={!user.length} onClick={() => { clearUser(); setMenu(false); }} className="flex w-full justify-between rounded-lg px-3 py-2 text-left hover:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-transparent">Remove reviews I added<span className="tabular-nums">{user.length}</span></button>
+                  <button role="menuitem" disabled={!tracked.length} onClick={() => { clearTracked(); setMenu(false); }} className="flex w-full justify-between rounded-lg px-3 py-2 text-left hover:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-transparent">Clear tracked issues<span className="tabular-nums">{tracked.length}</span></button>
+                  <button role="menuitem" disabled={!reports.length} onClick={() => { clearReports(); setMenu(false); }} className="flex w-full justify-between rounded-lg px-3 py-2 text-left hover:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-transparent">Delete saved reports<span className="tabular-nums">{reports.length}</span></button>
+                  <div className="my-1 border-t border-line" />
+                  <button role="menuitem" disabled={!user.length && !tracked.length && !reports.length} onClick={() => { clearUser(); clearTracked(); clearReports(); setMenu(false); }} className="w-full rounded-lg px-3 py-2 text-left font-medium text-rose-600 hover:bg-rose-50 disabled:text-slate-400 disabled:hover:bg-transparent">Reset everything</button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8 md:py-8">{children}</main>

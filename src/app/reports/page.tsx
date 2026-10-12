@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { Download, Printer, Save } from "lucide-react";
+import { Check, Copy, Download, Printer, Save, Trash2 } from "lucide-react";
 import { rankIssues, summarize, DEFAULT_FILTERS, pct, fmt, issueById } from "@/lib/data";
 import { useApp } from "@/lib/store";
 import { Card, PageHead, ScoreRing, btn, btnPrimary } from "@/components/ui";
 
 export default function Reports() {
-  const { tracked, reports, saveReport, filters } = useApp();
+  const { tracked, reports, saveReport, deleteReport, filters } = useApp();
+  const [copied, setCopied] = useState(false);
   // `filters` changes identity when feedback is added, which must refresh this.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const s = useMemo(() => summarize(DEFAULT_FILTERS), [filters]);
@@ -19,6 +20,19 @@ export default function Reports() {
   useEffect(() => setDate(new Date().toLocaleDateString("en-US", { dateStyle: "long" })), []);
   const net = pct(s.sentiment.positive, s.total) - pct(s.sentiment.negative, s.total);
   const fraudInTop = top.filter((i) => i.category === "Fraud and Scam").length;
+
+  const summaryText = () => [
+    `InsightFlow report, ${date}`,
+    `${fmt(s.total)} reviews analyzed, ${pct(s.sentiment.negative, s.total)}% negative (net sentiment ${net > 0 ? "+" : ""}${net}).`,
+    "", "Top priorities:",
+    ...top.map((i, n) => `${n + 1}. ${i.name} (priority ${i.score}, ${fmt(i.negative)} negative reviews). ${i.recommendation?.actions[0] ?? ""}`),
+    "", "Priority score = 100 x (0.40 volume + 0.35 negative share + 0.25 severity), a ranking heuristic.",
+  ].join("\n");
+  const copySummary = async () => {
+    try { await navigator.clipboard.writeText(summaryText()); }
+    catch { const t = Object.assign(document.createElement("textarea"), { value: summaryText() }); document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+  };
 
   const exportCsv = () => {
     const esc = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
@@ -33,8 +47,9 @@ export default function Reports() {
       <PageHead title="Reports" sub="A briefing you can print to PDF, export as CSV, or save." right={
         <div className="no-print flex flex-wrap gap-2">
           <button className={btn} onClick={exportCsv}><Download size={16} />Export CSV</button>
+          <button className={btn} onClick={copySummary}>{copied ? <><Check size={16} />Copied</> : <><Copy size={16} />Copy summary</>}</button>
           <button className={btn} onClick={() => window.print()}><Printer size={16} />Print / PDF</button>
-          <button className={btnPrimary} onClick={() => saveReport({ id: crypto.randomUUID(), title: `Insight report, ${date}`, createdAt: new Date().toISOString(), topIssueIds: top.map((i) => i.id) })}><Save size={16} />Save report</button>
+          <button className={btnPrimary} onClick={() => saveReport({ id: crypto.randomUUID(), title: `Insight report, ${date}`, createdAt: new Date().toISOString(), topIssueIds: top.map((i) => i.id), items: top.map((i) => ({ name: i.name, score: i.score })), totals: { reviews: s.total, negativePct: pct(s.sentiment.negative, s.total) } })}><Save size={16} />Save report</button>
         </div>} />
 
       <article className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_1px_2px_rgba(15,18,38,0.04)]">
@@ -84,8 +99,25 @@ export default function Reports() {
         </div>
       </article>
 
-      {reports.length > 0 && <Card className="no-print mx-auto mt-6 max-w-3xl"><h3 className="font-display text-lg font-semibold">Saved reports</h3>
-        <ul className="mt-2 divide-y divide-slate-100 text-sm">{reports.map((r) => <li key={r.id} className="py-2.5">{r.title}<span className="ml-2 text-muted">{new Date(r.createdAt).toLocaleString()}</span></li>)}</ul></Card>}
+      {reports.length > 0 && (
+        <Card className="no-print mx-auto mt-6 max-w-3xl">
+          <h3 className="text-lg font-semibold">Saved reports</h3>
+          <ul className="mt-2 divide-y divide-slate-100 text-sm">
+            {reports.map((r) => (
+              <li key={r.id} className="py-3">
+                <div className="flex items-center gap-3">
+                  <details className="group min-w-0 flex-1">
+                    <summary className="cursor-pointer list-none font-medium marker:hidden">{r.title}<span className="ml-2 font-normal text-muted">{new Date(r.createdAt).toLocaleString()}</span></summary>
+                    <div className="mt-2 rounded-lg bg-slate-50 p-3">
+                      {r.totals && <p className="text-muted">{fmt(r.totals.reviews)} reviews, {r.totals.negativePct}% negative when saved.</p>}
+                      <ol className="mt-1.5 list-decimal space-y-1 pl-5">{(r.items ?? r.topIssueIds.map((id) => ({ name: issueById(id).name, score: 0 }))).map((i) => <li key={i.name}>{i.name}{i.score > 0 && <span className="ml-2 text-muted">priority {i.score}</span>}</li>)}</ol>
+                    </div>
+                  </details>
+                  <button onClick={() => deleteReport(r.id)} aria-label={`Delete ${r.title}`} className="shrink-0 text-muted hover:text-rose-600"><Trash2 size={15} /></button>
+                </div>
+              </li>))}
+          </ul>
+        </Card>)}
     </>
   );
 }

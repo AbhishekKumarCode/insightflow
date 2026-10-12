@@ -69,4 +69,34 @@ ok("re-adding is flagged", await p.getByText(/already in your dashboard/).first(
 ok("nothing new to add", await p.getByRole("button", { name: "Nothing new to add" }).isDisabled());
 await p.getByLabel(/Add the 2 repeated reviews again anyway/).check();
 ok("can add anyway on purpose", await p.getByRole("button", { name: /Add 2 reviews/ }).isEnabled());
+
+// --- connectedness checks: things that looked interactive but weren't ---
+// 1) /import: "Import your own data" opens the popup (no dead-end upload zone).
+await p.goto(`${base}/import`, { waitUntil: "networkidle" });
+await p.getByRole("button", { name: "Import your own data" }).click();
+ok("import page opens the popup", await p.getByRole("tab", { name: /Upload CSV/ }).isVisible());
+await p.keyboard.press("Escape");
+
+// 2) Reports: copy summary (share) and saved reports can be opened and deleted.
+await p.context().grantPermissions(["clipboard-read", "clipboard-write"]).catch(() => {});
+await p.goto(`${base}/reports`, { waitUntil: "networkidle" });
+await p.getByRole("button", { name: /Copy summary/ }).click();
+await p.getByText("Copied").waitFor({ timeout: 3000 });
+ok("copy summary confirms", await p.getByText("Copied").isVisible());
+const clip = await p.evaluate(() => navigator.clipboard.readText()).catch(() => "");
+ok("clipboard holds the report", clip.includes("Top priorities") && clip.includes("Charged but order never arrived"));
+await p.getByText(/Insight report,/).first().click();
+ok("saved report opens with its issues", await p.getByText(/when saved/).first().isVisible());
+const before = await p.getByRole("button", { name: /^Delete Insight report/ }).count();
+await p.getByRole("button", { name: /^Delete Insight report/ }).first().click();
+ok("saved report deletes", (await p.getByRole("button", { name: /^Delete Insight report/ }).count()) === before - 1);
+
+// 3) Avatar menu resets browser data.
+await p.getByRole("button", { name: "My data" }).click();
+ok("avatar menu opens", await p.getByRole("menuitem", { name: /Reset everything/ }).isVisible());
+await p.getByRole("menuitem", { name: /Reset everything/ }).click();
+await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
+await p.getByText("7,000").first().waitFor({ timeout: 5000 });
+ok("reset returns to the 7,000-review sample", await p.getByText("7,000").first().isVisible());
+ok("reset clears tracked issues", (await p.evaluate(() => localStorage.getItem("if.tracked"))) === "[]");
 await b.close();

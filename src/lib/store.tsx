@@ -4,12 +4,13 @@ import { DEFAULT_FILTERS, setUserReviews, type Filters, type Review } from "./da
 
 export type TrackedStatus = "New" | "Investigating" | "In progress" | "Resolved";
 export type Tracked = { issueId: string; status: TrackedStatus; owner: string; note: string; addedAt: string };
-export type SavedReport = { id: string; title: string; createdAt: string; topIssueIds: string[] };
+export type SavedReport = { id: string; title: string; createdAt: string; topIssueIds: string[]; items?: { name: string; score: number }[]; totals?: { reviews: number; negativePct: number } };
 
 type Ctx = {
   filters: Filters; setFilters: (f: Partial<Filters>) => void; resetFilters: () => void;
   tracked: Tracked[]; track: (issueId: string) => void; untrack: (issueId: string) => void; updateTracked: (issueId: string, p: Partial<Tracked>) => void;
-  reports: SavedReport[]; saveReport: (r: SavedReport) => void;
+  reports: SavedReport[]; saveReport: (r: SavedReport) => void; deleteReport: (id: string) => void;
+  clearTracked: () => void; clearReports: () => void;
   user: Review[]; addUser: (r: Review[]) => void; clearUser: () => void;
   importOpen: boolean; setImportOpen: (v: boolean) => void;
   ready: boolean;
@@ -49,5 +50,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const untrack = (issueId: string) => setTracked((t) => t.filter((x) => x.issueId !== issueId));
   const updateTracked = (issueId: string, p: Partial<Tracked>) => setTracked((t) => t.map((x) => (x.issueId === issueId ? { ...x, ...p } : x)));
   const saveReport = (r: SavedReport) => setReports((l) => [r, ...l]);
-  return <C.Provider value={{ filters, setFilters, resetFilters, tracked, track, untrack, updateTracked, reports, saveReport, user, addUser, clearUser, importOpen, setImportOpen, ready: r1 && r2 && r3 }}>{children}</C.Provider>;
+  const deleteReport = (id: string) => setReports((l) => l.filter((x) => x.id !== id));
+  const clearTracked = () => setTracked([]);
+  const clearReports = () => setReports([]);
+  return <C.Provider value={{ filters, setFilters, resetFilters, tracked, track, untrack, updateTracked, reports, saveReport, deleteReport, clearTracked, clearReports, user, addUser, clearUser, importOpen, setImportOpen, ready: r1 && r2 && r3 }}>{children}</C.Provider>;
 }
