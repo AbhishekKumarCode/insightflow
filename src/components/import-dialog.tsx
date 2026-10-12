@@ -119,8 +119,8 @@ export function ImportDialog() {
         <div className="flex gap-1 border-b border-line px-6 pt-3" role="tablist">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); reset(); }}
-              className={`flex items-center gap-2 border-b-2 px-3 pb-2.5 text-sm font-medium ${tab === id ? "border-brand text-brand" : "border-transparent text-muted hover:text-ink"}`}>
-              <Icon size={16} />{label}</button>
+              className={`flex items-center gap-2 whitespace-nowrap border-b-2 px-2.5 pb-2.5 text-sm font-medium sm:px-3 ${tab === id ? "border-brand text-brand" : "border-transparent text-muted hover:text-ink"}`}>
+              <Icon size={16} className="hidden sm:block" />{label}</button>
           ))}
         </div>
 

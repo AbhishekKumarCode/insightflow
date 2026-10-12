@@ -26,7 +26,7 @@ export default function Priorities() {
       {ranked.length === 0 && <Card className="py-12 text-center text-muted">No negative feedback matches these filters.</Card>}
       {sel && (
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
-          <ol className="space-y-2" aria-label="Ranked issues">
+          <ol className="min-w-0 space-y-2" aria-label="Ranked issues">
             {ranked.map((i, n) => (
               <li key={i.id}>
                 <button onClick={() => setPick(i.id)} aria-current={sel.id === i.id} className={`relative flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${sel.id === i.id ? "border-indigo-300 bg-white shadow-sm" : "border-transparent hover:bg-white/70"}`}>
@@ -40,7 +40,7 @@ export default function Priorities() {
             ))}
           </ol>
 
-          <article key={sel.id} className="tab-pane space-y-7 self-start rounded-3xl border border-slate-200/70 bg-white p-6 shadow-[0_1px_2px_rgba(15,18,38,0.04)] md:p-8 lg:sticky lg:top-24">
+          <article key={sel.id} className="tab-pane min-w-0 space-y-7 self-start rounded-3xl border border-slate-200/70 bg-white p-6 shadow-[0_1px_2px_rgba(15,18,38,0.04)] md:p-8 lg:sticky lg:top-24">
             <header className="flex flex-wrap items-start justify-between gap-4">
               <div><Chip>{sel.category}</Chip><h2 className="mt-2 text-[28px] font-semibold leading-tight">{sel.name}</h2></div>
               <button disabled={isTracked} onClick={() => track(sel.id)} className={isTracked ? btn : btnPrimary}>

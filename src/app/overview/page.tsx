@@ -156,12 +156,12 @@ export default function Overview() {
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
               <h2 className="text-lg font-semibold">Sentiment distribution</h2>
-              <div className="mt-2 flex items-center gap-6">
+              <div className="mt-2 flex flex-wrap items-center gap-6">
                 <div className="h-44 w-44 shrink-0">
                   <ResponsiveContainer><PieChart><Pie data={donut} dataKey="value" innerRadius={52} outerRadius={80} paddingAngle={2} stroke="none">
                     {donut.map((d) => <Cell key={d.name} fill={COLORS[d.name]} />)}</Pie><Tooltip formatter={(v) => fmt(Number(v))} /></PieChart></ResponsiveContainer>
                 </div>
-                <ul className="flex-1 space-y-2 text-sm">
+                <ul className="min-w-[12rem] flex-1 space-y-2 text-sm">
                   {donut.map((d) => (
                     <li key={d.name} className="flex items-center gap-2"><span className="size-2.5 rounded-full" style={{ background: COLORS[d.name] }} />
                       <span className="capitalize">{d.name}</span><span className="ml-auto font-medium">{fmt(d.value)}</span><span className="w-10 text-right text-muted">{pct(d.value, s.total)}%</span></li>
