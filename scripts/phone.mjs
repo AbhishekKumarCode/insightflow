@@ -124,6 +124,25 @@ await p.getByRole("button", { name: "Remove filter Negative" }).click();
 await p.getByRole("button", { name: "Remove filter Fraud and Scam" }).click();
 ok("chips remove filters", (await p.getByRole("button", { name: /^Remove filter/ }).count()) === 0);
 
+// Sessions can be renamed and deleted from a phone (the sidebar does not exist there).
+await go("overview");
+await p.getByRole("button", { name: "New session" }).click();
+await p.getByRole("tab", { name: /Paste feedback/ }).click();
+await p.getByLabel("Pasted feedback", { exact: true }).fill("The app crashed at checkout twice");
+await p.getByRole("button", { name: "Check feedback" }).click();
+await p.getByRole("button", { name: /Create session with 1 review/ }).click();
+await p.waitForURL(/overview/);
+await p.getByRole("button", { name: "Switch session" }).click();
+await p.getByRole("button", { name: /^Rename Pasted feedback/ }).click();
+await p.getByLabel("Session name").fill("Phone test");
+await p.keyboard.press("Enter");
+ok("a session can be renamed from the phone", await p.getByRole("menuitem", { name: /Phone test/ }).isVisible());
+await p.getByRole("button", { name: "Delete Phone test" }).click();
+ok("deleting asks first", await p.getByText("Delete “Phone test”?").isVisible());
+await p.getByRole("button", { name: "Delete", exact: true }).click();
+await p.waitForTimeout(300);
+ok("a session can be deleted from the phone", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Sample dataset"));
+
 // Header keeps the session switcher on a phone.
 await p.getByRole("button", { name: "Switch session" }).click();
 ok("session switcher works on a phone", await p.getByRole("menuitem", { name: /New session/ }).isVisible());

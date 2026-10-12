@@ -105,3 +105,6 @@ function autoRecommendation(severity: number, neg: number, rows: number, quote?:
       : ["Read the original reviews in Feedback.", "Give the issue an owner and track it.", "Confirm the pattern is real before changing anything."],
   };
 }
+
+/** "1 review", "2 reviews". */
+export const plural = (n: number, word: string) => `${fmt(n)} ${word}${n === 1 ? "" : "s"}`;

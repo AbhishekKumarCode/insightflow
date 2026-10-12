@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { ArrowRight, Check, FilePlus2, ListChecks, MessageSquare, Plus } from "lucide-react";
-import { issueById, rankIssues, summarize, fmt, pct } from "@/lib/data";
+import { issueById, rankIssues, summarize, fmt, pct, plural } from "@/lib/data";
 import { useApp } from "@/lib/store";
 import { ScoreRing } from "./ui";
 
@@ -55,7 +55,7 @@ export function MobileHome() {
             </div>
             <ScoreRing score={top.score} size={56} dark />
           </div>
-          <p className="mt-3 text-sm text-white/80">{fmt(top.negative)} customers reported it · {top.category}</p>
+          <p className="mt-3 text-sm text-white/80">{plural(top.negative, "customer")} reported it · {top.category}</p>
           {top.recommendation?.actions[0] && <p className="mt-3 rounded-2xl bg-white/10 px-4 py-3 text-sm leading-relaxed text-white/95"><span className="block text-xs font-medium text-indigo-200">Do this first</span>{top.recommendation.actions[0]}</p>}
           <div className="mt-4 flex gap-2.5">
             <button onClick={() => track(top.id)} disabled={tracked.some((t) => t.issueId === top.id)} className="min-h-11 flex-1 rounded-xl bg-white px-4 text-sm font-semibold text-hero disabled:opacity-70">{tracked.some((t) => t.issueId === top.id) ? "Tracking" : "Track issue"}</button>

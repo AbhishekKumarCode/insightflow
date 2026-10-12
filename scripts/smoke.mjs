@@ -213,4 +213,13 @@ await p.getByRole("button", { name: "Check feedback" }).click();
 await p.getByRole("button", { name: /Create session with 1 review/ }).click();
 await p.waitForURL(/overview/);
 ok("a second import of the same source gets its own name", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").allInnerTexts()).join("|").includes("Pasted feedback (2)"));
+
+// --- deleting a session from the header menu (works on any screen, not just where the sidebar shows) ---
+const countSessions = async () => (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count());
+const beforeDel = await countSessions();
+await p.getByRole("button", { name: "Switch session" }).click();
+await p.getByRole("button", { name: "Delete Pasted feedback (2)" }).click();
+await p.getByRole("button", { name: "Delete", exact: true }).click();
+await p.waitForTimeout(300);
+ok("a session can be deleted from the header menu", (await countSessions()) === beforeDel - 1);
 await b.close();

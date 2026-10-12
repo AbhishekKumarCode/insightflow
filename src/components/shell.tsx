@@ -2,10 +2,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, MessageSquare, Flag, ListChecks, FileText, Search, Database, FilePlus2, Plus, MoreHorizontal, ChevronDown, Check } from "lucide-react";
+import { BarChart3, MessageSquare, Flag, ListChecks, FileText, Search, Database, FilePlus2, Plus, MoreHorizontal, ChevronDown, Check, Pencil, Trash2 } from "lucide-react";
 import { useApp, type Session } from "@/lib/store";
 import { useDismiss } from "@/lib/use-dismiss";
-import { DATA, DEFAULT_FILTERS, summarize, fmt } from "@/lib/data";
+import { DATA, DEFAULT_FILTERS, summarize, fmt, plural } from "@/lib/data";
 import { ImportDialog } from "./import-dialog";
 
 const NAV = [
@@ -50,6 +50,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [rowMenu, setRowMenu] = useState<string | null>(null);
   const [confirmDel, setConfirmDel] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
+  const [popConfirm, setPopConfirm] = useState<string | null>(null);
+  const [popRename, setPopRename] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const menuRef = useDismiss(menu, () => setMenu(false));
   const chipRef = useDismiss(chip, () => setChip(false));
@@ -102,13 +104,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
                         <button onClick={() => pick(s.id)} aria-current={on ? "true" : undefined} className="flex min-w-0 flex-1 items-center gap-2.5 px-3 py-2 text-left">
                           {s.kind === "sample" ? <Database size={15} className="shrink-0 text-indigo-300" /> : <FileText size={15} className="shrink-0 text-slate-400" />}
                           <span className="min-w-0 flex-1"><span className={`block truncate text-sm ${on ? "font-medium text-white" : ""}`}>{s.name}</span>
-                            <span className="block text-[11px] text-slate-400">{fmt(sessionCount(s))} reviews</span></span>
+                            <span className="block text-[11px] text-slate-400">{plural(sessionCount(s), "review")}</span></span>
                         </button>
                       )}
                       {s.kind === "import" && renaming !== s.id && (
                         <>
                           <button aria-label={`Options for ${s.name}`} aria-haspopup="menu" onClick={() => { setRowMenu(rowMenu === s.id ? null : s.id); setConfirmDel(null); }}
-                            className={`mr-1 grid size-7 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-white/10 hover:text-white ${rowMenu === s.id ? "bg-white/10" : "opacity-0 focus:opacity-100 group-hover:opacity-100"}`}><MoreHorizontal size={16} /></button>
+                            className={`mr-1 grid size-7 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-white/10 hover:text-white ${rowMenu === s.id ? "bg-white/10" : "opacity-60 group-hover:opacity-100"}`}><MoreHorizontal size={16} /></button>
                           {rowMenu === s.id && (
                             <div role="menu" className="absolute right-1 top-9 z-30 w-44 rounded-lg border border-white/10 bg-slate-900 p-1 text-sm shadow-xl">
                               <button role="menuitem" onClick={() => startRename(s)} className="w-full rounded-md px-3 py-1.5 text-left text-slate-200 hover:bg-white/10">Rename</button>
@@ -142,13 +144,33 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 <Database size={14} className="shrink-0 text-brand" /><span className="truncate">{session.name} · {fmt(all.total)}</span><ChevronDown size={14} className="shrink-0 text-muted" />
               </button>
               {chip && (
-                <div role="menu" className="absolute right-0 top-12 z-30 w-72 rounded-xl border border-line bg-white p-2 text-sm shadow-lg">
+                <div role="menu" className="absolute right-0 top-12 z-30 w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-line bg-white p-2 text-sm shadow-lg">
                   <p className="px-3 py-2 text-xs text-muted">Switch session</p>
-                  {sessions.map((s) => (
-                    <button key={s.id} role="menuitem" onClick={() => pick(s.id)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left hover:bg-slate-50">
-                      <span className="min-w-0 flex-1"><span className="block truncate font-medium">{s.name}</span><span className="block text-xs text-muted">{fmt(sessionCount(s))} reviews</span></span>
-                      {s.id === session.id && <Check size={16} className="text-brand" />}
-                    </button>
+                  {sessions.map((x) => (
+                    <div key={x.id} className="flex items-center gap-1 rounded-lg hover:bg-slate-50">
+                      {popConfirm === x.id ? (
+                        <div className="flex w-full items-center gap-2 px-3 py-2">
+                          <span className="min-w-0 flex-1 truncate">Delete “{x.name}”?</span>
+                          <button onClick={() => setPopConfirm(null)} className="rounded-md border border-line px-2.5 py-1.5 text-xs font-medium">Cancel</button>
+                          <button onClick={() => { deleteSession(x.id); setPopConfirm(null); setChip(false); }} className="rounded-md bg-rose-600 px-2.5 py-1.5 text-xs font-semibold text-white">Delete</button>
+                        </div>
+                      ) : popRename === x.id ? (
+                        <input autoFocus aria-label="Session name" value={draft} onChange={(e) => setDraft(e.target.value)} onBlur={() => { renameSession(x.id, draft); setPopRename(null); }}
+                          onKeyDown={(e) => { if (e.key === "Enter") { renameSession(x.id, draft); setPopRename(null); } if (e.key === "Escape") setPopRename(null); }}
+                          className="m-1.5 h-10 w-full rounded-lg border border-brand px-3 text-sm outline-none" />
+                      ) : (
+                        <>
+                          <button role="menuitem" onClick={() => pick(x.id)} className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left">
+                            <span className="min-w-0 flex-1"><span className="block truncate font-medium">{x.name}</span><span className="block text-xs text-muted">{plural(sessionCount(x), "review")}</span></span>
+                            {x.id === session.id && <Check size={16} className="shrink-0 text-brand" />}
+                          </button>
+                          {x.kind === "import" && (
+                            <>
+                              <button aria-label={`Rename ${x.name}`} onClick={() => { setDraft(x.name); setPopRename(x.id); }} className="grid size-10 shrink-0 place-items-center rounded-lg text-muted hover:bg-slate-100 hover:text-ink"><Pencil size={15} /></button>
+                              <button aria-label={`Delete ${x.name}`} onClick={() => setPopConfirm(x.id)} className="mr-1 grid size-10 shrink-0 place-items-center rounded-lg text-muted hover:bg-rose-50 hover:text-rose-600"><Trash2 size={15} /></button>
+                            </>)}
+                        </>)}
+                    </div>
                   ))}
                   <div className="my-1 border-t border-line" />
                   <button role="menuitem" onClick={() => { setChip(false); openImport("new"); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left font-medium text-brand hover:bg-brand-soft"><Plus size={15} />New session</button>
