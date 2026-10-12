@@ -6,14 +6,14 @@ const errs = []; p.on("pageerror", (e) => errs.push(String(e)));
 const ok = (name, cond) => { console.log(cond ? "PASS" : "FAIL", name); if (!cond) process.exitCode = 1; };
 
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
-ok("overview shows 7,000", await p.getByText("7,000").first().isVisible());
+ok("overview shows 7,000", await p.getByText("7,000").filter({ visible: true }).first().isVisible());
 await p.getByLabel("Category").selectOption("Fraud and Scam");
-ok("category filter changes total to 1,755", await p.getByText("1,755").first().isVisible());
+ok("category filter changes total to 1,755", await p.getByText("1,755").filter({ visible: true }).first().isVisible());
 ok("top issue is fraud", (await p.locator("ol").first().innerText()).includes("Charged but order never arrived"));
 await p.getByLabel("Sentiment").selectOption("positive");
-ok("positive+fraud shows 326", await p.getByText("326").first().isVisible());
+ok("positive+fraud shows 326", await p.getByText("326").filter({ visible: true }).first().isVisible());
 await p.getByText("Clear filters").click();
-ok("clear resets", await p.getByText("7,000").first().isVisible());
+ok("clear resets", await p.getByText("7,000").filter({ visible: true }).first().isVisible());
 
 await p.goto(`${base}/priorities`, { waitUntil: "networkidle" });
 await p.getByRole("button", { name: /Track this issue/ }).first().click();
@@ -65,11 +65,11 @@ ok("shows a match", await p.getByText(/similar to/).first().isVisible());
 await p.getByRole("button", { name: /Add 3 reviews/ }).waitFor({ timeout: 5000 });
 await p.getByRole("button", { name: /Add 3 reviews/ }).click();
 await p.waitForURL(/overview/);
-await p.getByText("7,003").first().waitFor({ timeout: 5000 });
-ok("total becomes 7,003", await p.getByText("7,003").first().isVisible());
+await p.getByText("7,003").filter({ visible: true }).first().waitFor({ timeout: 5000 });
+ok("total becomes 7,003", await p.getByText("7,003").filter({ visible: true }).first().isVisible());
 await p.reload({ waitUntil: "networkidle" });
-await p.getByText("7,003").first().waitFor({ timeout: 5000 });
-ok("added reviews persist", await p.getByText("7,003").first().isVisible());
+await p.getByText("7,003").filter({ visible: true }).first().waitFor({ timeout: 5000 });
+ok("added reviews persist", await p.getByText("7,003").filter({ visible: true }).first().isVisible());
 
 // Adding the same text again must not double the counts.
 await p.getByRole("button", { name: "New session" }).first().click();
@@ -110,8 +110,8 @@ await p.getByRole("button", { name: "My data" }).click();
 ok("avatar menu opens", await p.getByRole("menuitem", { name: /Reset everything/ }).isVisible());
 await p.getByRole("menuitem", { name: /Reset everything/ }).click();
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
-await p.getByText("7,000").first().waitFor({ timeout: 5000 });
-ok("reset returns to the 7,000-review sample", await p.getByText("7,000").first().isVisible());
+await p.getByText("7,000").filter({ visible: true }).first().waitFor({ timeout: 5000 });
+ok("reset returns to the 7,000-review sample", await p.getByText("7,000").filter({ visible: true }).first().isVisible());
 ok("reset clears tracked issues", (await p.evaluate(() => JSON.parse(localStorage.getItem("if.sessions") ?? "[]")[0]?.tracked?.length)) === 0);
 
 // --- report builder: options change the preview, downloads follow the options, and saved reports are compared ---
