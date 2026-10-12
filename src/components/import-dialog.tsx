@@ -6,6 +6,7 @@ import Papa from "papaparse";
 import { X, UploadCloud, ClipboardPaste, PenLine, CheckCircle2, AlertTriangle, ShieldCheck, Sparkles } from "lucide-react";
 import { DATA, WEEKS, UNMATCHED, allReviews, categories, fmt, issueById, type Review } from "@/lib/data";
 import { buildIndex, classify } from "@/lib/match";
+import { groupUnmatched } from "@/lib/group";
 import { scan, type RawRow } from "@/lib/scan";
 import { useApp } from "@/lib/store";
 import { SentimentPill, btn, btnPrimary } from "./ui";
@@ -20,7 +21,7 @@ const TABS: { id: Tab; label: string; icon: typeof UploadCloud }[] = [
 const MAX_ROWS = 20000;
 
 export function ImportDialog() {
-  const { importOpen, setImportOpen, addUser, user, clearUser } = useApp();
+  const { importOpen, setImportOpen, addUser, user, clearUser, importDest, createSession, session } = useApp();
   const router = useRouter();
   const ref = useRef<HTMLDialogElement>(null);
   const [tab, setTab] = useState<Tab>("upload");
@@ -32,6 +33,8 @@ export function ImportDialog() {
   const [drag, setDrag] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [addAnyway, setAddAnyway] = useState(false);
+  const [destChoice, setDestChoice] = useState<"new" | "this" | null>(null);
+  const dest = destChoice ?? importDest;
 
   useEffect(() => {
     const d = ref.current; if (!d) return;
@@ -40,12 +43,13 @@ export function ImportDialog() {
   }, [importOpen]);
 
   const reveal = (r: RawRow[]) => { setRows(r); setScanning(true); setTimeout(() => setScanning(false), 750); };
-  const reset = () => { setAddAnyway(false); setScanning(false); setRows(null); setErr(""); setText(""); setName(""); setCat(""); };
+  const reset = () => { setDestChoice(null); setAddAnyway(false); setScanning(false); setRows(null); setErr(""); setText(""); setName(""); setCat(""); };
   const close = () => { setImportOpen(false); reset(); };
 
   const index = useMemo(() => buildIndex(DATA.reviews.map((r) => ({ text: r.text, issue: r.issue, sentiment: r.sentiment }))), []);
   // Reviews already in the dashboard (sample data plus anything added before), compared on normalized text.
-  const existing = useMemo(() => new Set(allReviews().map((r) => norm(r.text))), [user, importOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A new session starts empty, so nothing counts as a repeat there.
+  const existing = useMemo(() => (dest === "this" ? new Set(allReviews().map((r) => norm(r.text))) : new Set<string>()), [user, importOpen, dest, session.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const result = useMemo(() => {
     if (!rows) return null;
     const s = scan(rows);
@@ -78,16 +82,18 @@ export function ImportDialog() {
 
   const commit = () => {
     if (!result) return;
-    const known = new Set(categories());
+    const chosen = result.matched.filter((x) => addAnyway || !x.dup);
     const stamp = Date.now();
-    const list: Review[] = result.matched.filter((x) => addAnyway || !x.dup).map(({ d, m }, i) => {
-      const issue = m.matched && m.issue ? m.issue : UNMATCHED;
-      const category = d.category && known.has(d.category) ? d.category : m.matched ? issueById(issue).category : "Uncategorized";
+    // Reviews that match no known issue are grouped with each other into new issues, so they can still be ranked.
+    const grouped = groupUnmatched(index, chosen.filter((x) => !x.m.matched).map(({ d, m }) => ({ text: d.text, count: d.count, category: d.category?.trim() || undefined, sentiment: m.sentiment })), `x${stamp.toString(36)}`);
+    const list: Review[] = chosen.map(({ d, m }, i) => {
+      const issue = m.matched && m.issue ? m.issue : grouped.assign.get(d.text) ?? UNMATCHED;
+      const category = d.category?.trim() || (m.matched && m.issue ? issueById(m.issue).category : grouped.issues.find((x) => x.id === issue)?.category ?? "Uncategorized");
       const weekly = Array(WEEKS).fill(0); weekly[WEEKS - 1] = d.count;
       return { id: `u${stamp}-${i}`, text: d.text, category, count: d.count, issue, sentiment: m.sentiment, weekly, source: "user", similarity: m.similarity };
     });
     if (!list.length) return;
-    addUser(list);
+    if (dest === "new") createSession(name.replace(/\.csv$/i, "") || "New session", list, grouped.issues); else addUser(list, grouped.issues);
     close();
     router.push("/overview");
   };
@@ -171,6 +177,17 @@ export function ImportDialog() {
                 </ul>
                 {dupCount > 0 && <label className="mt-3 flex cursor-pointer items-start gap-2 text-sm"><input type="checkbox" checked={addAnyway} onChange={(e) => setAddAnyway(e.target.checked)} className="mt-0.5 size-4 accent-indigo-600" /><span>Add the {dupCount} repeated {dupCount === 1 ? "review" : "reviews"} again anyway</span></label>}
               </div>
+              <fieldset>
+                <legend className="mb-2 text-sm font-semibold">Add to</legend>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {([["this", `This session`, session.name], ["new", "New session", "Its own dashboard, tracker and reports"]] as const).map(([v, title, sub]) => (
+                    <label key={v} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm ${dest === v ? "border-brand bg-brand-soft" : "border-line hover:bg-slate-50"}`}>
+                      <input type="radio" name="dest" value={v} checked={dest === v} onChange={() => setDestChoice(v)} className="mt-0.5 size-4 accent-indigo-600" />
+                      <span className="min-w-0"><span className="block font-medium">{title}</span><span className="block truncate text-xs text-muted">{sub}</span></span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
               <div>
                 <div className="mb-2 flex items-center gap-2"><Sparkles size={16} className="text-brand" /><h3 className="text-sm font-semibold">Matched to known issues</h3>
                   <span className="text-xs text-muted">{nMatched} of {result.matched.length} distinct reviews matched</span></div>
@@ -180,10 +197,10 @@ export function ImportDialog() {
                       <p>{d.text}{d.count > 1 && <span className="ml-1 text-xs text-muted">({fmt(d.count)}×)</span>}</p>
                       <p className="flex flex-wrap items-center gap-2 text-xs"><SentimentPill s={m.sentiment} />
                         {m.matched && m.issue ? <span className="text-slate-600">{issueById(m.issue).name} <span className="text-muted">· {Math.round(m.similarity * 100)}% similar to “{m.neighbor.slice(0, 48)}…”</span></span>
-                          : <span className="text-muted">No close match. Sentiment from keywords; kept as “Not matched”.</span>}</p>
+                          : <span className="text-muted">No close match to a known issue. It will be grouped with similar reviews into a new issue.</span>}</p>
                     </li>))}
                 </ul>
-                <p className="mt-2 text-xs text-muted">Matching compares each review with the 320 labeled reviews. It says so when nothing is close, instead of guessing.</p>
+                <p className="mt-2 text-xs text-muted">Matching compares each review with the 320 labeled reviews. When nothing is close it says so, and those reviews are grouped with each other into new issues.</p>
               </div>
             </>
           )}
@@ -194,7 +211,7 @@ export function ImportDialog() {
           <Link href="/import" onClick={close} className="text-sm text-muted hover:text-brand">Adaption cleaning details</Link>
           <div className="ml-auto flex gap-2">
             {rows && <button className={btn} onClick={reset}>Back</button>}
-            {rows && !scanning && <button disabled={toAdd === 0} className={`${btnPrimary} step-in`} style={{ ["--i" as string]: checks.length + 2 }} onClick={commit}>{toAdd === 0 ? "Nothing new to add" : `Add ${fmt(toAdd)} ${toAdd === 1 ? "review" : "reviews"} to dashboard`}</button>}
+            {rows && !scanning && <button disabled={toAdd === 0} className={`${btnPrimary} step-in`} style={{ ["--i" as string]: checks.length + 2 }} onClick={commit}>{toAdd === 0 ? "Nothing new to add" : dest === "new" ? `Create session with ${fmt(toAdd)} ${toAdd === 1 ? "review" : "reviews"}` : `Add ${fmt(toAdd)} ${toAdd === 1 ? "review" : "reviews"} to dashboard`}</button>}
           </div>
         </div>
       </div>

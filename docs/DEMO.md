@@ -36,11 +36,11 @@ Tip: do one dry run before recording. Use a fresh browser window so the Tracker 
 
 ## 1:30 to 1:50, adding feedback
 
-**Show:** click **Import data**, open **Paste feedback**, paste two lines (one with an email address, for example `Contact me at jane@example.com`), click **Check feedback**.
+**Show:** click **New session**, open **Paste feedback**, paste two or three lines (one with an email address, for example `Contact me at jane@example.com`, and one that is new, such as `My refund never arrived and support ignores my emails`), click **Check feedback**.
 
-> "New feedback goes through a pre-flight check. It finds personal data and masks it, flags repeats, and matches each review to a known issue, showing how similar it is. If nothing is close, it says so instead of guessing."
+> "New feedback goes through a pre-flight check. It finds personal data and masks it, flags repeats, and matches each review to a known issue, showing how similar it is. Anything new is grouped into its own issue. Each import becomes a session with its own dashboard, tracker and reports, like a chat history."
 
-Click **Add 2 reviews to dashboard**. Point at the total changing.
+Click **Create session**. Point at the new session in the sidebar and its own ranked issues, then click **Sample dataset** to switch back.
 
 ## 1:50 to 2:10, act on it
 

@@ -2,11 +2,11 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { ArrowRight } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, Cell, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ComposedChart } from "recharts";
-import { rankIssues, summarize, pct, fmt, issueById, DATA } from "@/lib/data";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { rankIssues, summarize, pct, fmt, issueById } from "@/lib/data";
 import { ShieldAlert, ThumbsUp, TrendingDown } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { Card, PageHead, ScoreBadge } from "@/components/ui";
+import { Card, PageHead } from "@/components/ui";
 import { FilterBar } from "@/components/filters";
 import { CountUp } from "@/components/count-up";
 import { CheckCircle2, ListPlus } from "lucide-react";
@@ -14,19 +14,18 @@ import { CheckCircle2, ListPlus } from "lucide-react";
 const COLORS = { positive: "#16a34a", neutral: "#d97706", negative: "#dc2626" };
 
 export default function Overview() {
-  const { filters: f, tracked, track } = useApp();
+  const { filters: f, tracked, track, session } = useApp();
   const s = useMemo(() => summarize(f), [f]);
   const ranked = useMemo(() => rankIssues(f), [f]);
   const net = pct(s.sentiment.positive, s.total) - pct(s.sentiment.negative, s.total);
-  const donut = (["positive", "neutral", "negative"] as const).map((k) => ({ name: k, value: s.sentiment[k] }));
-  const cats = Object.entries(s.categories).sort((a, b) => b[1] - a[1]);
-  const trend = s.weekly.map((v, i) => ({ week: `W${i + 1}`, volume: v, negPct: v ? pct(s.weeklyNeg[i], v) : 0 })).slice(f.from, f.to + 1);
   const top = ranked[0];
   const empty = s.total === 0;
 
   // Derived panels, all computed from the filtered rows.
   const negTotal = s.sentiment.negative;
-  const fraudNeg = s.rows.filter((x) => x.r.sentiment === "negative" && x.r.category === "Fraud and Scam").reduce((a, x) => a + x.w, 0);
+  const negByCat: Record<string, number> = {};
+  for (const { r, w } of s.rows) if (r.sentiment === "negative") negByCat[r.category] = (negByCat[r.category] ?? 0) + w;
+  const [topNegCat, topNegCatN] = Object.entries(negByCat).sort((a, b) => b[1] - a[1])[0] ?? ["", 0];
   const loved: Record<string, number> = {};
   const catSent: Record<string, { positive: number; neutral: number; negative: number }> = {};
   const issueWeekly: Record<string, number[]> = {};
@@ -41,10 +40,15 @@ export default function Overview() {
   const lovedList = Object.entries(loved).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const worstCat = Object.entries(catSent).map(([c, v]) => ({ c, share: pct(v.negative, v.positive + v.neutral + v.negative) })).sort((a, b) => b.share - a.share)[0];
   const insights = [
-    { icon: ShieldAlert, tone: "text-neg bg-red-50", title: "Fraud drives the risk", body: negTotal ? `${pct(fraudNeg, negTotal)}% of all negative reviews are in Fraud and Scam, the highest-severity category.` : "No negative feedback in this selection." },
+    { icon: ShieldAlert, tone: "text-neg bg-red-50", title: topNegCat === "Fraud and Scam" ? "Fraud drives the risk" : "Most complaints", body: negTotal ? `${pct(topNegCatN, negTotal)}% of all negative reviews are in ${topNegCat}${topNegCat === "Fraud and Scam" ? ", the highest-severity category" : ""}.` : "No negative feedback in this selection." },
     { icon: TrendingDown, tone: "text-amber-600 bg-amber-50", title: "Most negative category", body: worstCat ? `${worstCat.c} is ${worstCat.share}% negative, the highest of any category.` : "No data." },
     { icon: ThumbsUp, tone: "text-pos bg-green-50", title: "Strongest positive", body: lovedList[0] ? `${issueById(lovedList[0][0]).name}: ${fmt(lovedList[0][1])} positive reviews.` : "No positive feedback in this selection." },
   ];
+  const maxNeg = Math.max(1, ...ranked.map((i) => i.negative));
+  const catRows = Object.entries(catSent).map(([c, v]) => { const t = v.positive + v.neutral + v.negative; return { c, t, ...v, negPct: pct(v.negative, t) }; }).sort((a, b) => b.negPct - a.negPct);
+  const weekNeg = s.weeklyNeg.slice(f.from, f.to + 1).map((v, i) => ({ week: `W${f.from + i + 1}`, n: v }));
+  const recent = weekNeg.slice(-4).reduce((a, x) => a + x.n, 0), before = weekNeg.slice(-8, -4).reduce((a, x) => a + x.n, 0);
+  const swing = before ? Math.round(((recent - before) / before) * 100) : 0;
 
   return (
     <>
@@ -153,110 +157,84 @@ export default function Overview() {
             ))}
           </section>
 
+          <section>
+            <h2 className="text-lg font-semibold">Which problems matter most?</h2>
+            <p className="mt-1 text-sm text-muted"><b className="font-medium text-ink">What this tells you:</b> issues at the top reach the most customers and cost the most. A red bar means lost money or trust.</p>
+            <Card className="mt-3 !p-0 overflow-hidden">
+              <div className="overflow-x-auto"><table className="w-full text-sm">
+                <thead className="bg-slate-50 text-left text-xs text-muted"><tr><th className="w-10 px-5 py-2.5 font-medium">#</th><th className="font-medium">Issue</th><th className="hidden font-medium md:table-cell">Category</th><th className="w-52 font-medium">Negative reviews</th><th className="w-16 text-right font-medium">Score</th><th className="w-28 px-5 font-medium">Status</th></tr></thead>
+                <tbody className="divide-y divide-slate-100">
+                  {ranked.map((i, n) => {
+                    const t = tracked.find((x) => x.issueId === i.id);
+                    return (
+                      <tr key={i.id}>
+                        <td className="px-5 py-3 tabular-nums text-muted">{n + 1}</td>
+                        <td className="py-3 pr-3 font-medium">{i.name}<span className="block text-xs font-normal text-muted md:hidden">{i.category}</span></td>
+                        <td className="hidden text-slate-600 md:table-cell">{i.category}</td>
+                        <td className="pr-3"><div className="flex items-center gap-2"><div className="h-2 flex-1 rounded-full bg-slate-100"><div className="h-2 rounded-full" style={{ width: `${(i.negative / maxNeg) * 100}%`, background: i.severity >= 0.85 ? "#f43f5e" : "#6366f1" }} /></div><span className="w-10 text-right tabular-nums">{fmt(i.negative)}</span></div></td>
+                        <td className={`text-right text-base font-semibold tabular-nums ${i.score >= 85 ? "text-neg" : ""}`}>{i.score}</td>
+                        <td className="px-5 text-xs">{t ? <span className="rounded-full bg-brand-soft px-2.5 py-0.5 font-medium text-brand">{t.status}</span> : <Link href="/priorities" className="text-muted hover:text-brand">Not tracked</Link>}</td>
+                      </tr>);
+                  })}
+                </tbody></table></div>
+            </Card>
+          </section>
+
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <h2 className="text-lg font-semibold">Sentiment distribution</h2>
-              <div className="mt-2 flex flex-wrap items-center gap-6">
-                <div className="h-44 w-44 shrink-0">
-                  <ResponsiveContainer><PieChart><Pie data={donut} dataKey="value" innerRadius={52} outerRadius={80} paddingAngle={2} stroke="none">
-                    {donut.map((d) => <Cell key={d.name} fill={COLORS[d.name]} />)}</Pie><Tooltip formatter={(v) => fmt(Number(v))} /></PieChart></ResponsiveContainer>
-                </div>
-                <ul className="min-w-[12rem] flex-1 space-y-2 text-sm">
-                  {donut.map((d) => (
-                    <li key={d.name} className="flex items-center gap-2"><span className="size-2.5 rounded-full" style={{ background: COLORS[d.name] }} />
-                      <span className="capitalize">{d.name}</span><span className="ml-auto font-medium">{fmt(d.value)}</span><span className="w-10 text-right text-muted">{pct(d.value, s.total)}%</span></li>
+            <section>
+              <h2 className="text-lg font-semibold">How do customers feel?</h2>
+              <p className="mt-1 text-sm text-muted"><b className="font-medium text-ink">What this tells you:</b> {catRows[0] ? `${catRows[0].c} is the most negative category (${catRows[0].negPct}% of its reviews). Every category mixes praise and complaints, so check the issues, not just the category.` : "No data in this selection."}</p>
+              <Card className="mt-3">
+                <ul className="space-y-4">
+                  {catRows.map((r) => (
+                    <li key={r.c}>
+                      <div className="mb-1 flex justify-between text-sm"><span className="font-medium">{r.c}</span><span className="tabular-nums text-muted">{fmt(r.t)} reviews, {r.negPct}% negative</span></div>
+                      <div className="flex h-2.5 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${r.c}: ${pct(r.positive, r.t)}% positive, ${pct(r.negative, r.t)}% negative`}>
+                        <div style={{ width: `${pct(r.positive, r.t)}%`, background: COLORS.positive }} /><div style={{ width: `${pct(r.neutral, r.t)}%`, background: COLORS.neutral }} /><div style={{ width: `${pct(r.negative, r.t)}%`, background: COLORS.negative }} />
+                      </div>
+                    </li>))}
+                </ul>
+                <p className="mt-4 flex gap-4 text-xs text-muted"><span className="flex items-center gap-1.5"><i className="size-2 rounded-full" style={{ background: COLORS.positive }} />Positive</span><span className="flex items-center gap-1.5"><i className="size-2 rounded-full" style={{ background: COLORS.neutral }} />Mixed</span><span className="flex items-center gap-1.5"><i className="size-2 rounded-full" style={{ background: COLORS.negative }} />Negative</span></p>
+              </Card>
+            </section>
+            <section>
+              <h2 className="text-lg font-semibold">What do they like?</h2>
+              <p className="mt-1 text-sm text-muted"><b className="font-medium text-ink">What this tells you:</b> these are strengths to protect while you fix the problems.</p>
+              <Card className="mt-3 !p-0">
+                <ul className="divide-y divide-slate-100 text-sm">
+                  {lovedList.length === 0 && <li className="p-5 text-muted">No positive feedback in this selection.</li>}
+                  {lovedList.map(([id, n]) => (
+                    <li key={id} className="flex items-baseline gap-3 px-5 py-3"><span className="flex-1 font-medium">{issueById(id).name}</span><span className="hidden text-muted sm:inline">{issueById(id).category}</span><span className="w-14 text-right tabular-nums">{fmt(n)}</span></li>
                   ))}
                 </ul>
-              </div>
-            </Card>
-            <Card>
-              <h2 className="text-lg font-semibold">Feedback by category</h2>
-              <div className="mt-4 space-y-4">
-                {cats.map(([c, n]) => (
-                  <div key={c}>
-                    <div className="mb-1 flex justify-between text-sm"><span>{c}</span><span className="font-medium">{fmt(n)} <span className="text-muted">({pct(n, s.total)}%)</span></span></div>
-                    <div className="h-2 rounded-full bg-slate-100"><div className="grow h-2 rounded-full bg-brand" style={{ width: `${pct(n, cats[0][1])}%` }} /></div>
+              </Card>
+            </section>
+          </div>
+
+          <section>
+            <h2 className="text-lg font-semibold">Are complaints rising or falling?</h2>
+            {session.kind === "sample" ? (
+              <>
+                <p className="mt-1 text-sm text-muted"><b className="font-medium text-ink">What this tells you:</b> {weekNeg.length >= 8 ? `in the last 4 weeks there were ${fmt(recent)} negative reviews, ${Math.abs(swing) < 5 ? "about the same as" : `${Math.abs(swing)}% ${swing > 0 ? "more than" : "fewer than"}`} the 4 weeks before.` : "pick a longer period to compare."} <b className="font-semibold text-neu">This timeline is simulated:</b> the sample file has no dates, so reviews are spread across 13 weeks at random.</p>
+                <Card className="mt-3">
+                  <div className="h-56">
+                    <ResponsiveContainer>
+                      <BarChart data={weekNeg} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
+                        <CartesianGrid vertical={false} stroke="#e2e8f0" />
+                        <XAxis dataKey="week" tickLine={false} axisLine={false} fontSize={12} />
+                        <YAxis tickLine={false} axisLine={false} fontSize={12} width={44} />
+                        <Tooltip formatter={(v) => [fmt(Number(v)), "Negative reviews"]} cursor={{ fill: "#f1f5f9" }} />
+                        <Bar dataKey="n" fill="#6366f1" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          <Card>
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div><h2 className="text-lg font-semibold">Volume and negative share over time <span className="ml-1 rounded bg-amber-50 px-2 py-0.5 align-middle text-xs font-medium text-amber-700">Demo timeline (simulated)</span></h2>
-                <p className="text-sm text-muted">{DATA.timeline.note} Real dates are used when an imported file has a date column.</p></div>
-            </div>
-            <div className="mt-4 h-64">
-              <ResponsiveContainer>
-                <ComposedChart data={trend}>
-                  <CartesianGrid vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="week" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis yAxisId="l" tickLine={false} axisLine={false} fontSize={12} width={40} />
-                  <YAxis yAxisId="r" orientation="right" unit="%" domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} width={40} />
-                  <Tooltip />
-                  <Area yAxisId="l" dataKey="volume" name="Feedback volume" stroke="#4f46e5" fill="#eef0ff" strokeWidth={2} />
-                  <Line yAxisId="r" dataKey="negPct" name="Negative %" stroke="#dc2626" strokeWidth={2} dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <h2 className="text-lg font-semibold">Sentiment by category</h2>
-              <p className="text-sm text-muted">Each category mixes praise and complaints, so category alone does not tell you what is wrong.</p>
-              <div className="mt-4 space-y-4">
-                {Object.entries(catSent).map(([c, v]) => {
-                  const t = v.positive + v.neutral + v.negative;
-                  return (
-                    <div key={c}>
-                      <div className="mb-1 flex justify-between text-sm"><span>{c}</span><span className="text-muted">{pct(v.negative, t)}% negative</span></div>
-                      <div className="flex h-3 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${c}: ${pct(v.positive, t)}% positive, ${pct(v.negative, t)}% negative`}>
-                        <div className="grow" style={{ width: `${pct(v.positive, t)}%`, background: COLORS.positive }} />
-                        <div className="grow" style={{ width: `${pct(v.neutral, t)}%`, background: COLORS.neutral }} />
-                        <div className="grow" style={{ width: `${pct(v.negative, t)}%`, background: COLORS.negative }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
-            <Card>
-              <h2 className="text-lg font-semibold">What customers love</h2>
-              <p className="text-sm text-muted">The positive side, so you know what to protect.</p>
-              <ul className="mt-3 divide-y divide-line">
-                {lovedList.length === 0 && <li className="py-3 text-sm text-muted">No positive feedback in this selection.</li>}
-                {lovedList.map(([id, n]) => (
-                  <li key={id} className="flex items-center gap-3 py-2.5 text-sm">
-                    <ThumbsUp size={14} className="text-pos" /><span className="flex-1">{issueById(id).name}</span>
-                    <span className="text-muted">{issueById(id).category}</span><span className="w-14 text-right font-medium">{fmt(n)}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </div>
-
-          <Card className="!p-0 overflow-hidden">
-            <div className="px-5 pt-5"><h2 className="text-lg font-semibold">Issue watchlist</h2><p className="text-sm text-muted">Every ranked issue with its weekly negative volume (simulated timeline).</p></div>
-            <div className="overflow-x-auto"><table className="mt-3 w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-muted"><tr><th className="px-5 py-2">Issue</th><th className="px-3">Category</th><th className="px-3 text-right">Negative</th><th className="px-3">Weekly</th><th className="px-3">Score</th><th className="px-5 text-right">Status</th></tr></thead>
-              <tbody className="divide-y divide-line">
-                {ranked.map((i) => {
-                  const t = tracked.find((x) => x.issueId === i.id);
-                  const wk = (issueWeekly[i.id] ?? []).slice(f.from, f.to + 1).map((v, k) => ({ k, v }));
-                  return (
-                    <tr key={i.id}>
-                      <td className="px-5 py-2.5 font-medium">{i.name}</td><td className="px-3 text-muted">{i.category}</td>
-                      <td className="px-3 text-right tabular-nums">{fmt(i.negative)}</td>
-                      <td className="w-32 px-3"><div className="h-8 w-28"><ResponsiveContainer><AreaChart data={wk}><Area dataKey="v" stroke="#4f46e5" fill="#eef0ff" strokeWidth={1.5} /></AreaChart></ResponsiveContainer></div></td>
-                      <td className="px-3"><div className="flex items-center gap-2"><ScoreBadge score={i.score} /><div className="hidden h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 xl:block"><div className="grow h-full rounded-full" style={{ width: `${i.score}%`, background: i.score >= 85 ? "#dc2626" : i.score >= 70 ? "#d97706" : "#4f46e5" }} /></div></div></td>
-                      <td className="px-5 text-right">{t ? <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-medium text-brand">{t.status}</span> : <Link href="/priorities" className="text-xs font-medium text-muted hover:text-brand">Not tracked</Link>}</td>
-                    </tr>);
-                })}
-              </tbody></table></div>
-          </Card>
-
+                  <p className="mt-2 text-xs text-muted">Each bar is one week. Taller means more negative reviews that week.</p>
+                </Card>
+              </>
+            ) : (
+              <p className="mt-1 text-sm text-muted">This session has no dates, so there is no timeline. Only the sample dataset has a (simulated) weekly timeline.</p>
+            )}
+          </section>
         </div>
       )}
     </>

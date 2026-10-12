@@ -43,11 +43,12 @@ if (errs.length) console.log(errs);
 
 // Import dialog: paste three reviews, add them, dashboard total changes.
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
-await p.getByRole("button", { name: "Import data" }).first().click();
+await p.getByRole("button", { name: "New session" }).first().click();
 await p.getByRole("tab", { name: /Paste feedback/ }).click();
 await p.getByLabel("Pasted feedback").fill("Refund took six weeks to arrive\nI was scammed, they took my money. Contact me at jane@example.com\nThe app crashes every time I pay");
 await p.getByRole("button", { name: "Check feedback" }).click();
 await p.getByText(/Personal data found/).waitFor({ timeout: 5000 });
+await p.getByLabel(/This session/).check();
 ok("pre-flight flags the email", await p.getByText(/Personal data found/).isVisible());
 ok("shows a match", await p.getByText(/similar to/).first().isVisible());
 await p.getByRole("button", { name: /Add 3 reviews/ }).waitFor({ timeout: 5000 });
@@ -60,10 +61,12 @@ await p.getByText("7,003").first().waitFor({ timeout: 5000 });
 ok("added reviews persist", await p.getByText("7,003").first().isVisible());
 
 // Adding the same text again must not double the counts.
-await p.getByRole("button", { name: "Import data" }).first().click();
+await p.getByRole("button", { name: "New session" }).first().click();
 await p.getByRole("tab", { name: /Paste feedback/ }).click();
 await p.getByLabel("Pasted feedback").fill("Refund took six weeks to arrive\nThe app crashes every time I pay");
 await p.getByRole("button", { name: "Check feedback" }).click();
+await p.getByLabel(/This session/).waitFor({ timeout: 5000 });
+await p.getByLabel(/This session/).check();
 await p.getByText(/already in your dashboard/).first().waitFor({ timeout: 5000 });
 ok("re-adding is flagged", await p.getByText(/already in your dashboard/).first().isVisible());
 ok("nothing new to add", await p.getByRole("button", { name: "Nothing new to add" }).isDisabled());
@@ -98,5 +101,46 @@ await p.getByRole("menuitem", { name: /Reset everything/ }).click();
 await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
 await p.getByText("7,000").first().waitFor({ timeout: 5000 });
 ok("reset returns to the 7,000-review sample", await p.getByText("7,000").first().isVisible());
-ok("reset clears tracked issues", (await p.evaluate(() => localStorage.getItem("if.tracked"))) === "[]");
+ok("reset clears tracked issues", (await p.evaluate(() => JSON.parse(localStorage.getItem("if.sessions") ?? "[]")[0]?.tracked?.length)) === 0);
+
+// --- sessions: every import can be its own dataset, with its own dashboard ---
+await p.goto(`${base}/overview`, { waitUntil: "networkidle" });
+ok("starts with one session (the sample)", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 1);
+await p.getByRole("button", { name: "New session" }).first().click();
+await p.getByRole("tab", { name: /Paste feedback/ }).click();
+await p.getByLabel("Pasted feedback").fill("Checkout crashed twice on my phone\nSupport answered in minutes, thank you");
+await p.getByRole("button", { name: "Check feedback" }).click();
+await p.getByRole("button", { name: /Create session with 2 reviews/ }).waitFor({ timeout: 5000 });
+ok("sidebar New session defaults to a new session", await p.getByLabel(/^New session/).isChecked());
+await p.getByRole("button", { name: /Create session with 2 reviews/ }).click();
+await p.waitForURL(/overview/);
+await p.getByRole("button", { name: "Switch session" }).filter({ hasText: "Pasted feedback" }).waitFor({ timeout: 5000 });
+ok("new session is created and active", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Pasted feedback · 2"));
+ok("sidebar now lists two sessions", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 2);
+
+await p.getByRole("list", { name: "Sessions" }).getByRole("button", { name: /Sample dataset/ }).click();
+await p.getByRole("button", { name: "Switch session" }).filter({ hasText: "Sample dataset" }).waitFor({ timeout: 5000 });
+ok("switching back shows the 7,000-review sample", (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Sample dataset · 7,000"));
+
+await p.getByRole("button", { name: /Options for Pasted feedback/ }).click();
+await p.getByRole("menuitem", { name: "Rename" }).click();
+await p.getByLabel("Session name").fill("Q4 export");
+await p.keyboard.press("Enter");
+ok("session renames", await p.getByRole("list", { name: "Sessions" }).getByText("Q4 export").isVisible());
+
+await p.getByRole("button", { name: /Options for Q4 export/ }).click();
+await p.getByRole("menuitem", { name: "Delete session" }).click();
+await p.getByRole("menuitem", { name: /Click again to delete/ }).click();
+ok("session deletes after confirmation", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 1);
+
+// Sessions survive a reload, and the sample can't be deleted.
+await p.getByRole("button", { name: "New session" }).first().click();
+await p.getByRole("tab", { name: /Paste feedback/ }).click();
+await p.getByLabel("Pasted feedback").fill("The delivery was a week late");
+await p.getByRole("button", { name: "Check feedback" }).click();
+await p.getByRole("button", { name: /Create session with 1 review/ }).click();
+await p.waitForURL(/overview/);
+await p.reload({ waitUntil: "networkidle" });
+ok("sessions and the active one persist after reload", (await p.getByRole("list", { name: "Sessions" }).getByRole("listitem").count()) === 2 && (await p.getByRole("button", { name: "Switch session" }).innerText()).includes("Pasted feedback"));
+ok("the sample session has no delete option", (await p.getByRole("button", { name: /Options for Sample dataset/ }).count()) === 0);
 await b.close();

@@ -11,7 +11,7 @@ Built for Build Battle 2026 (Frontend Arena, AI × Web Development).
 
 | Requirement | Where it lives |
 |---|---|
-| **Feedback management**: submit, import CSV, search, filter, sample data | `Import data` popup (upload CSV, paste, add one), `/feedback`, "Use sample data" on `/import` |
+| **Feedback management**: submit, import CSV, search, filter, sample data | `New session` popup (upload CSV, paste, add one), `/feedback`, "Use sample data" on `/import`. Each import can be its own **session** with its own dashboard, tracker and reports |
 | **AI-powered analysis**: sentiment, topics, grouping, Adaption | Issue groups and sentiment for all 320 distinct reviews; a key-free matcher for new feedback; Adaption cleaning on `/import` |
 | **Analytics dashboard**: metrics, sentiment, issues, trends, filters | `/overview`: category, sentiment and period filters drive every widget |
 | **Recommendations**: priorities with a reason | `/priorities`: ranked issues, the score arithmetic, quotes, and actions |
@@ -46,17 +46,17 @@ Being plain about this matters more than sounding impressive.
 
 - **No model runs in the browser or on the server at request time.** The deployed app needs no API keys.
 - **Sample labels** (sentiment, issue group, severity) come from `scripts/label.mjs`: rules written after reading all 320 distinct reviews. I cross-checked them with a live language model (DeepSeek, `scripts/validate-llm.mjs`): **sentiment agreed on 318 of 320 reviews (99%)**. The model used finer issue names (74 vs my 21), so the curated groups are kept for stability. The model output is committed in `data/llm-labels.json`.
-- **New feedback** is matched against the 320 labeled reviews with TF-IDF similarity (`src/lib/match.ts`), with no key. Leave-one-out accuracy on the sample: **88% on issue, 96% on sentiment**. When nothing is close it says "No close match" instead of guessing.
+- **New feedback** is matched against the 320 labeled reviews with TF-IDF similarity (`src/lib/match.ts`), with no key. Leave-one-out accuracy on the sample: **88% on issue, 96% on sentiment**. When nothing is close it says so, and those reviews are **grouped with each other by similarity into new issues** (`src/lib/group.ts`). Those groups are named after their most-repeated review and get a severity from keywords (money and fraud words rank highest), so any dataset gets a ranking. The names are rough, not written by a model.
 - **Trends are simulated.** The sample has no dates, so the weekly timeline is a seeded random spread across 13 weeks, and the chart is labelled "Demo timeline (simulated)".
 - `src/lib/analyze.ts` has a server-side model labeling function (AI SDK + DeepSeek, schema-validated) that is **not wired into the UI**.
-- Data you add, track or save stays **in your browser** (localStorage). Nothing is sent anywhere. The avatar menu (top right) clears it, so the app can be reset between demos.
+- Data you add, track or save stays **in your browser** (localStorage). Nothing is sent anywhere. The avatar menu (top right) clears the current session or resets everything, so the app can be reset between demos.
 - There is no shareable link: reports are shared by copying the summary, printing to PDF or exporting CSV, because a link would need a server to store the report.
 
 ## Details worth knowing
 
 - **Duplicate protection**: uploading the same file again is detected ("320 of 320 distinct reviews are already in your dashboard") and skipped, so counts never double.
 - **Personal data**: emails, phone numbers and card-like numbers are masked as `[email]`, `[phone]`, `[card]` before anything is stored.
-- **Honest limits**: the matcher only recognises problems similar to the sample, and unmatched reviews count in totals but not in priorities.
+- **Honest limits**: auto-grouped issues have plain names (a representative review, not a written label) and keyword-based severity, so check them before acting. Imported data has no dates, so only the sample shows a (simulated) weekly timeline.
 
 ## Run it
 
